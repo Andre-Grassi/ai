@@ -10,17 +10,17 @@ class Problem:
         self.initial_state = initial_state
 
     @abstractmethod
-    def transition_model(state, action):
+    def transition_model(self, state, action) -> list | None:
         pass
 
     @abstractmethod
-    def goal_test(state) -> bool:
+    def goal_test(self, state) -> bool:
         pass
 
     @abstractmethod
-    def actions(state) -> list:
+    def actions(self, state) -> list:
         pass
 
     @abstractmethod
-    def action_cost(action) -> int | float:
+    def action_cost(self, action) -> int | float:
         pass
