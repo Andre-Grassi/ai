@@ -22,5 +22,5 @@ class Problem:
         pass
 
     @abstractmethod
-    def action_cost(self, action) -> int | float:
+    def action_cost(self, state, action, new_state) -> int | float:
         pass
