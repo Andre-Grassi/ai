@@ -53,3 +53,6 @@ class SlidingTileProblem(Problem):
             available_actions.append("Right")
 
         return available_actions
+
+    def action_cost(self, state, action, new_state):
+        return 1  # Each action cost just 1 (moving one tile)
