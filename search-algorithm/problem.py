@@ -10,7 +10,7 @@ class Problem:
         self.initial_state = initial_state
 
     @abstractmethod
-    def transition_model(self, state, action) -> list | None:
+    def transition_model(self, state, action):
         pass
 
     @abstractmethod
