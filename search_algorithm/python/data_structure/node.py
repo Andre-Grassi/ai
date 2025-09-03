@@ -1,7 +1,6 @@
 from problem import Problem
 from typing import Optional, List, Any
 
-
 class Node:
     state: Any
     parent: Optional["Node"]
