@@ -14,11 +14,14 @@ class Node {
    public:
     explicit Node(TState state,
                   std::shared_ptr<Node<TState, TAction>> parent = nullptr,
-                  TAction action = TAction{}, double path_cost = 0.0)
+                  TAction action = TAction{}, float path_cost = 0.0)
         : state_(std::move(state)),
           parent_(std::move(parent)),
           action_(action),
           path_cost_(path_cost) {}
+
+    std::vector<std::shared_ptr<Node<TState, TAction>>> Expand(
+        Problem<TState, TAction>& problem);
 
     const TState& get_state() const { return state_; }
     void set_state(const TState& state) { state_ = state; }
