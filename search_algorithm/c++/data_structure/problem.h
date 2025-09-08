@@ -3,6 +3,9 @@
 
 template <typename TState, typename TAction>
 class Problem {
+   protected:
+    TState initial_state_;
+
    public:
     virtual ~Problem() = default;
 
@@ -19,6 +22,8 @@ class Problem {
 
     virtual double GetActionCost(const TState& state, const TAction& action,
                                  const TState& new_state) const = 0;
+
+    virtual TState GetInitialState() const { return initial_state_; }
 };
 
 #endif  // __PROBLEM_H__
