@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include "node.tpp"
+
 template <typename TState, typename TAction>
 class Node {
    private:
@@ -23,22 +25,20 @@ class Node {
     std::vector<std::shared_ptr<Node<TState, TAction>>> Expand(
         Problem<TState, TAction>& problem);
 
-    const TState& get_state() const { return state_; }
-    void set_state(const TState& state) { state_ = state; }
-    void set_state(TState&& state) { state_ = std::move(state); }
+    const TState& GetState() const { return state_; }
+    void SetState(const TState& state) { state_ = state; }
+    void SetState(TState&& state) { state_ = std::move(state); }
 
-    std::shared_ptr<Node<TState, TAction>> get_parent() const {
-        return parent_;
-    }
-    void set_parent(std::shared_ptr<Node<TState, TAction>> parent) {
+    std::shared_ptr<Node<TState, TAction>> GetParent() const { return parent_; }
+    void SetParent(std::shared_ptr<Node<TState, TAction>> parent) {
         parent_ = std::move(parent);
     }
 
-    const TAction& get_action() const { return action_; }
-    void set_action(const TAction& action) { action_ = action; }
-    void set_action(TAction&& action) { action_ = std::move(action); }
+    const TAction& GetAction() const { return action_; }
+    void SetAction(const TAction& action) { action_ = action; }
+    void SetAction(TAction&& action) { action_ = std::move(action); }
 
-    float get_path_cost() const { return path_cost_; }
-    void set_path_cost(float path_cost) { path_cost_ = path_cost; }
+    float GetPathCost() const { return path_cost_; }
+    void SetPathCost(float path_cost) { path_cost_ = path_cost; }
 };
 #endif  // __NODE_H__
