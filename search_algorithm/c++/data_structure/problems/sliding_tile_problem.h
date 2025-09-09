@@ -1,3 +1,6 @@
+#ifndef SLIDING_TILE_PROBLEM_H
+#define SLIDING_TILE_PROBLEM_H
+
 #include <vector>
 
 #include "../node.h"
@@ -9,13 +12,13 @@ namespace sliding_tile {
 
 enum class Action { kUp, kDown, kLeft, kRight };
 
-using State = std::vector<std::vector<int>>;  // 2D grid representation
+using State = std::vector<std::vector<uint64_t>>;  // 2D grid representation
 
 class SlidingTileProblem : public Problem<State, Action> {
    private:
     State initial_state_;
     uint64_t dimension_ = 3;  // Default to 3x3 board
-    const std::vector<std::vector<int>> goal_state_ = {
+    const std::vector<std::vector<uint64_t>> goal_state_ = {
         {BLANK_TILE, 1, 2}, {3, 4, 5}, {6, 7, 8}};  // Goal state
 
     // Return random solvable 3x3 board
@@ -45,8 +48,8 @@ class SlidingTileProblem : public Problem<State, Action> {
     virtual State* GetResult(const State& state,
                              const Action& action) const override;
 
-    virtual double GetActionCost(const State& state, const Action& action,
-                                 const State& new_state) const override {
+    virtual double GetActionCost(const State&, const Action&,
+                                 const State&) const override {
         return 1.0;  // Uniform cost for all actions
     }
 
@@ -58,3 +61,5 @@ class SlidingTileProblem : public Problem<State, Action> {
 };
 
 }  // namespace sliding_tile
+
+#endif  // SLIDING_TILE_PROBLEM_H

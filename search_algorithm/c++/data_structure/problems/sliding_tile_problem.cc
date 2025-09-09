@@ -7,7 +7,7 @@
 using namespace sliding_tile;
 
 bool SlidingTileProblem::IsSolvable(State const& state) const {
-    std::vector<int> flat_state;
+    std::vector<uint64_t> flat_state;
     for (const auto& row : state) {
         for (const auto& tile : row) {
             if (tile != BLANK_TILE)  // Exclude blank tile
@@ -34,11 +34,11 @@ bool SlidingTileProblem::IsSolvable(State const& state) const {
 }
 
 State SlidingTileProblem::RandomizeBoard() {
-    State state = State(dimension_, std::vector<int>(dimension_, 0));
+    State state = State(dimension_, std::vector<uint64_t>(dimension_, 0));
 
-    int num_tiles = dimension_ * dimension_;
+    uint64_t num_tiles = dimension_ * dimension_;
 
-    std::vector<int> tiles(num_tiles);
+    std::vector<uint64_t> tiles(num_tiles);
     std::iota(tiles.begin(), tiles.end(), 0);
 
     do {
@@ -63,6 +63,7 @@ State* SlidingTileProblem::GetResult(const State& state,
                                      const Action& action) const {
     State* new_state = new State(state);
 
+    // BUG some conversions issues here with int and uint64_t
     // Find blank tile position
     int blank_row = -1;
     int blank_col = -1;
@@ -131,8 +132,8 @@ std::vector<Action> SlidingTileProblem::GetActions(const State& state) const {
 // Return blank tile position as (row, col)
 std::pair<int, int> SlidingTileProblem::GetBlankTileIndex(
     const State& state) const {
-    for (int row = 0; row < dimension_; ++row) {
-        for (int col = 0; col < dimension_; ++col) {
+    for (int row = 0; row < (int)dimension_; ++row) {
+        for (int col = 0; col < (int)dimension_; ++col) {
             if (state[row][col] == BLANK_TILE) {
                 return std::make_pair(row, col);
             }

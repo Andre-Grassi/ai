@@ -1,6 +1,8 @@
 #ifndef __PROBLEM_H__
 #define __PROBLEM_H__
 
+#include <vector>
+
 template <typename TState, typename TAction>
 class Problem {
    protected:
@@ -8,8 +10,6 @@ class Problem {
 
    public:
     virtual ~Problem() = default;
-
-    virtual TState GetInitialState() const = 0;
 
     // Goal test
     virtual bool IsGoal(const TState& state) const = 0;

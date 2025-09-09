@@ -15,7 +15,7 @@ Node<TState, TAction>::Expand(Problem<TState, TAction>& problem) {
         float cost = this->GetPathCost() +
                      problem.GetActionCost(current_state, action, new_state);
         children.emplace_back(std::make_shared<Node<TState, TAction>>(
-            new_state, shared_from_this(), action, cost));
+            new_state, this->shared_from_this(), action, cost));
     }
 
     return children;

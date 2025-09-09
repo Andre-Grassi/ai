@@ -3,10 +3,10 @@
 
 #include <memory>
 
-#include "node.tpp"
+#include "problem.h"
 
 template <typename TState, typename TAction>
-class Node {
+class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
    private:
     TState state_;
     std::shared_ptr<Node<TState, TAction>> parent_;
@@ -41,4 +41,7 @@ class Node {
     float GetPathCost() const { return path_cost_; }
     void SetPathCost(float path_cost) { path_cost_ = path_cost; }
 };
+
+#include "node.tpp"
+
 #endif  // __NODE_H__
