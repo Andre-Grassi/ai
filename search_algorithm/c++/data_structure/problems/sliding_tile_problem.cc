@@ -30,7 +30,7 @@ bool SlidingTileProblem::IsSolvable(State const& state) const {
         return true;
     else
         throw std::logic_error(
-            "IsSolvable: Odd dimension case not implemented");
+            "IsSolvable: Even dimension case not implemented");
 }
 
 State SlidingTileProblem::RandomizeBoard() {
