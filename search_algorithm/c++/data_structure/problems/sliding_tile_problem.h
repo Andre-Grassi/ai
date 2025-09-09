@@ -31,8 +31,8 @@ class SlidingTileProblem : public Problem<State, Action> {
         : initial_state_(initial_state), dimension_(dimension) {}
 
     SlidingTileProblem(const uint64_t dimension) {
-        initial_state_ = RandomizeBoard();
         dimension_ = dimension;
+        initial_state_ = RandomizeBoard();
     }
 
     virtual ~SlidingTileProblem() = default;
@@ -58,6 +58,8 @@ class SlidingTileProblem : public Problem<State, Action> {
     // Return blank tile position as (row, col)
     // (-1, -1) if not found
     std::pair<int, int> GetBlankTileIndex(const State& state) const;
+
+    void PrintState(const State& state) const;
 };
 
 }  // namespace sliding_tile
