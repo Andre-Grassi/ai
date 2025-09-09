@@ -7,7 +7,8 @@
 
 namespace search_algorithm {
 template <typename State, typename Action>
-Node<State, Action>* BreadthFirstSearch(Problem<State, Action> const& problem);
+std::shared_ptr<Node<State, Action>> BreadthFirstSearch(
+    Problem<State, Action> const& problem);
 }
 
 // Include template implementation
