@@ -16,9 +16,10 @@ class Problem {
 
     virtual std::vector<TAction> GetActions(const TState& state) const = 0;
 
-    // Transition model
-    virtual TState* GetResult(const TState& state,
-                              const TAction& action) const = 0;
+    // Transition model, return new state after applying action or nullptr if
+    // action is invalid
+    virtual std::unique_ptr<TState> GetResult(const TState& state,
+                                              const TAction& action) const = 0;
 
     virtual double GetActionCost(const TState& state, const TAction& action,
                                  const TState& new_state) const = 0;

@@ -66,9 +66,9 @@ State SlidingTileProblem::RandomizeBoard() {
     return state;
 }
 
-State* SlidingTileProblem::GetResult(const State& state,
-                                     const Action& action) const {
-    State* new_state = new State(state);
+std::unique_ptr<State> SlidingTileProblem::GetResult(
+    const State& state, const Action& action) const {
+    auto new_state = std::make_unique<State>(state);
 
     // BUG some conversions issues here with int and uint64_t
     // Find blank tile position
@@ -113,7 +113,8 @@ State* SlidingTileProblem::GetResult(const State& state,
     }
 
     // Swap blank tile with the adjacent tile
-    std::swap(new_state[blank_row][blank_col], new_state[new_row][new_col]);
+    std::swap((*new_state)[blank_row][blank_col],
+              (*new_state)[new_row][new_col]);
 
     return new_state;
 }

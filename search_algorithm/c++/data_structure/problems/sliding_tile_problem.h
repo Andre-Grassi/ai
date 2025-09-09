@@ -45,8 +45,8 @@ class SlidingTileProblem : public Problem<State, Action> {
 
     virtual std::vector<Action> GetActions(const State& state) const override;
 
-    virtual State* GetResult(const State& state,
-                             const Action& action) const override;
+    virtual std::unique_ptr<State> GetResult(
+        const State& state, const Action& action) const override;
 
     virtual double GetActionCost(const State&, const Action&,
                                  const State&) const override {
