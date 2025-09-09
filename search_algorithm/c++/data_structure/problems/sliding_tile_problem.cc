@@ -1,6 +1,7 @@
 #include "sliding_tile_problem.h"
 
 #include <cstdlib>
+#include <iostream>
 #include <numeric>
 #include <stdexcept>
 
@@ -25,34 +26,39 @@ bool SlidingTileProblem::IsSolvable(State const& state) const {
     bool even_board = (dimension_ % 2 == 0);
     bool even_inversions = (inversions % 2 == 0);
 
-    // If inversions is even and dimension is odd -> solvable
-    if (!even_board && even_inversions)
-        return true;
-    else
+    if (even_board)
         throw std::logic_error(
             "IsSolvable: Even dimension case not implemented");
+
+    // If inversions is even and dimension is odd -> solvable
+    if (even_inversions)
+        return true;
+    else
+        return false;
 }
 
 State SlidingTileProblem::RandomizeBoard() {
+    srand(time(NULL));
+
     State state = State(dimension_, std::vector<uint64_t>(dimension_, 0));
 
     uint64_t num_tiles = dimension_ * dimension_;
 
+    // Fill vector with tile numbers 0 to num_tiles-1
     std::vector<uint64_t> tiles(num_tiles);
     std::iota(tiles.begin(), tiles.end(), 0);
 
     do {
-        srand(time(NULL));
-
         // Attribute random values to each tile
         for (uint64_t i = 0; i < num_tiles; ++i) {
+            std::vector<uint64_t> tiles_copy = tiles;
             int row = i / dimension_;
             int col = i % dimension_;
 
             // Get random index from remaining tiles
             int rand_index = rand() % (num_tiles - i);
-            state[row][col] = tiles[rand_index];
-            tiles.erase(tiles.begin() + rand_index);
+            state[row][col] = tiles_copy[rand_index];
+            tiles_copy.erase(tiles_copy.begin() + rand_index);
         }
     } while (!IsSolvable(state));
 
@@ -140,4 +146,13 @@ std::pair<int, int> SlidingTileProblem::GetBlankTileIndex(
         }
     }
     return std::make_pair(-1, -1);  // Not found
+}
+
+void SlidingTileProblem::PrintState(const State& state) const {
+    for (size_t i = 0; i < state.size(); ++i) {
+        for (size_t j = 0; j < state[i].size(); ++j) {
+            std::cout << state[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
 }
