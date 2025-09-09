@@ -49,9 +49,9 @@ State SlidingTileProblem::RandomizeBoard() {
     std::iota(tiles.begin(), tiles.end(), 0);
 
     do {
+        std::vector<uint64_t> tiles_copy = tiles;
         // Attribute random values to each tile
         for (uint64_t i = 0; i < num_tiles; ++i) {
-            std::vector<uint64_t> tiles_copy = tiles;
             int row = i / dimension_;
             int col = i % dimension_;
 
