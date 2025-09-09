@@ -1,6 +1,7 @@
 #include "sliding_tile_problem.h"
 
 #include <cstdlib>
+#include <iomanip>
 #include <iostream>
 #include <numeric>
 #include <stdexcept>
@@ -149,9 +150,31 @@ std::pair<int, int> SlidingTileProblem::GetBlankTileIndex(
 }
 
 void SlidingTileProblem::PrintState(const State& state) const {
+    // Calculate the maximum number (dimension * dimension - 1)
+    int max_number = static_cast<int>(dimension_ * dimension_ - 1);
+
+    // Calculate the width needed (number of digits in max_number)
+    int width = 0;
+    int temp = max_number;
+    if (temp == 0) {
+        width = 1;
+    } else {
+        while (temp > 0) {
+            width++;
+            temp /= 10;
+        }
+    }
+
+    // Print the state with justified formatting
     for (size_t i = 0; i < state.size(); ++i) {
         for (size_t j = 0; j < state[i].size(); ++j) {
-            std::cout << state[i][j] << " ";
+            // Use setw to set field width and right-align numbers
+            std::cout << std::setw(width) << state[i][j];
+
+            // Add space between numbers except for the last column
+            if (j < state[i].size() - 1) {
+                std::cout << " ";
+            }
         }
         std::cout << std::endl;
     }
