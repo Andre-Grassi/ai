@@ -1,5 +1,6 @@
 #include <queue>
-#include <unordered_set>
+#include <set>
+#include <vector>
 
 #include "../data_structure/node.h"
 #include "../data_structure/problem.h"
@@ -13,7 +14,7 @@ using namespace search_algorithm;
 template <typename State, typename Action>
 Node<State, Action>* search_algorithm::BreadthFirstSearch(
     Problem<State, Action> const& problem) {
-    Node root = Node(problem.GetInitialState());
+    Node<State, Action> root = Node<State, Action>(problem.GetInitialState());
 
     if (problem.IsGoal(root.GetState())) return &root;
 
@@ -21,7 +22,7 @@ Node<State, Action>* search_algorithm::BreadthFirstSearch(
         std::queue<std::shared_ptr<Node<State, Action>>>();
     fifo_queue.push(std::make_shared<Node<State, Action>>(root));
 
-    std::unordered_set<State> reached = std::unordered_set<State>();
+    std::set<State> reached = std::set<State>();
     reached.insert(root.GetState());
 
     while (!fifo_queue.empty()) {
