@@ -6,8 +6,6 @@
 
 using namespace sliding_tile;
 
-State SlidingTileProblem::GetInitialState() const { return initial_state_; }
-
 bool SlidingTileProblem::IsSolvable(State const& state) const {
     std::vector<int> flat_state;
     for (const auto& row : state) {
@@ -112,26 +110,12 @@ State* SlidingTileProblem::GetResult(const State& state,
     return new_state;
 }
 
-bool SlidingTileProblem::IsGoal(const State& state) const {
-    return state == goal_state_;
-}
-
 std::vector<Action> SlidingTileProblem::GetActions(const State& state) const {
     std::vector<Action> actions;
 
     // Find blank tile position
-    int blank_row = -1;
-    int blank_col = -1;
-    for (uint64_t i = 0; i < dimension_; ++i) {
-        for (uint64_t j = 0; j < dimension_; ++j) {
-            if (state[i][j] == BLANK_TILE) {
-                blank_row = i;
-                blank_col = j;
-                break;
-            }
-        }
-        if (blank_row != -1) break;  // Exit outer loop if found
-    }
+    int blank_row, blank_col;
+    std::tie(blank_row, blank_col) = GetBlankTileIndex(state);
 
     // Check possible moves
     if (blank_row > 0) actions.push_back(Action::kUp);
@@ -145,14 +129,14 @@ std::vector<Action> SlidingTileProblem::GetActions(const State& state) const {
 }
 
 // Return blank tile position as (row, col)
-std::tuple<int, int> SlidingTileProblem::GetBlankTileIndex(
+std::pair<int, int> SlidingTileProblem::GetBlankTileIndex(
     const State& state) const {
     for (int row = 0; row < dimension_; ++row) {
         for (int col = 0; col < dimension_; ++col) {
             if (state[row][col] == BLANK_TILE) {
-                return std::make_tuple(row, col);
+                return std::make_pair(row, col);
             }
         }
     }
-    return std::make_tuple(-1, -1);  // Not found
+    return std::make_pair(-1, -1);  // Not found
 }
