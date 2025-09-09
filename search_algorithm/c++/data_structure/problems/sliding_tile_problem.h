@@ -34,9 +34,11 @@ class SlidingTileProblem : public Problem<State, Action> {
 
     virtual ~SlidingTileProblem() = default;
 
-    virtual State GetInitialState() const override;
+    virtual State GetInitialState() const override { return initial_state_; }
 
-    virtual bool IsGoal(const State& state) const override;
+    virtual bool IsGoal(const State& state) const override {
+        return state == goal_state_;
+    }
 
     virtual std::vector<Action> GetActions(const State& state) const override;
 
@@ -44,13 +46,15 @@ class SlidingTileProblem : public Problem<State, Action> {
                              const Action& action) const override;
 
     virtual double GetActionCost(const State& state, const Action& action,
-                                 const State& new_state) const override;
+                                 const State& new_state) const override {
+        return 1.0;  // Uniform cost for all actions
+    }
 
     uint64_t GetDimension() const { return dimension_; }
 
     // Return blank tile position as (row, col)
     // (-1, -1) if not found
-    std::tuple<int, int> GetBlankTileIndex(const State& state) const;
+    std::pair<int, int> GetBlankTileIndex(const State& state) const;
 };
 
 }  // namespace sliding_tile
