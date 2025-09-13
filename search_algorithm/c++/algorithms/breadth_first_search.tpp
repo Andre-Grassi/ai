@@ -15,8 +15,9 @@ using namespace search_algorithm;
 template <typename State, typename Action>
 std::shared_ptr<Node<State, Action>> search_algorithm::BreadthFirstSearch(
     Problem<State, Action> const& problem) {
-    auto root =
-        std::make_shared<Node<State, Action>>(problem.GetInitialState());
+    State initialState = problem.GetInitialState();
+    std::shared_ptr<Node<State, Action>> root =
+        std::make_shared<Node<State, Action>>(initialState);
 
     if (problem.IsGoal(root->GetState())) return root;
 
