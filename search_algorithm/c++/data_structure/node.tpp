@@ -21,3 +21,13 @@ Node<TState, TAction>::Expand(Problem<TState, TAction>& problem) {
 
     return children;
 }
+
+template <typename TState, typename TAction>
+bool Node<TState, TAction>::IsCycle() const {
+    auto parent = this->GetParent();
+    while (parent) {
+        if (parent->GetState() == this->GetState()) return true;
+        parent = parent->GetParent();
+    }
+    return false;
+}

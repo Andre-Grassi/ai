@@ -31,6 +31,8 @@ class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
     std::vector<std::shared_ptr<Node<TState, TAction>>> Expand(
         Problem<TState, TAction>& problem);
 
+    bool IsCycle() const;
+
     const TState& GetState() const { return state_; }
     void SetState(const TState& state) { state_ = state; }
     void SetState(TState&& state) { state_ = std::move(state); }
