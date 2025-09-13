@@ -14,13 +14,15 @@ using namespace search_algorithm;
 template <typename State, typename Action>
 std::shared_ptr<Node<State, Action>> search_algorithm::DepthLimitedSearch(
     Problem<State, Action> const& problem, uint64_t depth_limit,
-    bool check_node_cycles) {
+    bool check_node_cycles, bool* out_cutoff) {
     auto root =
         std::make_shared<Node<State, Action>>(problem.GetInitialState());
 
     std::stack<std::shared_ptr<Node<State, Action>>> lifo_stack =
         std::stack<std::shared_ptr<Node<State, Action>>>();
     lifo_stack.push(root);
+
+    bool cutoff_occurred = false;
 
     while (!lifo_stack.empty()) {
         std::shared_ptr<Node<State, Action>> node = lifo_stack.top();
@@ -34,8 +36,11 @@ std::shared_ptr<Node<State, Action>> search_algorithm::DepthLimitedSearch(
             std::vector<std::shared_ptr<Node<State, Action>>> children =
                 node->Expand(const_cast<Problem<State, Action>&>(problem));
             for (const auto& child : children) lifo_stack.push(child);
-        }
+        } else
+            cutoff_occurred = true;
     }
 
-    return nullptr;  // Failure or cutoff
+    if (cutoff_occurred) *out_cutoff = true;
+
+    return nullptr;  // Failure or cutoff (cutoff is indicated via out_cutoff)
 }
