@@ -9,8 +9,13 @@ namespace search_algorithm {
 template <typename State, typename Action>
 std::shared_ptr<Node<State, Action>> BreadthFirstSearch(
     Problem<State, Action> const& problem);
-}
+
+template <typename State, typename Action>
+std::shared_ptr<Node<State, Action>> DepthFirstSearch(
+    Problem<State, Action> const& problem);
+}  // namespace search_algorithm
 
 // Include template implementation
 #include "breadth_first_search.tpp"
+#include "depth_first_search.tpp"
 #endif  // SEARCH_ALGORITHM_BREADTH_FIRST_SEARCH_H
