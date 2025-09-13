@@ -13,9 +13,17 @@ std::shared_ptr<Node<State, Action>> BreadthFirstSearch(
 template <typename State, typename Action>
 std::shared_ptr<Node<State, Action>> DepthFirstSearch(
     Problem<State, Action> const& problem);
+
+// check_node_cycles: if true, check for cycles in the current path to avoid
+// redundant paths, but is more computationally expensive
+template <typename State, typename Action>
+std::shared_ptr<Node<State, Action>> DepthLimitedSearch(
+    Problem<State, Action> const& problem, uint64_t depth_limit,
+    bool check_node_cycles);
 }  // namespace search_algorithm
 
 // Include template implementation
 #include "breadth_first_search.tpp"
 #include "depth_first_search.tpp"
+#include "depth_limited_search.tpp"
 #endif  // SEARCH_ALGORITHM_BREADTH_FIRST_SEARCH_H
