@@ -8,7 +8,7 @@
 
 using namespace search_algorithm;
 
-// Reference: figure 3.9, page 96, Artificial Intelligence: A Modern Approach,
+// Reference: page 96, Artificial Intelligence: A Modern Approach,
 // 4th edition
 
 template <typename State, typename Action>
@@ -30,6 +30,8 @@ std::shared_ptr<Node<State, Action>> search_algorithm::DepthFirstSearch(
         std::vector<std::shared_ptr<Node<State, Action>>> children =
             node->Expand(const_cast<Problem<State, Action>&>(problem));
         for (const auto& child : children) {
+            // DEBUG not sure if this is the correct place for goal test, but
+            // makes sense
             if (problem.IsGoal(child->GetState())) return child;
             lifo_stack.push(child);
         }

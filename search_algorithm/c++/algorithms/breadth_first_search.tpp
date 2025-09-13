@@ -11,6 +11,7 @@ using namespace search_algorithm;
 // Reference: figure 3.9, page 95, Artificial Intelligence: A Modern Approach,
 // 4th edition
 
+// Uses a set to avoid redundant paths
 template <typename State, typename Action>
 std::shared_ptr<Node<State, Action>> search_algorithm::BreadthFirstSearch(
     Problem<State, Action> const& problem) {
