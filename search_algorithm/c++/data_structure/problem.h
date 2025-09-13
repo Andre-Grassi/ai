@@ -1,5 +1,5 @@
-#ifndef __PROBLEM_H__
-#define __PROBLEM_H__
+#ifndef SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_
+#define SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_
 
 #include <vector>
 
@@ -27,4 +27,4 @@ class Problem {
     virtual TState GetInitialState() const { return initial_state_; }
 };
 
-#endif  // __PROBLEM_H__
+#endif  // SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_

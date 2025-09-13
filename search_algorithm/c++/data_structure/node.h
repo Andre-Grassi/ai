@@ -1,5 +1,5 @@
-#ifndef __NODE_H__
-#define __NODE_H__
+#ifndef SEARCH_ALG_DATA_STRUCTURE_NODE_H_
+#define SEARCH_ALG_DATA_STRUCTURE_NODE_H_
 
 #include <memory>
 
@@ -54,4 +54,4 @@ class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
 
 #include "node.tpp"
 
-#endif  // __NODE_H__
+#endif  // SEARCH_ALG_DATA_STRUCTURE_NODE_H_
