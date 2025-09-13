@@ -16,14 +16,23 @@ std::shared_ptr<Node<State, Action>> DepthFirstSearch(
 
 // check_node_cycles: if true, check for cycles in the current path to avoid
 // redundant paths, but is more computationally expensive
+// *out_cutoff: if not nullptr, set to true if a cutoff occurred and no solution
+// was found
 template <typename State, typename Action>
 std::shared_ptr<Node<State, Action>> DepthLimitedSearch(
     Problem<State, Action> const& problem, uint64_t depth_limit,
-    bool check_node_cycles);
+    bool check_node_cycles, bool* out_cutoff);
+
+// Calls DepthLimitedSearch with increasing depth limits until a solution is
+// found or it is determined that no solution exists
+template <typename State, typename Action>
+std::shared_ptr<Node<State, Action>> IterativeDeepeningSearch(
+    Problem<State, Action> const& problem);
 }  // namespace search_algorithm
 
 // Include template implementation
 #include "breadth_first_search.tpp"
 #include "depth_first_search.tpp"
 #include "depth_limited_search.tpp"
+#include "iterative_deepening_search.tpp"
 #endif  // SEARCH_ALGORITHM_BREADTH_FIRST_SEARCH_H
