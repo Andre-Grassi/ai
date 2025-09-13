@@ -180,3 +180,16 @@ void SlidingTileProblem::PrintState(const State& state) const {
         std::cout << std::endl;
     }
 }
+
+State SlidingTileProblem::GenerateGoalState() const {
+    State goal = State(dimension_, std::vector<uint64_t>(dimension_, 0));
+    uint64_t count = 0;
+    for (uint64_t i = 0; i < dimension_; ++i) {
+        for (uint64_t j = 0; j < dimension_; ++j) {
+            goal[i][j] = count;
+            count++;
+        }
+    }
+    goal[0][0] = BLANK_TILE;  // Blank tile
+    return goal;
+}

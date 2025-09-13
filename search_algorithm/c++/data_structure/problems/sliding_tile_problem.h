@@ -18,21 +18,25 @@ class SlidingTileProblem : public Problem<State, Action> {
    private:
     State initial_state_;
     uint64_t dimension_ = 3;  // Default to 3x3 board
-    const std::vector<std::vector<uint64_t>> goal_state_ = {
-        {BLANK_TILE, 1, 2}, {3, 4, 5}, {6, 7, 8}};  // Goal state
+    State goal_state_;
 
     // Return random solvable 3x3 board
     State RandomizeBoard();
 
     bool IsSolvable(const State& state) const;
 
+    State GenerateGoalState() const;
+
    public:
     SlidingTileProblem(const State& initial_state, const uint64_t dimension)
-        : initial_state_(initial_state), dimension_(dimension) {}
+        : initial_state_(initial_state),
+          dimension_(dimension),
+          goal_state_(GenerateGoalState()) {}
 
     SlidingTileProblem(const uint64_t dimension) {
         dimension_ = dimension;
         initial_state_ = RandomizeBoard();
+        goal_state_ = GenerateGoalState();
     }
 
     virtual ~SlidingTileProblem() = default;
@@ -58,6 +62,8 @@ class SlidingTileProblem : public Problem<State, Action> {
     // Return blank tile position as (row, col)
     // (-1, -1) if not found
     std::pair<int, int> GetBlankTileIndex(const State& state) const;
+
+    State GetGoalState() const { return goal_state_; }
 
     void PrintState(const State& state) const;
 };
