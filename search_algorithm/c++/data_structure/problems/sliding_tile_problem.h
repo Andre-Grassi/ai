@@ -1,5 +1,5 @@
-#ifndef SLIDING_TILE_PROBLEM_H
-#define SLIDING_TILE_PROBLEM_H
+#ifndef SEARCH_ALG_DATA_STRUCTURE_PROBLEMS_SLIDING_H_
+#define SEARCH_ALG_DATA_STRUCTURE_PROBLEMS_SLIDING_H_
 
 #include <vector>
 
@@ -70,4 +70,4 @@ class SlidingTileProblem : public Problem<State, Action> {
 
 }  // namespace sliding_tile
 
-#endif  // SLIDING_TILE_PROBLEM_H
+#endif  // SEARCH_ALG_DATA_STRUCTURE_PROBLEMS_SLIDING_H_
