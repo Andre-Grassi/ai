@@ -1,5 +1,5 @@
-#ifndef SEARCH_ALGORITHM_BREADTH_FIRST_SEARCH_H
-#define SEARCH_ALGORITHM_BREADTH_FIRST_SEARCH_H
+#ifndef SEARCH_ALG_ALGORITHMS_SEARCH_ALGORITHM_H_
+#define SEARCH_ALG_ALGORITHMS_SEARCH_ALGORITHM_H_
 
 #include "../data_structure/node.h"
 #include "../data_structure/problem.h"
@@ -28,6 +28,11 @@ std::shared_ptr<Node<State, Action>> DepthLimitedSearch(
 template <typename State, typename Action>
 std::shared_ptr<Node<State, Action>> IterativeDeepeningSearch(
     Problem<State, Action> const& problem);
+
+template <typename State, typename Action>
+std::shared_ptr<Node<sliding_tile::State, sliding_tile::Action>>
+BestFirstSearch(
+    Problem<sliding_tile::State, sliding_tile::Action> const& problem);
 }  // namespace search_algorithm
 
 // Include template implementation
@@ -35,4 +40,4 @@ std::shared_ptr<Node<State, Action>> IterativeDeepeningSearch(
 #include "depth_first_search.tpp"
 #include "depth_limited_search.tpp"
 #include "iterative_deepening_search.tpp"
-#endif  // SEARCH_ALGORITHM_BREADTH_FIRST_SEARCH_H
+#endif  // SEARCH_ALG_ALGORITHMS_SEARCH_ALGORITHM_H_
