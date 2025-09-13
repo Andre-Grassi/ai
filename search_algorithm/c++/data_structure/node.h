@@ -12,6 +12,7 @@ class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
     std::shared_ptr<Node<TState, TAction>> parent_;
     TAction action_;
     float path_cost_;
+    uint64_t depth_;
 
    public:
     explicit Node(TState state,
@@ -20,7 +21,12 @@ class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
         : state_(std::move(state)),
           parent_(std::move(parent)),
           action_(action),
-          path_cost_(path_cost) {}
+          path_cost_(path_cost) {
+        if (parent_)
+            depth_ = parent_->GetDepth() + 1;
+        else
+            depth_ = 0;
+    }
 
     std::vector<std::shared_ptr<Node<TState, TAction>>> Expand(
         Problem<TState, TAction>& problem);
@@ -40,6 +46,8 @@ class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
 
     float GetPathCost() const { return path_cost_; }
     void SetPathCost(float path_cost) { path_cost_ = path_cost; }
+
+    uint64_t GetDepth() const { return depth_; }
 };
 
 #include "node.tpp"
