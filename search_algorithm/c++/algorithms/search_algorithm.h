@@ -2,6 +2,7 @@
 #define SEARCH_ALG_ALGORITHMS_SEARCH_ALGORITHM_H_
 
 #include "../data_structure/node.h"
+#include "../data_structure/node_comparators.h"
 #include "../data_structure/problem.h"
 #include "../data_structure/problems/sliding_tile_problem.h"
 
@@ -32,6 +33,14 @@ std::shared_ptr<Node<State, Action>> IterativeDeepeningSearch(
 template <typename State, typename Action, typename NodeComparator>
 std::shared_ptr<Node<State, Action>> BestFirstSearch(
     Problem<State, Action> const& problem);
+
+template <typename State, typename Action>
+std::shared_ptr<Node<State, Action>> UniformCostSearch(
+    Problem<State, Action> const& problem) {
+    return BestFirstSearch<State, Action, node_comparators::CompareByPathCost>(
+        problem);
+}
+
 }  // namespace search_algorithm
 
 // Include template implementation
