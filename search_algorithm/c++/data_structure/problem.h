@@ -25,6 +25,8 @@ class Problem {
                                  const TState& new_state) const = 0;
 
     virtual TState GetInitialState() const { return initial_state_; }
+
+    virtual double Heuristic(const TState& state) const = 0;
 };
 
 #endif  // SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_
