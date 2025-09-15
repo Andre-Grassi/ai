@@ -57,6 +57,8 @@ class SlidingTileProblem : public Problem<State, Action> {
         return 1.0;  // Uniform cost for all actions
     }
 
+    double Heuristic(const State& state) const override;
+
     uint64_t GetDimension() const { return dimension_; }
 
     // Return blank tile position as (row, col)

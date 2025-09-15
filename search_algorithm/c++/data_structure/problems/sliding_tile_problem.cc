@@ -137,6 +137,45 @@ std::vector<Action> SlidingTileProblem::GetActions(const State& state) const {
     return actions;
 }
 
+double SlidingTileProblem::Heuristic(const State& state) const {
+    // Using Manhattan distance as heuristic
+    double total_distance = 0.0;
+
+    // Find blank tile position
+    int blank_row, blank_col;
+    std::tie(blank_row, blank_col) = GetBlankTileIndex(state);
+
+    for (uint64_t row = 0; row <= blank_row; ++row) {
+        for (uint64_t col = 0; col < blank_col; ++col) {
+            uint64_t tile = state[row][col];
+            // Calculate goal position
+            uint64_t goal_row = tile / dimension_;
+            uint64_t goal_col = tile % dimension_;
+
+            // Calculate Manhattan distance
+            total_distance +=
+                std::abs(static_cast<int>(row) - static_cast<int>(goal_row)) +
+                std::abs(static_cast<int>(col) - static_cast<int>(goal_col));
+        }
+    }
+
+    for (uint64_t row = blank_row; row < dimension_; ++row) {
+        for (uint64_t col = blank_col + 1; col < dimension_; ++col) {
+            uint64_t tile = state[row][col];
+            // Calculate goal position
+            uint64_t goal_row = tile / dimension_;
+            uint64_t goal_col = tile % dimension_;
+
+            // Calculate Manhattan distance
+            total_distance +=
+                std::abs(static_cast<int>(row) - static_cast<int>(goal_row)) +
+                std::abs(static_cast<int>(col) - static_cast<int>(goal_col));
+        }
+    }
+
+    return total_distance;
+}
+
 // Return blank tile position as (row, col)
 std::pair<int, int> SlidingTileProblem::GetBlankTileIndex(
     const State& state) const {
