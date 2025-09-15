@@ -29,13 +29,13 @@ template <typename State, typename Action>
 std::shared_ptr<Node<State, Action>> IterativeDeepeningSearch(
     Problem<State, Action> const& problem);
 
-template <typename State, typename Action>
-std::shared_ptr<Node<sliding_tile::State, sliding_tile::Action>>
-BestFirstSearch(
-    Problem<sliding_tile::State, sliding_tile::Action> const& problem);
+template <typename State, typename Action, typename NodeComparator>
+std::shared_ptr<Node<State, Action>> BestFirstSearch(
+    Problem<State, Action> const& problem);
 }  // namespace search_algorithm
 
 // Include template implementation
+#include "best_first_search.tpp"
 #include "breadth_first_search.tpp"
 #include "depth_first_search.tpp"
 #include "depth_limited_search.tpp"
