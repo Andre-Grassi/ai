@@ -1,7 +1,7 @@
 /**
  * @file node.h
  * @brief Node class for search algorithms
- * @author Your Name
+ * @author Andre Grassi
  * @date 2025
  */
 
