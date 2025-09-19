@@ -1,0 +1,228 @@
+\hypertarget{classNode}{}\doxysection{Node$<$ TState, TAction $>$ Class Template Reference}
+\label{classNode}\index{Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}}
+
+
+Represents a node in a search tree.  
+
+
+
+
+{\ttfamily \#include $<$node.\+h$>$}
+
+
+
+Inheritance diagram for Node$<$ TState, TAction $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=231pt]{classNode__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Node$<$ TState, TAction $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=231pt]{classNode__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classNode_a1630a8123aec78390eaf884775866eff}\label{classNode_a1630a8123aec78390eaf884775866eff}} 
+{\bfseries Node} (TState state, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ parent=nullptr, TAction action=TAction\{\}, float path\+\_\+cost=0.\+0)
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$ $>$ $>$ \mbox{\hyperlink{classNode_a73446d853a0a68eb476a098eefbb1f87}{Expand}} (\mbox{\hyperlink{classProblem}{Problem}}$<$ TState, TAction $>$ \&problem)
+\begin{DoxyCompactList}\small\item\em Expands this node by generating all possible child nodes. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classNode_a2e2ffb13c472cb96e36f89b9bc5e2e93}{Is\+Cycle}} () const
+\begin{DoxyCompactList}\small\item\em Checks if this node creates a cycle in the current path. \end{DoxyCompactList}\item 
+const TState \& \mbox{\hyperlink{classNode_a44912be719e00d7517354b25de0705c5}{Get\+State}} () const
+\begin{DoxyCompactList}\small\item\em Gets the state of this node. \end{DoxyCompactList}\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$ $>$ \mbox{\hyperlink{classNode_a37ff421e34d794715d2c424635d54745}{Get\+Parent}} () const
+\begin{DoxyCompactList}\small\item\em Gets the parent node. \end{DoxyCompactList}\item 
+const TAction \& \mbox{\hyperlink{classNode_a6a87112a8a6cfecbdd827f86d6456a3e}{Get\+Action}} () const
+\begin{DoxyCompactList}\small\item\em Gets the action that led to this node. \end{DoxyCompactList}\item 
+float \mbox{\hyperlink{classNode_aab18036336b41a3df473993f2e154596}{Get\+Path\+Cost}} () const
+\begin{DoxyCompactList}\small\item\em Gets the cumulative path cost from root to this node. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{classNode_add058c60a31e35f7362efdb898ea298c}{Get\+Depth}} () const
+\begin{DoxyCompactList}\small\item\em Gets the depth of this node in the search tree. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Member Functions}
+\begin{Indent}\textbf{ Private Setter Methods}\par
+{\em \begin{DoxyWarning}{Warning}
+These methods are dangerous and should NOT be used after construction. They can break node immutability and corrupt the search tree structure. All node properties should be set only during construction. Unless you are doing something really fancy. 
+\end{DoxyWarning}
+}\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classNode_a80bccc53135b1a14dd5136b73f777311}\label{classNode_a80bccc53135b1a14dd5136b73f777311}} 
+void {\bfseries Set\+State} (const TState \&state)
+\item 
+\mbox{\Hypertarget{classNode_ada1cb7d26d44495c019efe4c71659cf9}\label{classNode_ada1cb7d26d44495c019efe4c71659cf9}} 
+void {\bfseries Set\+State} (TState \&\&state)
+\item 
+\mbox{\Hypertarget{classNode_a4068e6c9683d334e15f83147a6a5cb52}\label{classNode_a4068e6c9683d334e15f83147a6a5cb52}} 
+void {\bfseries Set\+Parent} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ parent)
+\item 
+\mbox{\Hypertarget{classNode_a00e9884fed8b131ba73fe7b7af57d027}\label{classNode_a00e9884fed8b131ba73fe7b7af57d027}} 
+void {\bfseries Set\+Action} (const TAction \&action)
+\item 
+\mbox{\Hypertarget{classNode_a77d0779ac455b6d8818152c327d47239}\label{classNode_a77d0779ac455b6d8818152c327d47239}} 
+void {\bfseries Set\+Action} (TAction \&\&action)
+\item 
+\mbox{\Hypertarget{classNode_a2596a67176e0f208646cee5e17ef0de9}\label{classNode_a2596a67176e0f208646cee5e17ef0de9}} 
+void {\bfseries Set\+Path\+Cost} (float path\+\_\+cost)
+\item 
+\mbox{\Hypertarget{classNode_a1fa2eaaffb793f6b397ad49bbf0e5926}\label{classNode_a1fa2eaaffb793f6b397ad49bbf0e5926}} 
+void {\bfseries Set\+Depth} (uint64\+\_\+t depth)
+\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classNode_a5d62b9a1501aeb3d3fbf3c9f0141a135}\label{classNode_a5d62b9a1501aeb3d3fbf3c9f0141a135}} 
+TState {\bfseries state\+\_\+}
+\item 
+\mbox{\Hypertarget{classNode_a2fb843e87f558a109234ab4cdca996bf}\label{classNode_a2fb843e87f558a109234ab4cdca996bf}} 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$ $>$ {\bfseries parent\+\_\+}
+\item 
+\mbox{\Hypertarget{classNode_a1fc2f6269970318e7f47e1777a4c5d56}\label{classNode_a1fc2f6269970318e7f47e1777a4c5d56}} 
+TAction {\bfseries action\+\_\+}
+\item 
+\mbox{\Hypertarget{classNode_a9b4365e724c4bef7d0908e97cc2d3f16}\label{classNode_a9b4365e724c4bef7d0908e97cc2d3f16}} 
+float {\bfseries path\+\_\+cost\+\_\+}
+\item 
+\mbox{\Hypertarget{classNode_afe10db9bfddd8d7c230e273e5722a26c}\label{classNode_afe10db9bfddd8d7c230e273e5722a26c}} 
+uint64\+\_\+t {\bfseries depth\+\_\+}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename TState, typename TAction$>$\newline
+class Node$<$ TState, TAction $>$}
+
+Represents a node in a search tree. 
+
+A node contains a state, a pointer to its parent node, the action that led to this state, and the cumulative path cost from the initial state. Nodes are used to build search trees in various AI search algorithms.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em TState} & Type representing the problem state \\
+\hline
+{\em TAction} & Type representing actions that can be taken \\
+\hline
+\end{DoxyTemplParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classNode_a73446d853a0a68eb476a098eefbb1f87}\label{classNode_a73446d853a0a68eb476a098eefbb1f87}} 
+\index{Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}!Expand@{Expand}}
+\index{Expand@{Expand}!Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}}
+\doxysubsubsection{\texorpdfstring{Expand()}{Expand()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+std\+::vector$<$std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classNode}{Node}}$<$TState, TAction$>$ $>$ $>$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$\+::Expand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classProblem}{Problem}}$<$ TState, TAction $>$ \&}]{problem }\end{DoxyParamCaption})}
+
+
+
+Expands this node by generating all possible child nodes. 
+
+Creates child nodes for all valid actions from the current state. Each child node has this node as its parent and the corresponding action and updated path cost.
+
+
+\begin{DoxyParams}{Parameters}
+{\em problem} & The problem instance containing action and transition logic \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Vector of shared pointers to child nodes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNode_a6a87112a8a6cfecbdd827f86d6456a3e}\label{classNode_a6a87112a8a6cfecbdd827f86d6456a3e}} 
+\index{Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}!GetAction@{GetAction}}
+\index{GetAction@{GetAction}!Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}}
+\doxysubsubsection{\texorpdfstring{GetAction()}{GetAction()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+const TAction\& \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$\+::Get\+Action (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Gets the action that led to this node. 
+
+\begin{DoxyReturn}{Returns}
+Const reference to the action 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNode_add058c60a31e35f7362efdb898ea298c}\label{classNode_add058c60a31e35f7362efdb898ea298c}} 
+\index{Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}!GetDepth@{GetDepth}}
+\index{GetDepth@{GetDepth}!Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}}
+\doxysubsubsection{\texorpdfstring{GetDepth()}{GetDepth()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+uint64\+\_\+t \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$\+::Get\+Depth (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Gets the depth of this node in the search tree. 
+
+\begin{DoxyReturn}{Returns}
+The depth as a uint64\+\_\+t 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNode_a37ff421e34d794715d2c424635d54745}\label{classNode_a37ff421e34d794715d2c424635d54745}} 
+\index{Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}!GetParent@{GetParent}}
+\index{GetParent@{GetParent}!Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}}
+\doxysubsubsection{\texorpdfstring{GetParent()}{GetParent()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classNode}{Node}}$<$TState, TAction$>$ $>$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$\+::Get\+Parent (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Gets the parent node. 
+
+\begin{DoxyReturn}{Returns}
+Shared pointer to the parent node (nullptr for root) 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNode_aab18036336b41a3df473993f2e154596}\label{classNode_aab18036336b41a3df473993f2e154596}} 
+\index{Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}!GetPathCost@{GetPathCost}}
+\index{GetPathCost@{GetPathCost}!Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}}
+\doxysubsubsection{\texorpdfstring{GetPathCost()}{GetPathCost()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+float \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$\+::Get\+Path\+Cost (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Gets the cumulative path cost from root to this node. 
+
+\begin{DoxyReturn}{Returns}
+The path cost as a float 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNode_a44912be719e00d7517354b25de0705c5}\label{classNode_a44912be719e00d7517354b25de0705c5}} 
+\index{Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}!GetState@{GetState}}
+\index{GetState@{GetState}!Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}}
+\doxysubsubsection{\texorpdfstring{GetState()}{GetState()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+const TState\& \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$\+::Get\+State (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Gets the state of this node. 
+
+\begin{DoxyReturn}{Returns}
+Const reference to the state 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNode_a2e2ffb13c472cb96e36f89b9bc5e2e93}\label{classNode_a2e2ffb13c472cb96e36f89b9bc5e2e93}} 
+\index{Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}!IsCycle@{IsCycle}}
+\index{IsCycle@{IsCycle}!Node$<$ TState, TAction $>$@{Node$<$ TState, TAction $>$}}
+\doxysubsubsection{\texorpdfstring{IsCycle()}{IsCycle()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+bool \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$\+::Is\+Cycle (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Checks if this node creates a cycle in the current path. 
+
+Traverses up the parent chain to detect if the current state has already appeared in the path from root to this node.
+
+\begin{DoxyReturn}{Returns}
+true if a cycle is detected, false otherwise 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+data\+\_\+structure/\mbox{\hyperlink{node_8h}{node.\+h}}\end{DoxyCompactItemize}

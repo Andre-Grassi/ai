@@ -1,0 +1,62 @@
+\hypertarget{structnode__comparators_1_1CompareByPathCost}{}\doxysection{node\+\_\+comparators\+::Compare\+By\+Path\+Cost Struct Reference}
+\label{structnode__comparators_1_1CompareByPathCost}\index{node\_comparators::CompareByPathCost@{node\_comparators::CompareByPathCost}}
+
+
+Comparator that orders nodes by their path cost.  
+
+
+
+
+{\ttfamily \#include $<$node\+\_\+comparators.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename TState , typename TAction $>$ }\\bool \mbox{\hyperlink{structnode__comparators_1_1CompareByPathCost_ae8df306b566835dc32b5b5caaf2c1b54}{operator()}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ \&a, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ \&b) const
+\begin{DoxyCompactList}\small\item\em Compares two nodes by their path cost. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Comparator that orders nodes by their path cost. 
+
+Orders nodes by path cost in ascending order, creating a min-\/heap where nodes with lower path costs have higher priority. This is used by uniform cost search to always expand the lowest-\/cost frontier node first.
+
+\begin{DoxyNote}{Note}
+Returns true if \textquotesingle{}a\textquotesingle{} should have lower priority than \textquotesingle{}b\textquotesingle{} in a priority queue 
+\end{DoxyNote}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{structnode__comparators_1_1CompareByPathCost_ae8df306b566835dc32b5b5caaf2c1b54}\label{structnode__comparators_1_1CompareByPathCost_ae8df306b566835dc32b5b5caaf2c1b54}} 
+\index{node\_comparators::CompareByPathCost@{node\_comparators::CompareByPathCost}!operator()@{operator()}}
+\index{operator()@{operator()}!node\_comparators::CompareByPathCost@{node\_comparators::CompareByPathCost}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+bool node\+\_\+comparators\+::\+Compare\+By\+Path\+Cost\+::operator() (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ \&}]{a,  }\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ \&}]{b }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Compares two nodes by their path cost. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em TState} & Type representing the problem state \\
+\hline
+{\em TAction} & Type representing actions that can be taken \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em a} & First node to compare \\
+\hline
+{\em b} & Second node to compare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if node \textquotesingle{}a\textquotesingle{} has higher path cost than \textquotesingle{}b\textquotesingle{} (lower priority) 
+\end{DoxyReturn}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+data\+\_\+structure/\mbox{\hyperlink{node__comparators_8h}{node\+\_\+comparators.\+h}}\end{DoxyCompactItemize}

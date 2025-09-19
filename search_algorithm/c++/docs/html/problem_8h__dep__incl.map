@@ -1,0 +1,7 @@
+<map id="data_structure/problem.h" name="data_structure/problem.h">
+<area shape="rect" id="node1" title="Abstract base class for search problems." alt="" coords="65,5,252,32"/>
+<area shape="rect" id="node2" href="$search__algorithm_8h_source.html" title=" " alt="" coords="49,244,270,271"/>
+<area shape="rect" id="node3" href="$node_8h.html" title="Node class for search algorithms." alt="" coords="136,80,300,107"/>
+<area shape="rect" id="node4" href="$node__comparators_8h.html" title="Comparator functions for ordering nodes in search algorithms." alt="" coords="28,155,180,196"/>
+<area shape="rect" id="node5" href="$sliding__tile__problem_8h_source.html" title=" " alt="" coords="254,155,436,196"/>
+</map>

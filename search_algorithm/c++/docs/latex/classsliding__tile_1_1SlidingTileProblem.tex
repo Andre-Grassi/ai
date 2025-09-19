@@ -1,0 +1,111 @@
+\hypertarget{classsliding__tile_1_1SlidingTileProblem}{}\doxysection{sliding\+\_\+tile\+::Sliding\+Tile\+Problem Class Reference}
+\label{classsliding__tile_1_1SlidingTileProblem}\index{sliding\_tile::SlidingTileProblem@{sliding\_tile::SlidingTileProblem}}
+
+
+Inheritance diagram for sliding\+\_\+tile\+::Sliding\+Tile\+Problem\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{classsliding__tile_1_1SlidingTileProblem__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sliding\+\_\+tile\+::Sliding\+Tile\+Problem\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{classsliding__tile_1_1SlidingTileProblem__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_ac5624187ed15320928651e8763ed8022}\label{classsliding__tile_1_1SlidingTileProblem_ac5624187ed15320928651e8763ed8022}} 
+{\bfseries Sliding\+Tile\+Problem} (const State \&initial\+\_\+state, const uint64\+\_\+t dimension)
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_add87da736b3aa86728a651496ac46c4d}\label{classsliding__tile_1_1SlidingTileProblem_add87da736b3aa86728a651496ac46c4d}} 
+{\bfseries Sliding\+Tile\+Problem} (const uint64\+\_\+t dimension)
+\item 
+virtual State \mbox{\hyperlink{classsliding__tile_1_1SlidingTileProblem_a60623717ab37985a9931cc53d310eb12}{Get\+Initial\+State}} () const override
+\begin{DoxyCompactList}\small\item\em Gets the initial state of the problem. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_ad0f83b219ee01a208e90b4e05e644928}\label{classsliding__tile_1_1SlidingTileProblem_ad0f83b219ee01a208e90b4e05e644928}} 
+virtual bool {\bfseries Is\+Goal} (const State \&state) const override
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_a954f8bf0166aa9459df16778c3ce0c66}\label{classsliding__tile_1_1SlidingTileProblem_a954f8bf0166aa9459df16778c3ce0c66}} 
+virtual std\+::vector$<$ Action $>$ {\bfseries Get\+Actions} (const State \&state) const override
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_af9b9c99fc562a5da6e7ca3b19e97212a}\label{classsliding__tile_1_1SlidingTileProblem_af9b9c99fc562a5da6e7ca3b19e97212a}} 
+virtual std\+::unique\+\_\+ptr$<$ State $>$ {\bfseries Get\+Result} (const State \&state, const Action \&action) const override
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_aef0f7ae21d536ecd2dde32890bdd765d}\label{classsliding__tile_1_1SlidingTileProblem_aef0f7ae21d536ecd2dde32890bdd765d}} 
+virtual double {\bfseries Get\+Action\+Cost} (const State \&, const Action \&, const State \&) const override
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_a4eb1702488ae91ace116cdf289e544ee}\label{classsliding__tile_1_1SlidingTileProblem_a4eb1702488ae91ace116cdf289e544ee}} 
+double {\bfseries Heuristic} (const State \&state) const override
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_a4cf753d557ff0170b1416e0d9a180a8d}\label{classsliding__tile_1_1SlidingTileProblem_a4cf753d557ff0170b1416e0d9a180a8d}} 
+uint64\+\_\+t {\bfseries Get\+Dimension} () const
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_a6b843552e4ffdcd3101ce0de62abd247}\label{classsliding__tile_1_1SlidingTileProblem_a6b843552e4ffdcd3101ce0de62abd247}} 
+std\+::pair$<$ int, int $>$ {\bfseries Get\+Blank\+Tile\+Index} (const State \&state) const
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_a7625908ed2004cfb55ce400350045574}\label{classsliding__tile_1_1SlidingTileProblem_a7625908ed2004cfb55ce400350045574}} 
+State {\bfseries Get\+Goal\+State} () const
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_a6be651ab833dac92e1fbf46435c110d1}\label{classsliding__tile_1_1SlidingTileProblem_a6be651ab833dac92e1fbf46435c110d1}} 
+void {\bfseries Print\+State} (const State \&state) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_a85aaf1955b34a79f759845a1863e3647}\label{classsliding__tile_1_1SlidingTileProblem_a85aaf1955b34a79f759845a1863e3647}} 
+State {\bfseries Randomize\+Board} ()
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_ad622224cf1f19a397911f16dd876b1d6}\label{classsliding__tile_1_1SlidingTileProblem_ad622224cf1f19a397911f16dd876b1d6}} 
+bool {\bfseries Is\+Solvable} (const State \&state) const
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_affc6ac316cf30ca601926d3a761a4c3a}\label{classsliding__tile_1_1SlidingTileProblem_affc6ac316cf30ca601926d3a761a4c3a}} 
+State {\bfseries Generate\+Goal\+State} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_a5d179bc2bc6e21020129c27d97b16034}\label{classsliding__tile_1_1SlidingTileProblem_a5d179bc2bc6e21020129c27d97b16034}} 
+State {\bfseries initial\+\_\+state\+\_\+}
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_aed45ef6f119af8e91780b97f57f4bfe2}\label{classsliding__tile_1_1SlidingTileProblem_aed45ef6f119af8e91780b97f57f4bfe2}} 
+uint64\+\_\+t {\bfseries dimension\+\_\+} = 3
+\item 
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_ab9ec1461370ad00889a1f79be6965106}\label{classsliding__tile_1_1SlidingTileProblem_ab9ec1461370ad00889a1f79be6965106}} 
+State {\bfseries goal\+\_\+state\+\_\+}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsliding__tile_1_1SlidingTileProblem_a60623717ab37985a9931cc53d310eb12}\label{classsliding__tile_1_1SlidingTileProblem_a60623717ab37985a9931cc53d310eb12}} 
+\index{sliding\_tile::SlidingTileProblem@{sliding\_tile::SlidingTileProblem}!GetInitialState@{GetInitialState}}
+\index{GetInitialState@{GetInitialState}!sliding\_tile::SlidingTileProblem@{sliding\_tile::SlidingTileProblem}}
+\doxysubsubsection{\texorpdfstring{GetInitialState()}{GetInitialState()}}
+{\footnotesize\ttfamily virtual State sliding\+\_\+tile\+::\+Sliding\+Tile\+Problem\+::\+Get\+Initial\+State (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Gets the initial state of the problem. 
+
+Returns the starting state from which the search begins. This is typically set during problem construction.
+
+\begin{DoxyReturn}{Returns}
+The initial state 
+\end{DoxyReturn}
+
+
+Reimplemented from \mbox{\hyperlink{classProblem_acec31df02f0140c324d0f41ba28d1961}{Problem$<$ State, Action $>$}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+data\+\_\+structure/problems/sliding\+\_\+tile\+\_\+problem.\+h\item 
+data\+\_\+structure/problems/sliding\+\_\+tile\+\_\+problem.\+cc\end{DoxyCompactItemize}

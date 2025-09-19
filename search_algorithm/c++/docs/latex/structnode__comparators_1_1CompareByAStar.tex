@@ -1,0 +1,101 @@
+\hypertarget{structnode__comparators_1_1CompareByAStar}{}\doxysection{node\+\_\+comparators\+::Compare\+By\+AStar$<$ TState, TAction $>$ Struct Template Reference}
+\label{structnode__comparators_1_1CompareByAStar}\index{node\_comparators::CompareByAStar$<$ TState, TAction $>$@{node\_comparators::CompareByAStar$<$ TState, TAction $>$}}
+
+
+Comparator for A$\ast$ search algorithm.  
+
+
+
+
+{\ttfamily \#include $<$node\+\_\+comparators.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structnode__comparators_1_1CompareByAStar_a45a390f587d2db16bb5d1c7fb01742ef}{Compare\+By\+AStar}} (\mbox{\hyperlink{classProblem}{Problem}}$<$ TState, TAction $>$ problem)
+\begin{DoxyCompactList}\small\item\em Constructs the A$\ast$ comparator with a problem instance. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{structnode__comparators_1_1CompareByAStar_a8937a4931f2104ddc4ed1f6f9d10fb2e}{operator()}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ \&a, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ \&b) const
+\begin{DoxyCompactList}\small\item\em Compares two nodes by their A$\ast$ evaluation function f(n) = g(n) + h(n) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structnode__comparators_1_1CompareByAStar_a2c6fb6112492fdfb2ab93ff669e2e15c}\label{structnode__comparators_1_1CompareByAStar_a2c6fb6112492fdfb2ab93ff669e2e15c}} 
+\mbox{\hyperlink{classProblem}{Problem}}$<$ TState, TAction $>$ \mbox{\hyperlink{structnode__comparators_1_1CompareByAStar_a2c6fb6112492fdfb2ab93ff669e2e15c}{problem\+\_\+}}
+\begin{DoxyCompactList}\small\item\em \mbox{\hyperlink{classProblem}{Problem}} reference to access heuristic function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename TState, typename TAction$>$\newline
+struct node\+\_\+comparators\+::\+Compare\+By\+AStar$<$ TState, TAction $>$}
+
+Comparator for A$\ast$ search algorithm. 
+
+Orders nodes by their evaluation function f(n) = g(n) + h(n), where\+:
+\begin{DoxyItemize}
+\item g(n) is the path cost from start to node n
+\item h(n) is the heuristic estimate from node n to goal
+\end{DoxyItemize}
+
+Creates a min-\/heap where nodes with lower f-\/values have higher priority. This ensures A$\ast$ always expands the most promising node first.
+
+\begin{DoxyNote}{Note}
+Need to provide a \mbox{\hyperlink{classProblem}{Problem}} instance in construction to access the heuristic function
+\end{DoxyNote}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em TState} & Type representing the problem state \\
+\hline
+{\em TAction} & Type representing actions that can be taken \\
+\hline
+\end{DoxyTemplParams}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{structnode__comparators_1_1CompareByAStar_a45a390f587d2db16bb5d1c7fb01742ef}\label{structnode__comparators_1_1CompareByAStar_a45a390f587d2db16bb5d1c7fb01742ef}} 
+\index{node\_comparators::CompareByAStar$<$ TState, TAction $>$@{node\_comparators::CompareByAStar$<$ TState, TAction $>$}!CompareByAStar@{CompareByAStar}}
+\index{CompareByAStar@{CompareByAStar}!node\_comparators::CompareByAStar$<$ TState, TAction $>$@{node\_comparators::CompareByAStar$<$ TState, TAction $>$}}
+\doxysubsubsection{\texorpdfstring{CompareByAStar()}{CompareByAStar()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+\mbox{\hyperlink{structnode__comparators_1_1CompareByAStar}{node\+\_\+comparators\+::\+Compare\+By\+AStar}}$<$ TState, TAction $>$\+::\mbox{\hyperlink{structnode__comparators_1_1CompareByAStar}{Compare\+By\+AStar}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classProblem}{Problem}}$<$ TState, TAction $>$}]{problem }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Constructs the A$\ast$ comparator with a problem instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em problem} & The problem instance containing the heuristic function \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{structnode__comparators_1_1CompareByAStar_a8937a4931f2104ddc4ed1f6f9d10fb2e}\label{structnode__comparators_1_1CompareByAStar_a8937a4931f2104ddc4ed1f6f9d10fb2e}} 
+\index{node\_comparators::CompareByAStar$<$ TState, TAction $>$@{node\_comparators::CompareByAStar$<$ TState, TAction $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!node\_comparators::CompareByAStar$<$ TState, TAction $>$@{node\_comparators::CompareByAStar$<$ TState, TAction $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily template$<$typename TState , typename TAction $>$ \\
+bool \mbox{\hyperlink{structnode__comparators_1_1CompareByAStar}{node\+\_\+comparators\+::\+Compare\+By\+AStar}}$<$ TState, TAction $>$\+::operator() (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ \&}]{a,  }\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classNode}{Node}}$<$ TState, TAction $>$$>$ \&}]{b }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Compares two nodes by their A$\ast$ evaluation function f(n) = g(n) + h(n) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & First node to compare \\
+\hline
+{\em b} & Second node to compare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if node \textquotesingle{}a\textquotesingle{} has higher f-\/value than \textquotesingle{}b\textquotesingle{} (lower priority)
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The comparison returns true when \textquotesingle{}a\textquotesingle{} should have lower priority than \textquotesingle{}b\textquotesingle{} in a priority queue, ensuring the min-\/heap property for A$\ast$ search 
+\end{DoxyNote}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+data\+\_\+structure/\mbox{\hyperlink{node__comparators_8h}{node\+\_\+comparators.\+h}}\end{DoxyCompactItemize}
