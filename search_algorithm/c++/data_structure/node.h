@@ -55,8 +55,8 @@ class Node
      * logic
      * @return Vector of shared pointers to child nodes
      */
-    std::vector <
-        std::shared_ptr<NodeType> Expand(Problem<TState, TAction>& problem);
+    std::vector<std::shared_ptr<NodeType>> Expand(
+        Problem<TState, TAction, CostType>& problem);
 
     /**
      * @brief Checks if this node creates a cycle in the current path
