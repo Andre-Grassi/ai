@@ -21,39 +21,19 @@
  *
  * @tparam TState Type representing the problem state
  * @tparam TAction Type representing actions that can be taken
+ * @tparam CostType Type representing the cost of actions (default is float)
  */
-template <typename TState, typename TAction>
-class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
-   private:
-    TState state_;
-    std::shared_ptr<Node<TState, TAction>> parent_;
-    TAction action_;
-    float path_cost_;
-    uint64_t depth_;
-
-    /**
-     * @name Private Setter Methods
-     * @warning These methods are dangerous and should NOT be used after
-     * construction. They can break node immutability and corrupt the search
-     * tree structure. All node properties should be set only during
-     * construction. Unless you are doing something really fancy.
-     * @{
-     */
-    void SetState(const TState& state) { state_ = state; }
-    void SetState(TState&& state) { state_ = std::move(state); }
-    void SetParent(std::shared_ptr<Node<TState, TAction>> parent) {
-        parent_ = std::move(parent);
-    }
-    void SetAction(const TAction& action) { action_ = action; }
-    void SetAction(TAction&& action) { action_ = std::move(action); }
-    void SetPathCost(float path_cost) { path_cost_ = path_cost; }
-    void SetDepth(uint64_t depth) { depth_ = depth; }
-    /// @}
-
+template <typename TState, typename TAction, typename CostType = float>
+class Node
+    : public std::enable_shared_from_this<Node<TState, TAction, CostType>> {
    public:
-    explicit Node(TState state,
-                  std::shared_ptr<Node<TState, TAction>> parent = nullptr,
-                  TAction action = TAction{}, float path_cost = 0.0)
+    /**
+     * @brief Type alias for this node type
+     */
+    using NodeType = Node<TState, TAction, CostType>;
+
+    explicit Node(TState state, std::shared_ptr<NodeType> parent = nullptr,
+                  TAction action = TAction{}, CostType path_cost = 0.0)
         : state_(std::move(state)),
           parent_(std::move(parent)),
           action_(action),
@@ -75,8 +55,8 @@ class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
      * logic
      * @return Vector of shared pointers to child nodes
      */
-    std::vector<std::shared_ptr<Node<TState, TAction>>> Expand(
-        Problem<TState, TAction>& problem);
+    std::vector <
+        std::shared_ptr<NodeType> Expand(Problem<TState, TAction>& problem);
 
     /**
      * @brief Checks if this node creates a cycle in the current path
@@ -98,7 +78,7 @@ class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
      * @brief Gets the parent node
      * @return Shared pointer to the parent node (nullptr for root)
      */
-    std::shared_ptr<Node<TState, TAction>> GetParent() const { return parent_; }
+    std::shared_ptr<NodeType> GetParent() const { return parent_; }
 
     /**
      * @brief Gets the action that led to this node
@@ -117,6 +97,32 @@ class Node : public std::enable_shared_from_this<Node<TState, TAction>> {
      * @return The depth as a uint64_t
      */
     uint64_t GetDepth() const { return depth_; }
+
+   private:
+    TState state_;
+    std::shared_ptr<NodeType> parent_;
+    TAction action_;
+    float path_cost_;
+    uint64_t depth_;
+
+    /**
+     * @name Private Setter Methods
+     * @warning These methods are dangerous and should NOT be used after
+     * construction. They can break node immutability and corrupt the search
+     * tree structure. All node properties should be set only during
+     * construction. Unless you are doing something really fancy.
+     * @{
+     */
+    void SetState(const TState& state) { state_ = state; }
+    void SetState(TState&& state) { state_ = std::move(state); }
+    void SetParent(std::shared_ptr<NodeType> parent) {
+        parent_ = std::move(parent);
+    }
+    void SetAction(const TAction& action) { action_ = action; }
+    void SetAction(TAction&& action) { action_ = std::move(action); }
+    void SetPathCost(CostType path_cost) { path_cost_ = path_cost; }
+    void SetDepth(uint64_t depth) { depth_ = depth; }
+    /// @}
 };
 
 #include "node.tpp"
