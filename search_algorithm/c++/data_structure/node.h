@@ -21,9 +21,9 @@
  *
  * @tparam TState Type representing the problem state
  * @tparam TAction Type representing actions that can be taken
- * @tparam CostType Type representing the cost of actions (default is float)
+ * @tparam CostType Type representing the cost of actions
  */
-template <typename TState, typename TAction, typename CostType = float>
+template <typename TState, typename TAction, typename CostType>
 class Node
     : public std::enable_shared_from_this<Node<TState, TAction, CostType>> {
    public:
