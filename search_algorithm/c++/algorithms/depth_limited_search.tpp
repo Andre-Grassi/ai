@@ -11,21 +11,23 @@ using namespace search_algorithm;
 // Reference: figure 3.12, page 99, Artificial Intelligence: A Modern Approach,
 // 4th edition
 
-template <typename State, typename Action>
-std::shared_ptr<Node<State, Action>> search_algorithm::DepthLimitedSearch(
-    Problem<State, Action> const& problem, uint64_t depth_limit,
+template <typename State, typename Action, typename CostType>
+std::shared_ptr<Node<State, Action, CostType>>
+search_algorithm::DepthLimitedSearch(
+    Problem<State, Action, CostType> const& problem, uint64_t depth_limit,
     bool check_node_cycles, bool* out_cutoff) {
-    auto root =
-        std::make_shared<Node<State, Action>>(problem.GetInitialState());
+    using NodeType = Node<State, Action, CostType>;
 
-    std::stack<std::shared_ptr<Node<State, Action>>> lifo_stack =
-        std::stack<std::shared_ptr<Node<State, Action>>>();
+    auto root = std::make_shared<NodeType>(problem.GetInitialState());
+
+    std::stack<std::shared_ptr<NodeType>> lifo_stack =
+        std::stack<std::shared_ptr<NodeType>>();
     lifo_stack.push(root);
 
     bool cutoff_occurred = false;
 
     while (!lifo_stack.empty()) {
-        std::shared_ptr<Node<State, Action>> node = lifo_stack.top();
+        std::shared_ptr<NodeType> node = lifo_stack.top();
         lifo_stack.pop();
 
         if (problem.IsGoal(node->GetState())) return node;  // Solution found
@@ -33,8 +35,8 @@ std::shared_ptr<Node<State, Action>> search_algorithm::DepthLimitedSearch(
         if (node->GetDepth() <= depth_limit) {
             if (check_node_cycles && node->IsCycle()) continue;
 
-            std::vector<std::shared_ptr<Node<State, Action>>> children =
-                node->Expand(const_cast<Problem<State, Action>&>(problem));
+            std::vector<std::shared_ptr<NodeType>> children = node->Expand(
+                const_cast<Problem<State, Action, CostType>&>(problem));
             for (const auto& child : children) lifo_stack.push(child);
         } else
             cutoff_occurred = true;

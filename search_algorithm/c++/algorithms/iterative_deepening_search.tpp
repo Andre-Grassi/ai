@@ -11,10 +11,10 @@ using namespace search_algorithm;
 // Reference: figure 3.12, page 99, Artificial Intelligence: A Modern Approach,
 // 4th edition
 
-template <typename State, typename Action>
-std::shared_ptr<Node<State, Action>> search_algorithm::IterativeDeepeningSearch(
-    Problem<State, Action> const& problem) {
-    std::shared_ptr<Node<State, Action>> result = nullptr;
+template <typename State, typename Action, typename CostType>
+std::shared_ptr<Node<State, Action, CostType>> search_algorithm::IterativeDeepeningSearch(
+    Problem<State, Action, CostType> const& problem) {
+    std::shared_ptr<Node<State, Action, CostType>> result = nullptr;
 
     // Increase depth limit until solution is found
     for (uint64_t depth = 0;; ++depth) {

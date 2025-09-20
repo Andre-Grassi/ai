@@ -7,38 +7,38 @@
 #include "../data_structure/problems/sliding_tile_problem.h"
 
 namespace search_algorithm {
-template <typename State, typename Action>
-std::shared_ptr<Node<State, Action>> BreadthFirstSearch(
-    Problem<State, Action> const& problem);
+template <typename State, typename Action, typename CostType>
+std::shared_ptr<Node<State, Action, CostType>> BreadthFirstSearch(
+    Problem<State, Action, CostType> const& problem);
 
-template <typename State, typename Action>
-std::shared_ptr<Node<State, Action>> DepthFirstSearch(
-    Problem<State, Action> const& problem);
+template <typename State, typename Action, typename CostType>
+std::shared_ptr<Node<State, Action, CostType>> DepthFirstSearch(
+    Problem<State, Action, CostType> const& problem);
 
 // check_node_cycles: if true, check for cycles in the current path to avoid
 // redundant paths, but is more computationally expensive
 // *out_cutoff: if not nullptr, set to true if a cutoff occurred and no solution
 // was found
-template <typename State, typename Action>
-std::shared_ptr<Node<State, Action>> DepthLimitedSearch(
-    Problem<State, Action> const& problem, uint64_t depth_limit,
+template <typename State, typename Action, typename CostType>
+std::shared_ptr<Node<State, Action, CostType>> DepthLimitedSearch(
+    Problem<State, Action, CostType> const& problem, uint64_t depth_limit,
     bool check_node_cycles, bool* out_cutoff);
 
 // Calls DepthLimitedSearch with increasing depth limits until a solution is
 // found or it is determined that no solution exists
-template <typename State, typename Action>
-std::shared_ptr<Node<State, Action>> IterativeDeepeningSearch(
-    Problem<State, Action> const& problem);
+template <typename State, typename Action, typename CostType>
+std::shared_ptr<Node<State, Action, CostType>> IterativeDeepeningSearch(
+    Problem<State, Action, CostType> const& problem);
 
-template <typename State, typename Action, typename NodeComparator>
-std::shared_ptr<Node<State, Action>> BestFirstSearch(
-    Problem<State, Action> const& problem);
+template <typename State, typename Action, typename CostType,
+          typename NodeComparator>
+std::shared_ptr<Node<State, Action, CostType>> BestFirstSearch(
+    Problem<State, Action, CostType> const& problem);
 
-template <typename State, typename Action>
-std::shared_ptr<Node<State, Action>> UniformCostSearch(
-    Problem<State, Action> const& problem) {
-    return BestFirstSearch<State, Action, node_comparators::CompareByPathCost>(
-        problem);
+template <typename State, typename Action, typename CostType>
+std::shared_ptr<Node<State, Action, CostType>> UniformCostSearch(
+    Problem<State, Action, CostType> const& problem) {
+    return BestFirstSearch<State, Action, CostType>(problem);
 }
 
 }  // namespace search_algorithm
