@@ -44,9 +44,10 @@ struct CompareByPathCost {
      * @param b Second node to compare
      * @return true if node 'a' has higher path cost than 'b' (lower priority)
      */
-    template <typename TState, typename TAction>
-    bool operator()(const std::shared_ptr<Node<TState, TAction>>& a,
-                    const std::shared_ptr<Node<TState, TAction>>& b) const {
+    template <typename TState, typename TAction, typename CostType>
+    bool operator()(
+        const std::shared_ptr<Node<TState, TAction, CostType>>& a,
+        const std::shared_ptr<Node<TState, TAction, CostType>>& b) const {
         return a->GetPathCost() > b->GetPathCost();
     }
 };
@@ -67,10 +68,10 @@ struct CompareByPathCost {
  * @tparam TState Type representing the problem state
  * @tparam TAction Type representing actions that can be taken
  */
-template <typename TState, typename TAction>
+template <typename TState, typename TAction, typename CostType>
 struct CompareByAStar {
    private:
-    Problem<TState, TAction>
+    Problem<TState, TAction, CostType>
         problem_;  ///< Problem reference to access heuristic function
 
    public:
@@ -79,7 +80,8 @@ struct CompareByAStar {
      *
      * @param problem The problem instance containing the heuristic function
      */
-    CompareByAStar(Problem<TState, TAction> problem) : problem_(problem) {}
+    CompareByAStar(Problem<TState, TAction, CostType> problem)
+        : problem_(problem) {}
 
     /**
      * @brief Compares two nodes by their A* evaluation function f(n) = g(n) +
@@ -93,8 +95,9 @@ struct CompareByAStar {
      * than 'b' in a priority queue, ensuring the min-heap property for A*
      * search
      */
-    bool operator()(const std::shared_ptr<Node<TState, TAction>>& a,
-                    const std::shared_ptr<Node<TState, TAction>>& b) const {
+    bool operator()(
+        const std::shared_ptr<Node<TState, TAction, CostType>>& a,
+        const std::shared_ptr<Node<TState, TAction, CostType>>& b) const {
         return (a->GetPathCost() + problem_.Heuristic(a->GetState())) >
                (b->GetPathCost() + problem_.Heuristic(b->GetState()));
     }
