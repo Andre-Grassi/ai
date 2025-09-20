@@ -48,6 +48,8 @@ enum class Action {
  */
 using State = std::vector<std::vector<uint64_t>>;
 
+using CostType = int;  ///< Cost type for actions (uniform cost of 1)
+
 /**
  * @brief Sliding tile puzzle problem implementation
  *
@@ -62,7 +64,7 @@ using State = std::vector<std::vector<uint64_t>>;
  * @note The class ensures generated puzzles are solvable by checking
  *       the inversion count and blank tile position parity.
  */
-class SlidingTileProblem : public Problem<State, Action> {
+class SlidingTileProblem : public Problem<State, Action, CostType> {
    private:
     State initial_state_;     ///< Starting configuration of the puzzle
     uint64_t dimension_ = 3;  ///< Grid dimension (3 for 3x3, 4 for 4x4, etc.)
@@ -182,9 +184,9 @@ class SlidingTileProblem : public Problem<State, Action> {
      * @param new_state Resulting state (unused)
      * @return Always returns 1.0 (uniform cost)
      */
-    virtual double GetActionCost(const State&, const Action&,
-                                 const State&) const override {
-        return 1.0;  // Uniform cost for all actions
+    virtual CostType GetActionCost(const State&, const Action&,
+                                   const State&) const override {
+        return 1;  // Uniform cost for all actions
     }
 
     /**
