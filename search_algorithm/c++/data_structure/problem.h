@@ -24,8 +24,9 @@
  *
  * @tparam TState Type representing a state in the problem space
  * @tparam TAction Type representing actions that can be applied to states
+ * @tparam CostType Type representing the cost of actions (default is float)
  */
-template <typename TState, typename TAction>
+template <typename TState, typename TAction, typename CostType = float>
 class Problem {
    protected:
     TState initial_state_;  ///< The starting state of the problem
@@ -86,10 +87,10 @@ class Problem {
      * @param state The current state
      * @param action The action being applied
      * @param new_state The resulting state after applying the action
-     * @return The cost of the action as a double
+     * @return The cost of the action as CostType
      */
-    virtual double GetActionCost(const TState& state, const TAction& action,
-                                 const TState& new_state) const = 0;
+    virtual CostType GetActionCost(const TState& state, const TAction& action,
+                                   const TState& new_state) const = 0;
 
     /**
      * @brief Gets the initial state of the problem
