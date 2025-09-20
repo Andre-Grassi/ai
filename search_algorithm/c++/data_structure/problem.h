@@ -24,9 +24,9 @@
  *
  * @tparam TState Type representing a state in the problem space
  * @tparam TAction Type representing actions that can be applied to states
- * @tparam CostType Type representing the cost of actions (default is float)
+ * @tparam CostType Type representing the cost of actions
  */
-template <typename TState, typename TAction, typename CostType = float>
+template <typename TState, typename TAction, typename CostType>
 class Problem {
    protected:
     TState initial_state_;  ///< The starting state of the problem
