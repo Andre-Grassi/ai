@@ -11,6 +11,7 @@ SRC_DIR = .
 DATA_STRUCTURE_DIR = data_structure
 PROBLEMS_DIR = data_structure/problems
 ALGORITHMS_DIR = algorithms
+VISUAL_DIR = algorithms/visual
 BUILD_DIR = build
 BIN_DIR = bin
 
@@ -25,7 +26,9 @@ HEADERS = $(wildcard $(DATA_STRUCTURE_DIR)/*.h) \
           $(wildcard $(DATA_STRUCTURE_DIR)/*.tpp) \
           $(wildcard $(PROBLEMS_DIR)/*.h) \
           $(wildcard $(ALGORITHMS_DIR)/*.h) \
-          $(wildcard $(ALGORITHMS_DIR)/*.tpp)
+          $(wildcard $(ALGORITHMS_DIR)/*.tpp) \
+          $(wildcard $(VISUAL_DIR)/*.h) \
+          $(wildcard $(VISUAL_DIR)/*.tpp)
 
 # Target executable
 TARGET = $(BIN_DIR)/search_algorithm

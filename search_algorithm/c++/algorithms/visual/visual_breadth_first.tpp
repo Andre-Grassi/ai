@@ -1,0 +1,61 @@
+#include <limits>
+#include <queue>
+#include <set>
+#include <vector>
+
+#include "../../data_structure/node.h"
+#include "../../data_structure/problem.h"
+#include "visual_search.h"
+
+using namespace visual_search;
+
+// Reference: figure 3.9, page 95, Artificial Intelligence: A Modern Approach,
+// 4th edition
+
+// Uses a set to avoid redundant paths
+template <typename State, typename Action, typename CostType>
+std::shared_ptr<VisualNode<State, Action, CostType>>
+visual_search::VisualBreadthFirstSearch(
+    Problem<State, Action, CostType> const& problem) {
+    using NodeType = VisualNode<State, Action, CostType>;
+
+    State initialState = problem.GetInitialState();
+    std::shared_ptr<NodeType> root =
+        std::make_shared<NodeType>("0", initialState);
+
+    if (problem.IsGoal(root->GetState())) return root;
+
+    std::queue<std::shared_ptr<NodeType>> fifo_queue =
+        std::queue<std::shared_ptr<NodeType>>();
+    fifo_queue.push(root);
+
+    std::set<State> reached = std::set<State>();
+    reached.insert(root->GetState());
+
+    while (!fifo_queue.empty()) {
+        std::shared_ptr<NodeType> node = fifo_queue.front();
+        fifo_queue.pop();
+
+        std::vector<std::shared_ptr<NodeType>> children = node->Expand(
+            const_cast<Problem<State, Action, CostType>&>(problem));
+
+        /*
+         * Print Tree
+         */
+        root->PrintTree();
+
+        // Wait for user input to proceed
+        std::cout << "Press Enter to continue..." << std::endl;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        for (const auto& child : children) {
+            if (problem.IsGoal(child->GetState())) return child;
+            if (reached.find(child->GetState()) == reached.end()) {
+                reached.insert(child->GetState());
+                fifo_queue.push(child);
+            }
+        }
+    }
+
+    return nullptr;  // Failure
+}
