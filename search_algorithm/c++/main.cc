@@ -1,11 +1,14 @@
 #include <iostream>
 #include <memory>
 
-#include "algorithms/search_algorithm.h"
-#include "data_structure/node.h"
+#include "algorithms/visual/visual_search.h"
 #include "data_structure/problems/sliding_tile_problem.h"
+#include "data_structure/visual/visual_node.h"
 
 int main() {
+    using NodeType = VisualNode<sliding_tile::State, sliding_tile::Action,
+                                sliding_tile::CostType>;
+
     std::cout << "Search Algorithm Demo" << std::endl;
 
     uint64_t dimension;
@@ -25,8 +28,8 @@ int main() {
     // Display initial state
     problem->PrintState(initial_state);
 
-    std::shared_ptr<Node<sliding_tile::State, sliding_tile::Action>> solution =
-        search_algorithm::BreadthFirstSearch(*problem);
+    std::shared_ptr<NodeType> solution =
+        visual_search::VisualBreadthFirstSearch(*problem);
 
     problem->PrintState(solution->GetState());
 
