@@ -5,6 +5,7 @@
 
 #include "../../data_structure/node.h"
 #include "../../data_structure/problem.h"
+#include "../../data_structure/visual/terminal_ui.h"
 #include "visual_search.h"
 
 using namespace visual_search;
@@ -18,6 +19,11 @@ std::shared_ptr<VisualNode<State, Action, CostType>>
 visual_search::VisualBreadthFirstSearch(
     Problem<State, Action, CostType> const& problem) {
     using NodeType = VisualNode<State, Action, CostType>;
+
+    int columns_layout = 2;
+    TerminalUI ui = TerminalUI(columns_layout);
+    int left_window_index = 0;
+    int right_window_index = 1;
 
     State initialState = problem.GetInitialState();
     std::shared_ptr<NodeType> root =
@@ -42,11 +48,14 @@ visual_search::VisualBreadthFirstSearch(
         /*
          * Print Tree
          */
-        root->PrintTree();
+        ui.RefreshAll();
+        ui.PrintToWindow(left_window_index, 0, 0, root->GetTreeString());
+        ui.PrintToStatusBar("Press Enter to continue...");
+        ui.RefreshAll();
 
         // Wait for user input to proceed
-        std::cout << "Press Enter to continue..." << std::endl;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        // std::cout << "Press Enter to continue..." << std::endl;
+        ui.WaitForKey(KEY_ENTER);
 
         for (const auto& child : children) {
             if (problem.IsGoal(child->GetState())) return child;

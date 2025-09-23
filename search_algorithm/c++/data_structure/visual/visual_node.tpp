@@ -1,4 +1,8 @@
+#include <ncurses.h>
+
 #include <queue>
+#include <sstream>
+#include <string>
 #include <vector>
 
 #include "../node.h"
@@ -24,6 +28,40 @@ VisualNode<TState, TAction, CostType>::Expand(
     this->children_ = std::move(children);
 
     return this->children_;
+}
+
+template <typename TState, typename TAction, typename CostType>
+std::string VisualNode<TState, TAction, CostType>::GetTreeString() const {
+    std::stringstream tree_ss;
+
+    std::queue<std::shared_ptr<NodeType>> node_queue;
+    node_queue.push(
+        std::make_shared<VisualNode<TState, TAction, CostType>>(*this));
+
+    uint64_t depth = this->GetDepth();
+
+    while (!node_queue.empty()) {
+        uint64_t this_depth_node_count = node_queue.size();
+
+        // Get depth level
+        tree_ss << std::to_string(depth) << ": ";
+
+        // Process all nodes at the current depth
+        for (uint64_t i = 0; i < this_depth_node_count; ++i) {
+            std::shared_ptr<NodeType> current_node = node_queue.front();
+            node_queue.pop();
+            tree_ss << current_node->index_string_ << " ";
+
+            // Enqueue children for the next depth level
+            for (const auto& child : current_node->children_)
+                node_queue.push(child);
+        }
+        tree_ss << std::endl;
+
+        depth++;
+    }
+
+    return tree_ss.str();
 }
 
 template <typename TState, typename TAction, typename CostType>

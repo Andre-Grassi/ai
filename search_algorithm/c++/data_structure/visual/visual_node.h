@@ -102,6 +102,8 @@ class VisualNode : public Node<TState, TAction, CostType> {
         return children_;
     }
 
+    std::string GetTreeString() const;
+
     /**
      * @brief Print the entire search tree starting from the root
      *
