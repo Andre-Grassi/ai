@@ -5,6 +5,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O2 -g
 INCLUDES = -I. -Idata_structure -Ialgorithms
+LDFLAGS = -lncurses
 
 # Directories
 SRC_DIR = .
@@ -43,7 +44,7 @@ directories:
 
 # Main target
 $(TARGET): $(OBJECTS) main.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ main.cc $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ main.cc $(OBJECTS) $(LDFLAGS)
 
 # Object files rule
 $(BUILD_DIR)/%.o: %.cc $(HEADERS)
@@ -52,7 +53,7 @@ $(BUILD_DIR)/%.o: %.cc $(HEADERS)
 
 # Test target (if you want to create a test executable)
 test: directories $(OBJECTS) test_main.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(BIN_DIR)/test_search test_main.cc $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(BIN_DIR)/test_search test_main.cc $(OBJECTS) $(LDFLAGS)
 
 # Debug build
 debug: CXXFLAGS += -DDEBUG -g3 -O0
