@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "../node.h"
+#include "node.h"
 
 /**
  * @brief A visual representation of a search tree node that extends the base
