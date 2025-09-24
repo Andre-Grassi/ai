@@ -49,7 +49,11 @@ visual_search::VisualBreadthFirstSearch(
          * Print Tree
          */
         ui.RefreshAll();
-        ui.PrintToWindow(left_window_index, 0, 0, root->GetTreeString());
+        ui.PrintToWindow(left_window_index, 0, 0,
+                         "Tree:\n" + root->GetTreeString());
+        ui.PrintToWindow(
+            right_window_index, 0, 0,
+            "Frontier States:\n" + root->GetFrontierStatesString(problem));
         ui.PrintToStatusBar("Press Enter to continue...");
         ui.RefreshAll();
 
