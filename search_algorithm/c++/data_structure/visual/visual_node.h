@@ -118,6 +118,9 @@ class VisualNode : public Node<TState, TAction, CostType> {
      */
     void PrintTree() const;
 
+    std::string GetFrontierStatesString(
+        const Problem<TState, TAction, CostType>& problem) const;
+
    private:
     /**
      * @brief Hierarchical index string for node identification

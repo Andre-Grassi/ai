@@ -93,3 +93,37 @@ void VisualNode<TState, TAction, CostType>::PrintTree() const {
         depth++;
     }
 }
+
+template <typename TState, typename TAction, typename CostType>
+std::string VisualNode<TState, TAction, CostType>::GetFrontierStatesString(
+    const Problem<TState, TAction, CostType>& problem) const {
+    std::stringstream frontier_states_ss;
+
+    std::queue<std::shared_ptr<NodeType>> node_queue;
+    node_queue.push(
+        std::make_shared<VisualNode<TState, TAction, CostType>>(*this));
+
+    std::queue<std::shared_ptr<NodeType>> frontier;
+
+    while (!node_queue.empty()) {
+        std::shared_ptr<NodeType> current_node = node_queue.front();
+        node_queue.pop();
+
+        if (current_node->children_.empty()) {
+            frontier.push(current_node);
+        } else {
+            for (const auto& child : current_node->children_)
+                node_queue.push(child);
+        }
+    }
+
+    // Format the frontier states into a string
+    while (!frontier.empty()) {
+        std::shared_ptr<NodeType> node = frontier.front();
+        frontier.pop();
+        frontier_states_ss << node->index_string_ << ":\n"
+                           << problem.GetStateString(node->GetState()) << "\n";
+    }
+
+    return frontier_states_ss.str();
+}
