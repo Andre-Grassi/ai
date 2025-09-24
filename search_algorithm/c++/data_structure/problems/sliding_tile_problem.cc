@@ -220,6 +220,40 @@ void SlidingTileProblem::PrintState(const State& state) const {
     }
 }
 
+std::string SlidingTileProblem::GetStateString(const State& state) const {
+    std::stringstream state_ss;
+
+    // Calculate the maximum number (dimension * dimension - 1)
+    int max_number = static_cast<int>(dimension_ * dimension_ - 1);
+
+    // Calculate the width needed (number of digits in max_number)
+    int width = 0;
+    int temp = max_number;
+    if (temp == 0) {
+        width = 1;
+    } else {
+        while (temp > 0) {
+            width++;
+            temp /= 10;
+        }
+    }
+
+    // Print the state with justified formatting
+    for (size_t i = 0; i < state.size(); ++i) {
+        for (size_t j = 0; j < state[i].size(); ++j) {
+            // Use setw to set field width and right-align numbers
+            state_ss << std::setw(width) << state[i][j];
+
+            // Add space between numbers except for the last column
+            if (j < state[i].size() - 1) {
+                state_ss << " ";
+            }
+        }
+        state_ss << std::endl;
+    }
+    return state_ss.str();
+}
+
 State SlidingTileProblem::GenerateGoalState() const {
     State goal = State(dimension_, std::vector<uint64_t>(dimension_, 0));
     uint64_t count = 0;

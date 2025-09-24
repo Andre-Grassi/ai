@@ -229,6 +229,8 @@ class SlidingTileProblem : public Problem<State, Action, CostType> {
      * @param state The state to print
      */
     void PrintState(const State& state) const;
+
+    std::string GetStateString(const State& state) const override;
 };
 
 }  // namespace sliding_tile
