@@ -15,6 +15,7 @@ ALGORITHMS_DIR = algorithms
 VISUAL_DIR = algorithms/visual
 BUILD_DIR = build
 BIN_DIR = bin
+EXAMPLES_DIR = examples
 
 # Source files
 SOURCES = $(wildcard $(PROBLEMS_DIR)/*.cc)
@@ -34,6 +35,10 @@ HEADERS = $(wildcard $(DATA_STRUCTURE_DIR)/*.h) \
 # Target executable
 TARGET = $(BIN_DIR)/search_algorithm
 
+# Examples
+EXAMPLE_SOURCES = $(wildcard $(EXAMPLES_DIR)/*.cc)
+EXAMPLE_TARGETS = $(EXAMPLE_SOURCES:$(EXAMPLES_DIR)/%.cc=$(BIN_DIR)/%)
+
 # Default target
 all: directories $(TARGET)
 
@@ -50,6 +55,13 @@ $(TARGET): $(OBJECTS) main.cc
 $(BUILD_DIR)/%.o: %.cc $(HEADERS)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+# Examples target - compile all examples
+examples: directories $(EXAMPLE_TARGETS)
+
+# Rule to compile each example
+$(BIN_DIR)/%: $(EXAMPLES_DIR)/%.cc $(OBJECTS) $(HEADERS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(OBJECTS) $(LDFLAGS)
 
 # Test target (if you want to create a test executable)
 test: directories $(OBJECTS) test_main.cc
@@ -78,6 +90,8 @@ info:
 	@echo "Sources: $(SOURCES)"
 	@echo "Objects: $(OBJECTS)"
 	@echo "Headers: $(HEADERS)"
+	@echo "Example Sources: $(EXAMPLE_SOURCES)"
+	@echo "Example Targets: $(EXAMPLE_TARGETS)"
 
 # Install (copy to system path - optional)
 install: $(TARGET)
@@ -116,6 +130,7 @@ docs:
 help:
 	@echo "Available targets:"
 	@echo "  all       - Build the project (default)"
+	@echo "  examples  - Build all example executables"
 	@echo "  test      - Build test executable"
 	@echo "  debug     - Build with debug flags"
 	@echo "  release   - Build with release optimizations"
@@ -130,7 +145,7 @@ help:
 	@echo "  help      - Show this help message"
 
 # Phony targets
-.PHONY: all directories test debug release clean rebuild info install uninstall format check docs help
+.PHONY: all directories examples test debug release clean rebuild info install uninstall format check docs help
 
 # Dependency tracking (automatically generated)
 -include $(OBJECTS:.o=.d)
