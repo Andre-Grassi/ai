@@ -37,14 +37,7 @@ visual_search::VisualBreadthFirstSearch(
 
     std::set<State> reached = std::set<State>();
     reached.insert(root->GetState());
-
     while (!fifo_queue.empty()) {
-        std::shared_ptr<NodeType> node = fifo_queue.front();
-        fifo_queue.pop();
-
-        std::vector<std::shared_ptr<NodeType>> children = node->Expand(
-            const_cast<Problem<State, Action, CostType>&>(problem));
-
         /*
          * Print Tree
          */
@@ -59,7 +52,13 @@ visual_search::VisualBreadthFirstSearch(
 
         // Wait for user input to proceed
         // std::cout << "Press Enter to continue..." << std::endl;
-        ui.WaitForKey(KEY_ENTER);
+        ui.WaitForKey('\n');
+
+        std::shared_ptr<NodeType> node = fifo_queue.front();
+        fifo_queue.pop();
+
+        std::vector<std::shared_ptr<NodeType>> children = node->Expand(
+            const_cast<Problem<State, Action, CostType>&>(problem));
 
         for (const auto& child : children) {
             if (problem.IsGoal(child->GetState())) return child;
