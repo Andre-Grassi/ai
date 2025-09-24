@@ -2,8 +2,8 @@
 #include <set>
 #include <vector>
 
-#include "../data_structure/node.h"
-#include "../data_structure/problem.h"
+#include "data_structure/node.h"
+#include "data_structure/problem.h"
 #include "search_algorithm.h"
 
 using namespace search_algorithm;

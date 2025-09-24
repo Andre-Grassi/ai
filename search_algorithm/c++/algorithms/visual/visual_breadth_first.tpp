@@ -3,9 +3,9 @@
 #include <set>
 #include <vector>
 
-#include "../../data_structure/node.h"
-#include "../../data_structure/problem.h"
-#include "../../data_structure/visual/terminal_ui.h"
+#include "data_structure/node.h"
+#include "data_structure/problem.h"
+#include "data_structure/visual/terminal_ui.h"
 #include "visual_search.h"
 
 using namespace visual_search;

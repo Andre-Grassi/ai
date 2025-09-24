@@ -8,10 +8,10 @@
 #ifndef SEARCH_ALG_ALGORITHMS_SEARCH_ALGORITHM_H_
 #define SEARCH_ALG_ALGORITHMS_SEARCH_ALGORITHM_H_
 
-#include "../data_structure/node.h"
-#include "../data_structure/node_comparators.h"
-#include "../data_structure/problem.h"
-#include "../data_structure/problems/sliding_tile_problem.h"
+#include "data_structure/node.h"
+#include "data_structure/node_comparators.h"
+#include "data_structure/problem.h"
+#include "data_structure/problems/sliding_tile_problem.h"
 
 /**
  * @namespace search_algorithm
