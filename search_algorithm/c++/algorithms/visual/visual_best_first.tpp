@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "data_structure/problem.h"
+#include "data_structure/visual/terminal_ui.h"
 #include "data_structure/visual/visual_node.h"
 #include "visual_search.h"
 
@@ -18,6 +19,11 @@ visual_search::VisualBestFirstSearch(
     Problem<State, Action, CostType> const& problem) {
     using NodeType = VisualNode<State, Action, CostType>;
     using NodePtrVector = std::vector<std::shared_ptr<NodeType>>;
+
+    int columns_layout = 2;
+    TerminalUI ui(columns_layout);
+    int left_window_index = 0;
+    int right_window_index = 1;
 
     State initialState = problem.GetInitialState();
     std::string rootIndexStr = "0";
@@ -43,6 +49,22 @@ visual_search::VisualBestFirstSearch(
 
     // Increase depth limit until solution is found
     while (!frontier.empty()) {
+        
+
+        /*
+         * Print Tree
+         */
+        ui.RefreshAll();
+        ui.PrintToWindow(left_window_index, 0, 0,
+                         "Tree:\n" + root->GetTreeString());
+        ui.PrintToWindow(
+            right_window_index, 0, 0,
+            "Frontier States:\n" + root->GetFrontierStatesString(problem));
+        ui.PrintToStatusBar("Press Enter to continue...");
+        ui.RefreshAll();
+
+        ui.WaitForKey('\n');
+
         std::shared_ptr<NodeType> node = frontier.top();
         frontier.pop();
 
