@@ -5,6 +5,9 @@
  * @date 2025
  */
 
+#ifndef SEARCH_ALG_DATA_STRUCTURE_VISUAL_TERMINAL_UI_H_
+#define SEARCH_ALG_DATA_STRUCTURE_VISUAL_TERMINAL_UI_H_
+
 #include <ncurses.h>
 
 #include <memory>
@@ -142,3 +145,5 @@ class TerminalUI {
         column_height_; /**< Dimensions of each individual column */
     std::vector<WindowPtr> windows_; /**< Vector of ncurses window pointers */
 };
+
+#endif  // SEARCH_ALG_DATA_STRUCTURE_VISUAL_TERMINAL_UI_H_
