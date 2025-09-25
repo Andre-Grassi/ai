@@ -9,7 +9,7 @@
 #define SEARCH_ALG_ALGORITHMS_SEARCH_ALGORITHM_H_
 
 #include "data_structure/node.h"
-#include "data_structure/node_comparators.h"
+#include "data_structure/node_comparator.h"
 #include "data_structure/problem.h"
 #include "data_structure/problems/sliding_tile_problem.h"
 
@@ -105,10 +105,10 @@ std::shared_ptr<Node<State, Action, CostType>> IterativeDeepeningSearch(
  * @note Use node_comparators::CompareByPathCost for UCS
  * @note Use node_comparators::CompareByAStar for A* search
  */
-template <typename State, typename Action, typename CostType,
-          typename NodeComparator>
+template <typename State, typename Action, typename CostType>
 std::shared_ptr<Node<State, Action, CostType>> BestFirstSearch(
-    Problem<State, Action, CostType> const& problem);
+    Problem<State, Action, CostType> const& problem,
+    NodeComparator<State, Action, CostType> const& comparator);
 
 /**
  * @brief Uniform Cost Search algorithm
@@ -129,7 +129,8 @@ std::shared_ptr<Node<State, Action, CostType>> BestFirstSearch(
 template <typename State, typename Action, typename CostType>
 std::shared_ptr<Node<State, Action, CostType>> UniformCostSearch(
     Problem<State, Action, CostType> const& problem) {
-    return BestFirstSearch<State, Action, CostType>(problem);
+    CompareByPathCost<State, Action, CostType> comparator(problem);
+    return BestFirstSearch<State, Action, CostType>(problem, comparator);
 }
 
 }  // namespace search_algorithm

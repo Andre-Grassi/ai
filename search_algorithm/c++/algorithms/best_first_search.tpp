@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "data_structure/node.h"
+#include "data_structure/node_comparator.h"
 #include "data_structure/problem.h"
 #include "search_algorithm.h"
 
@@ -12,25 +13,36 @@ using namespace search_algorithm;
 // 4th edition
 
 template <typename State, typename Action, typename CostType>
-using NodePtrVector = std::vector<std::shared_ptr<Node<State, Action, CostType>>>;
+using NodePtrVector =
+    std::vector<std::shared_ptr<Node<State, Action, CostType>>>;
 
-template <typename State, typename Action, typename CostType,
-          typename NodeComparator>
+/*
+* //TODO: Always Instantiate NodeComparator with the type given in the template
+* // cause it can be needed, for example the a start node comparator needs to
+* // access the heuristic function of the node
+
+*/
+
+template <typename State, typename Action, typename CostType>
 std::shared_ptr<Node<State, Action, CostType>>
 search_algorithm::BestFirstSearch(
-    Problem<State, Action, CostType> const& problem) {
+    Problem<State, Action, CostType> const& problem,
+    NodeComparator<State, Action, CostType> const& comparator) {
     State initialState = problem.GetInitialState();
     std::shared_ptr<Node<State, Action, CostType>> root =
         std::make_shared<Node<State, Action, CostType>>(initialState);
 
     std::priority_queue<
+        // Type of elements in the priority queue
         std::shared_ptr<Node<State, Action, CostType>>,
+        // Container type for the priority queue
         std::vector<std::shared_ptr<Node<State, Action, CostType>>>,
+        // Comparator for the priority queue
         NodeComparator>
         frontier =
             std::priority_queue<std::shared_ptr<Node<State, Action, CostType>>,
                                 NodePtrVector<State, Action, CostType>,
-                                NodeComparator>();
+                                NodeComparator>(comparator);
     frontier.push(root);
 
     std::set<State> reached = std::set<State>();
@@ -43,8 +55,8 @@ search_algorithm::BestFirstSearch(
 
         if (problem.IsGoal(node->GetState())) return node;
 
-        NodePtrVector<State, Action, CostType> children =
-            node->Expand(const_cast<Problem<State, Action, CostType>&>(problem));
+        NodePtrVector<State, Action, CostType> children = node->Expand(
+            const_cast<Problem<State, Action, CostType>&>(problem));
         for (const auto& child : children) {
             if (reached.find(child->GetState()) == reached.end()) {
                 reached.insert(child->GetState());
