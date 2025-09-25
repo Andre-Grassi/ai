@@ -1,0 +1,290 @@
+/**
+ * @file node.dox
+ * @brief Documentation for node class for search algorithms
+ * @author Andre Grassi
+ * @date 2025
+ */
+
+/**
+ * @class Node
+ * 
+ * @details
+ * The Node class is a fundamental component of search algorithms, representing
+ * a single node in a search tree. Each node encapsulates:
+ * - A problem state
+ * - A reference to its parent node (for path reconstruction)
+ * - The action that led to this state
+ * - The cumulative cost from the root to this node
+ * - The depth level in the search tree
+ * 
+ * This class supports various search algorithms including:
+ * - Depth-First Search (DFS)
+ * - Breadth-First Search (BFS)
+ * - Uniform Cost Search (UCS)
+ * - A* Search
+ * - Greedy Best-First Search
+ * 
+ * @tparam TState Type representing the problem state (e.g., board configuration)
+ * @tparam TAction Type representing actions (e.g., move directions)
+ * @tparam CostType Type representing cost values (typically int or float)
+ * 
+ * @section usage Usage Example
+ * @code{.cpp}
+ * // Create a root node for sliding tile puzzle
+ * auto initial_state = problem.GetInitialState();
+ * auto root = std::make_shared<Node<State, Action, int>>(initial_state);
+ * 
+ * // Expand the node to get children
+ * auto children = root->Expand(problem);
+ * 
+ * // Check if we've reached a goal
+ * if (problem.IsGoal(root->GetState())) {
+ *     std::cout << "Goal found at depth: " << root->GetDepth() << std::endl;
+ * }
+ * @endcode
+ * 
+ * @section memory_management Memory Management
+ * Nodes use std::shared_ptr for automatic memory management and safe
+ * parent-child relationships. The enable_shared_from_this inheritance
+ * allows nodes to safely create shared_ptr references to themselves
+ * when creating child nodes.
+ * 
+ * @section immutability Immutability Considerations
+ * Once constructed, nodes should be treated as immutable. The private
+ * setter methods exist for special cases but their use is strongly
+ * discouraged as they can corrupt the search tree structure.
+ * 
+ * @author Andre Grassi
+ * @date 2025
+ */
+
+/**
+ * @section constructors Constructors
+ */
+
+/**
+ * @fn Node::Node(TState state, std::shared_ptr<NodeType> parent, TAction action, CostType path_cost)
+ * @brief Constructs a new Node with the specified parameters
+ * 
+ * @details
+ * Creates a new node in the search tree. The depth is automatically calculated
+ * based on the parent node's depth (parent depth + 1, or 0 for root nodes).
+ * 
+ * @param state The problem state this node represents
+ * @param parent Shared pointer to the parent node (nullptr for root node)
+ * @param action The action that led from parent to this state (default constructed for root)
+ * @param path_cost The cumulative cost from root to this node (0.0 for root)
+ * 
+ * @pre The state should be valid according to the problem constraints
+ * @pre If parent is not nullptr, the action should be valid from parent's state
+ * @pre path_cost should be non-negative
+ * 
+ * @post The node's depth is set to parent->GetDepth() + 1, or 0 if parent is nullptr
+ * @post All member variables are properly initialized
+ * 
+ */
+
+/**
+ * @section public_methods Public Methods
+ */
+
+/**
+ * @fn std::vector<std::shared_ptr<NodeType>> Node::Expand(Problem<TState, TAction, CostType>& problem)
+ * 
+ * @details
+ * Creates child nodes for all valid actions from the current state.
+ * Each child node has this node as its parent and the corresponding
+ * action and updated path cost.
+ *
+ * @pre The problem must be properly initialized
+ * @pre This node's state must be valid
+ * 
+ * @post Each returned child node has this node as its parent
+ * @post Each child's path cost is this node's path cost plus the action cost
+ * @post Each child's depth is this node's depth plus one
+ */
+
+/**
+ * @fn bool Node::IsCycle() const
+ * 
+ * @details
+ * Detects cycles by traversing up the parent chain and comparing states.
+ * This is crucial for avoiding infinite loops in search algorithms when
+ * the state space contains cycles (e.g., returning to a previously visited state).
+ * 
+ * The method compares the current node's state with all ancestor states
+ * in the path from root to this node.
+ * 
+ * @pre The state type TState must support equality comparison (operator==)
+ * 
+ * @warning If TState does not properly implement operator==, cycle detection
+ *          may not work correctly
+ */
+
+/**
+ * @section getter_methods Getter Methods
+ */
+
+/**
+ * @fn const TState& Node::GetState() const
+ *
+ * @post The returned reference remains valid as long as the node exists
+ * @post The state cannot be modified through the returned reference
+ */
+
+/**
+ * @fn std::shared_ptr<NodeType> Node::GetParent() const
+ * @post The returned shared_ptr ensures the parent remains alive as long as
+ *       the returned pointer exists
+ */
+
+/**
+ * @fn const TAction& Node::GetAction() const
+ * @return Const reference to the action that was applied to the parent state
+ *         to reach this node's state
+ * 
+ * @note For root nodes, this returns a default-constructed action
+ * @note Used for solution path reconstruction
+ */
+
+/**
+ * @fn float Node::GetPathCost() const
+ * @post The returned value is the sum of all action costs along the path
+ * @post For root nodes, this returns 0.0
+ */
+
+/**
+ * @fn uint64_t Node::GetDepth() const
+ * @post Root nodes have depth 0
+ * @post Child nodes have depth = parent depth + 1
+ * @note Stored as uint64_t to handle very deep search trees, but that is practically impossible to compute anyway
+ */
+
+/**
+ * @section member_variables Member Variables
+ */
+
+/**
+ * @var TState Node::state_
+ * @brief The problem state represented by this node
+ * 
+ * @details
+ * Stores the current configuration or situation in the problem space.
+ * For example, in a sliding tile puzzle, this would be the current
+ * arrangement of tiles on the board.
+ * 
+ * @note Should be treated as immutable after construction
+ */
+
+/**
+ * @var std::shared_ptr<NodeType> Node::parent_
+ * @brief Pointer to the parent node in the search tree
+ * 
+ * @details
+ * Maintains the tree structure and enables path reconstruction.
+ * Set to nullptr for root nodes.
+ * 
+ * @note Uses shared_ptr for automatic memory management
+ * @note Enables traversing back up the tree for cycle detection and solution paths
+ */
+
+/**
+ * @var TAction Node::action_
+ * @brief The action that led from the parent state to this node's state
+ * 
+ * @details
+ * Represents the operation or move that was applied to transform
+ * the parent's state into this node's state. For root nodes,
+ * contains a default-constructed action.
+ * 
+ * @note Essential for reconstructing the solution path
+ * @note The action type is problem-specific (e.g., move directions, operations)
+ */
+
+/**
+ * @var float Node::path_cost_
+ * @brief The cumulative cost from the root node to this node
+ * 
+ * @details
+ * Represents the total cost of all actions taken along the path
+ * from the root to this node. Used by cost-aware search algorithms
+ * like Uniform Cost Search and A*.
+ * 
+ * @note Stored as float to accommodate various numeric cost types
+ * @note Should always be non-negative
+ * @note Root nodes have path_cost_ = 0.0
+ */
+
+/**
+ * @var uint64_t Node::depth_
+ * @brief The depth level of this node in the search tree
+ * 
+ * @details
+ * Represents the number of edges (actions) from the root to this node.
+ * Automatically calculated during construction based on the parent's depth.
+ * 
+ * @note Root nodes have depth = 0
+ * @note Used for depth-limited searches and tree statistics
+ * @note Large integer type to handle very deep search trees
+ */
+
+/**
+ * @section private_methods Private Methods (Dangerous)
+ */
+
+/**
+ * @warning These methods are dangerous and should NOT be used after construction. They can break node immutability and corrupt the search tree structure. All node properties should be set only during construction. Unless you are doing something really fancy.
+ */
+
+/**
+ * @fn void Node::SetState(const TState& state)
+ * @fn void Node::SetState(TState&& state)
+ * @brief Sets the node's state (DANGEROUS - breaks immutability)
+ * 
+ * @warning This method breaks the immutability contract of nodes.
+ *          Changing a node's state after construction can corrupt
+ *          the search tree and lead to incorrect results.
+ * 
+ * @param state The new state to set (by const reference or move)
+ */
+
+/**
+ * @fn void Node::SetParent(std::shared_ptr<NodeType> parent)
+ * @brief Sets the parent node (DANGEROUS - breaks tree structure)
+ * 
+ * @warning Changing parent relationships after construction can create
+ *          cycles, orphan nodes, or inconsistent tree structures.
+ * 
+ * @param parent New parent node pointer
+ */
+
+/**
+ * @fn void Node::SetAction(const TAction& action)
+ * @fn void Node::SetAction(TAction&& action)
+ * @brief Sets the action that led to this node (DANGEROUS)
+ * 
+ * @warning Changing the action after construction makes the search
+ *          tree inconsistent and can break solution reconstruction.
+ * 
+ * @param action The new action (by const reference or move)
+ */
+
+/**
+ * @fn void Node::SetPathCost(CostType path_cost)
+ * @brief Sets the cumulative path cost (DANGEROUS)
+ * 
+ * @warning Manually setting path cost can break optimality guarantees
+ *          of search algorithms and lead to incorrect solutions.
+ * 
+ * @param path_cost The new path cost value
+ */
+
+/**
+ * @fn void Node::SetDepth(uint64_t depth)
+ * @brief Sets the node's depth (DANGEROUS)
+ * 
+ * @warning Incorrect depth values can break depth-limited searches
+ *          and tree statistics.
+ * 
+ * @param depth The new depth value
+ */
