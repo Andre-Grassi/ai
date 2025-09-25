@@ -10,6 +10,7 @@
 #define SEARCH_ALG_DATA_STRUCTURE_VISUAL_VISUAL_NODE_H_
 
 #include <cstdint>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -118,7 +119,17 @@ class VisualNode : public Node<TState, TAction, CostType> {
      */
     void PrintTree() const;
 
+    std::queue<std::shared_ptr<VisualNode<TState, TAction, CostType>>>
+    GetFrontierStates(const Problem<TState, TAction, CostType>& problem) const;
+
+    // Get the frontier states and format them as a string
     std::string GetFrontierStatesString(
+        const Problem<TState, TAction, CostType>& problem) const;
+
+    // Given the frontier states, format according to the problem
+    std::string FormatFrontierStates(
+        std::queue<std::shared_ptr<VisualNode<TState, TAction, CostType>>>
+            frontier,
         const Problem<TState, TAction, CostType>& problem) const;
 
    private:

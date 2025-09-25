@@ -95,10 +95,9 @@ void VisualNode<TState, TAction, CostType>::PrintTree() const {
 }
 
 template <typename TState, typename TAction, typename CostType>
-std::string VisualNode<TState, TAction, CostType>::GetFrontierStatesString(
+std::queue<std::shared_ptr<VisualNode<TState, TAction, CostType>>>
+VisualNode<TState, TAction, CostType>::GetFrontierStates(
     const Problem<TState, TAction, CostType>& problem) const {
-    std::stringstream frontier_states_ss;
-
     std::queue<std::shared_ptr<NodeType>> node_queue;
     node_queue.push(
         std::make_shared<VisualNode<TState, TAction, CostType>>(*this));
@@ -117,13 +116,36 @@ std::string VisualNode<TState, TAction, CostType>::GetFrontierStatesString(
         }
     }
 
+    return frontier;
+}
+
+template <typename TState, typename TAction, typename CostType>
+std::string VisualNode<TState, TAction, CostType>::FormatFrontierStates(
+    std::queue<std::shared_ptr<VisualNode<TState, TAction, CostType>>> frontier,
+    const Problem<TState, TAction, CostType>& problem) const {
+    std::stringstream frontier_states_ss;
+
     // Format the frontier states into a string
     while (!frontier.empty()) {
         std::shared_ptr<NodeType> node = frontier.front();
         frontier.pop();
         frontier_states_ss << node->index_string_ << ":\n"
                            << problem.GetStateString(node->GetState()) << "\n";
+        if (problem.Heuristic(node->GetState()) != 0)
+            frontier_states_ss
+                << "Heuristic: "
+                << std::to_string(problem.Heuristic(node->GetState())) << "\n";
     }
 
     return frontier_states_ss.str();
+}
+
+template <typename TState, typename TAction, typename CostType>
+std::string VisualNode<TState, TAction, CostType>::GetFrontierStatesString(
+    const Problem<TState, TAction, CostType>& problem) const {
+    std::stringstream frontier_states_ss;
+
+    std::queue<std::shared_ptr<NodeType>> frontier = GetFrontierStates(problem);
+
+    return FormatFrontierStates(frontier, problem);
 }
