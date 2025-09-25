@@ -15,10 +15,6 @@
 /**
  * @brief Represents a node in a search tree
  *
- * A node contains a state, a pointer to its parent node, the action that
- * led to this state, and the cumulative path cost from the initial state.
- * Nodes are used to build search trees in various AI search algorithms.
- *
  * @tparam TState Type representing the problem state
  * @tparam TAction Type representing actions that can be taken
  * @tparam CostType Type representing the cost of actions
@@ -46,11 +42,6 @@ class Node
 
     /**
      * @brief Expands this node by generating all possible child nodes
-     *
-     * Creates child nodes for all valid actions from the current state.
-     * Each child node has this node as its parent and the corresponding
-     * action and updated path cost.
-     *
      * @param problem The problem instance containing action and transition
      * logic
      * @return Vector of shared pointers to child nodes
@@ -60,10 +51,6 @@ class Node
 
     /**
      * @brief Checks if this node creates a cycle in the current path
-     *
-     * Traverses up the parent chain to detect if the current state
-     * has already appeared in the path from root to this node.
-     *
      * @return true if a cycle is detected, false otherwise
      */
     bool IsCycle() const;
@@ -107,10 +94,7 @@ class Node
 
     /**
      * @name Private Setter Methods
-     * @warning These methods are dangerous and should NOT be used after
-     * construction. They can break node immutability and corrupt the search
-     * tree structure. All node properties should be set only during
-     * construction. Unless you are doing something really fancy.
+     * @warning Using these after construction can break tree integrity
      * @{
      */
     void SetState(const TState& state) { state_ = state; }

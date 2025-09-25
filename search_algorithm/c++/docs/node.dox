@@ -59,10 +59,6 @@
  */
 
 /**
- * @section constructors Constructors
- */
-
-/**
  * @fn Node::Node(TState state, std::shared_ptr<NodeType> parent, TAction action, CostType path_cost)
  * @brief Constructs a new Node with the specified parameters
  * 
@@ -82,10 +78,6 @@
  * @post The node's depth is set to parent->GetDepth() + 1, or 0 if parent is nullptr
  * @post All member variables are properly initialized
  * 
- */
-
-/**
- * @section public_methods Public Methods
  */
 
 /**
@@ -122,10 +114,6 @@
  */
 
 /**
- * @section getter_methods Getter Methods
- */
-
-/**
  * @fn const TState& Node::GetState() const
  *
  * @post The returned reference remains valid as long as the node exists
@@ -158,10 +146,6 @@
  * @post Root nodes have depth 0
  * @post Child nodes have depth = parent depth + 1
  * @note Stored as uint64_t to handle very deep search trees, but that is practically impossible to compute anyway
- */
-
-/**
- * @section member_variables Member Variables
  */
 
 /**
@@ -228,12 +212,10 @@
  * @note Large integer type to handle very deep search trees
  */
 
-/**
- * @section private_methods Private Methods (Dangerous)
- */
 
 /**
- * @warning These methods are dangerous and should NOT be used after construction. They can break node immutability and corrupt the search tree structure. All node properties should be set only during construction. Unless you are doing something really fancy.
+ * @warning Using these after construction can break tree integrity
+ * @{
  */
 
 /**
@@ -288,3 +270,4 @@
  * 
  * @param depth The new depth value
  */
+/* @} */
