@@ -98,17 +98,18 @@ std::shared_ptr<Node<State, Action, CostType>> IterativeDeepeningSearch(
  * @tparam State Type representing problem states
  * @tparam Action Type representing actions/moves
  * @tparam CostType Type for action costs
- * @tparam NodeComparator Comparator for priority queue ordering
+ * @tparam Comparator Concrete comparator type (e.g., CompareByAStar)
  * @param problem The problem instance to solve
  * @return Shared pointer to goal node, or nullptr if no solution exists
  *
  * @note Use node_comparators::CompareByPathCost for UCS
  * @note Use node_comparators::CompareByAStar for A* search
  */
-template <typename State, typename Action, typename CostType>
+template <typename State, typename Action, typename CostType,
+          typename Comparator>
 std::shared_ptr<Node<State, Action, CostType>> BestFirstSearch(
     Problem<State, Action, CostType> const& problem,
-    NodeComparator<State, Action, CostType> const& comparator);
+    Comparator const& comparator);
 
 /**
  * @brief Uniform Cost Search algorithm
@@ -129,8 +130,8 @@ std::shared_ptr<Node<State, Action, CostType>> BestFirstSearch(
 template <typename State, typename Action, typename CostType>
 std::shared_ptr<Node<State, Action, CostType>> UniformCostSearch(
     Problem<State, Action, CostType> const& problem) {
-    CompareByPathCost<State, Action, CostType> comparator(problem);
-    return BestFirstSearch<State, Action, CostType>(problem, comparator);
+    return BestFirstSearch<State, Action, CostType,
+                           CompareByPathCost<State, Action, CostType>>(problem);
 }
 
 }  // namespace search_algorithm

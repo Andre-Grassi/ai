@@ -16,21 +16,18 @@ template <typename State, typename Action, typename CostType>
 using NodePtrVector =
     std::vector<std::shared_ptr<Node<State, Action, CostType>>>;
 
-/*
-* //TODO: Always Instantiate NodeComparator with the type given in the template
-* // cause it can be needed, for example the a start node comparator needs to
-* // access the heuristic function of the node
 
-*/
-
-template <typename State, typename Action, typename CostType>
+template <typename State, typename Action, typename CostType,
+          typename Comparator>
 std::shared_ptr<Node<State, Action, CostType>>
 search_algorithm::BestFirstSearch(
-    Problem<State, Action, CostType> const& problem,
-    NodeComparator<State, Action, CostType> const& comparator) {
+    Problem<State, Action, CostType> const& problem) {
     State initialState = problem.GetInitialState();
     std::shared_ptr<Node<State, Action, CostType>> root =
         std::make_shared<Node<State, Action, CostType>>(initialState);
+
+    // Create concrete comparator instance
+    Comparator comparator(problem);
 
     std::priority_queue<
         // Type of elements in the priority queue
@@ -38,11 +35,9 @@ search_algorithm::BestFirstSearch(
         // Container type for the priority queue
         std::vector<std::shared_ptr<Node<State, Action, CostType>>>,
         // Comparator for the priority queue
-        NodeComparator>
-        frontier =
-            std::priority_queue<std::shared_ptr<Node<State, Action, CostType>>,
-                                NodePtrVector<State, Action, CostType>,
-                                NodeComparator>(comparator);
+        Comparator>
+        frontier(comparator);
+
     frontier.push(root);
 
     std::set<State> reached = std::set<State>();

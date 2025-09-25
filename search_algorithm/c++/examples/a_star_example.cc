@@ -13,6 +13,9 @@ int main() {
     using TAction = sliding_tile::Action;
     using TCost = sliding_tile::CostType;
 
+    // Use A* comparator
+    using Comparator = CompareByAStar<TState, TAction, TCost>;
+
     std::cout << "Search Algorithm Demo" << std::endl;
 
     uint64_t dimension;
@@ -32,13 +35,8 @@ int main() {
     // Display initial state
     problem->PrintState(initial_state);
 
-    // Use A* comparator
-    CompareByAStar<TState, TAction, TCost> comparator =
-        CompareByAStar<TState, TAction, TCost>(*problem);
-
     std::shared_ptr<NodeType> solution =
-        search_algorithm::BestFirstSearch<TState, TAction, TCost>(*problem,
-                                                                  comparator);
+        search_algorithm::BestFirstSearch<TState, TAction, TCost, Comparator>(*problem);
 
     problem->PrintState(solution->GetState());
 
