@@ -233,6 +233,6 @@ class SlidingTileProblem : public Problem<State, Action, CostType> {
     std::string GetStateString(const State& state) const override;
 };
 
-}  // namespace sliding_tile
+};  // namespace sliding_tile
 
 #endif  // SEARCH_ALG_DATA_STRUCTURE_PROBLEMS_SLIDING_H_
