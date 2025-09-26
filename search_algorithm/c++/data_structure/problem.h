@@ -128,8 +128,8 @@ class Problem {
      * @param state The state to evaluate
      * @return Heuristic estimate of cost to goal (default: 0)
      */
-    virtual double Heuristic(const TState& state) const {
-        return 0.0;  // Default: admissible but uninformative heuristic
+    virtual CostType Heuristic(const TState& state) const {
+        return 0;  // Default: admissible but uninformative heuristic
     }
 };
 
