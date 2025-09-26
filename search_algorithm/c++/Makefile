@@ -3,7 +3,7 @@
 
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O2 -g
+CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O2 -g 
 INCLUDES = -I. -Idata_structure -Ialgorithms
 LDFLAGS = -lncurses
 
@@ -36,7 +36,7 @@ HEADERS = $(wildcard $(DATA_STRUCTURE_DIR)/*.h) \
           $(wildcard $(VISUAL_DIR)/*.tpp)
 
 # Target executable
-TARGET = $(BIN_DIR)/search_algorithm
+TARGET = $(BIN_DIR)/$(basename $(MAIN_FILE))
 
 # Examples
 EXAMPLE_SOURCES = $(wildcard $(EXAMPLES_DIR)/*.cc)
