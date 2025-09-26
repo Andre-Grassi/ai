@@ -7,6 +7,7 @@
 #include "data_structure/problems/chess_board_problem.h"
 
 int main() {
+    // Use A* comparator
     using Comparator = CompareByAStar<chess_board::State, chess_board::Action,
                                       chess_board::ChessCostType>;
 
