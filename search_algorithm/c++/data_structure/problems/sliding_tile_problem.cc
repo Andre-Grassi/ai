@@ -137,9 +137,9 @@ std::vector<Action> SlidingTileProblem::GetActions(const State& state) const {
     return actions;
 }
 
-double SlidingTileProblem::Heuristic(const State& state) const {
+int SlidingTileProblem::Heuristic(const State& state) const {
     // Using Manhattan distance as heuristic
-    double total_distance = 0.0;
+    int total_distance = 0;
 
     // Find blank tile position
     int blank_row, blank_col;
