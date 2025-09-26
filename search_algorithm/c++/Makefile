@@ -6,6 +6,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O2 -g 
 INCLUDES = -I. -Idata_structure -Ialgorithms
 LDFLAGS = -lncurses
+RELAXED_FLAGS = -Wno-unused-parameter -Wno-unused-variable
 
 # Directories
 SRC_DIR = .
@@ -74,6 +75,10 @@ test: directories $(OBJECTS) test_main.cc
 debug: CXXFLAGS += -DDEBUG -g3 -O0
 debug: all
 
+# Relaxed build (less warnings)
+relaxed: CXXFLAGS += $(RELAXED_FLAGS)
+relaxed: all
+
 # Release build
 release: CXXFLAGS += -DNDEBUG -O3
 release: all
@@ -137,6 +142,7 @@ help:
 	@echo "  test      - Build test executable"
 	@echo "  debug     - Build with debug flags"
 	@echo "  release   - Build with release optimizations"
+	@echo "  relaxed   - Build with relaxed warnings"
 	@echo "  clean     - Remove build artifacts"
 	@echo "  rebuild   - Clean and build"
 	@echo "  info      - Show build information"
@@ -148,7 +154,7 @@ help:
 	@echo "  help      - Show this help message"
 
 # Phony targets
-.PHONY: all directories examples test debug release clean rebuild info install uninstall format check docs help
+.PHONY: all directories examples test debug release clean rebuild info install uninstall format check docs help relaxed
 
 # Dependency tracking (automatically generated)
 -include $(OBJECTS:.o=.d)
