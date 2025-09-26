@@ -199,7 +199,7 @@ class SlidingTileProblem : public Problem<State, Action, CostType> {
      * @param state The state to evaluate
      * @return Manhattan distance to goal (admissible heuristic)
      */
-    double Heuristic(const State& state) const override;
+    CostType Heuristic(const State& state) const override;
 
     /**
      * @brief Gets the grid dimension
