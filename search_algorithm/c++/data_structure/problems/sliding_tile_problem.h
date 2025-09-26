@@ -66,7 +66,6 @@ using CostType = int;  ///< Cost type for actions (uniform cost of 1)
  */
 class SlidingTileProblem : public Problem<State, Action, CostType> {
    private:
-    State initial_state_;     ///< Starting configuration of the puzzle
     uint64_t dimension_ = 3;  ///< Grid dimension (3 for 3x3, 4 for 4x4, etc.)
     State goal_state_;        ///< Target configuration to reach
 
@@ -113,7 +112,7 @@ class SlidingTileProblem : public Problem<State, Action, CostType> {
      * @warning Does not verify if the initial state is solvable
      */
     SlidingTileProblem(const State& initial_state, const uint64_t dimension)
-        : initial_state_(initial_state),
+        : Problem<State, Action, CostType>(initial_state),
           dimension_(dimension),
           goal_state_(GenerateGoalState()) {}
 
@@ -122,23 +121,22 @@ class SlidingTileProblem : public Problem<State, Action, CostType> {
      *
      * @param dimension Grid size (3 for 3x3, 4 for 4x4, etc.)
      * @note Automatically generates a solvable random initial configuration
+     * @note We need to call the base class constructor first, that's why
+     * the initial state is passed as a dummy state and then the dimension is
+     * set and the initial state is overwritten with a random board.
      */
-    SlidingTileProblem(const uint64_t dimension) {
-        dimension_ = dimension;
-        initial_state_ = RandomizeBoard();
-        goal_state_ = GenerateGoalState();
+    SlidingTileProblem(const uint64_t dimension)
+        : Problem<State, Action, CostType>(
+              State(dimension, std::vector<uint64_t>(dimension, 0))),
+          dimension_(dimension),
+          goal_state_(GenerateGoalState()) {
+        this->initial_state_ = RandomizeBoard();
     }
 
     /**
      * @brief Virtual destructor
      */
     virtual ~SlidingTileProblem() = default;
-
-    /**
-     * @brief Gets the initial state of the puzzle
-     * @return The starting configuration
-     */
-    virtual State GetInitialState() const override { return initial_state_; }
 
     /**
      * @brief Tests if a state is the goal state
