@@ -15,6 +15,9 @@ ALGORITHMS_DIR = algorithms
 VISUAL_DIR = algorithms/visual
 BUILD_DIR = build
 BIN_DIR = bin
+
+MAIN_FILE = chess_main.cc
+#MAIN_FILE = tile_main.cc
 EXAMPLES_DIR = examples
 
 # Source files
@@ -48,8 +51,8 @@ directories:
 	@mkdir -p $(BIN_DIR)
 
 # Main target
-$(TARGET): $(OBJECTS) main.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ main.cc $(OBJECTS) $(LDFLAGS)
+$(TARGET): $(OBJECTS) $(MAIN_FILE)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $(MAIN_FILE) $(OBJECTS) $(LDFLAGS)
 
 # Object files rule
 $(BUILD_DIR)/%.o: %.cc $(HEADERS)
