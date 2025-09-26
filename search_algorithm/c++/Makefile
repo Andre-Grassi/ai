@@ -11,9 +11,9 @@ RELAXED_FLAGS = -Wno-unused-parameter -Wno-unused-variable
 # Directories
 SRC_DIR = .
 DATA_STRUCTURE_DIR = data_structure
-PROBLEMS_DIR = data_structure/problems
-ALGORITHMS_DIR = algorithms
-VISUAL_DIR = algorithms/visual
+PROBLEMS_DIR = data_structure/basic_search/problems
+BASIC_ALGORITHMS_DIR = algorithms/basic_search
+BASIC_ALGORITHMS_VISUAL_DIR = algorithms/basic_search/visual
 BUILD_DIR = build
 BIN_DIR = bin
 

@@ -1,7 +1,7 @@
 #include <vector>
 
+#include "basic_search/problem.h"
 #include "node.h"
-#include "problem.h"
 
 template <typename TState, typename TAction, typename CostType>
 std::vector<std::shared_ptr<Node<TState, TAction, CostType>>>

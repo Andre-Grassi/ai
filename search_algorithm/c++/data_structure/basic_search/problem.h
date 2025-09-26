@@ -8,6 +8,7 @@
 #ifndef SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_
 #define SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 

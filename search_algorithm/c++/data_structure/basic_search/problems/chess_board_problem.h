@@ -1,10 +1,11 @@
 #ifndef SEARCH_ALG_DATA_STRUCTURE_PROBLEMS_CHESS_BOARD_H_
 #define SEARCH_ALG_DATA_STRUCTURE_PROBLEMS_CHESS_BOARD_H_
 
+#include <memory>
 #include <vector>
 
-#include "../node.h"
-#include "../problem.h"
+#include "data_structure/basic_search/problem.h"
+#include "node.h"
 
 namespace chess_board {
 

@@ -1,10 +1,10 @@
 #include <iostream>
 #include <memory>
 
-#include "algorithms/search_algorithm.h"
+#include "algorithms/basic_search/search_algorithm.h"
+#include "data_structure/basic_search/problems/chess_board_problem.h"
 #include "data_structure/node.h"
 #include "data_structure/node_comparator.h"
-#include "data_structure/problems/chess_board_problem.h"
 
 int main() {
     // Use A* comparator

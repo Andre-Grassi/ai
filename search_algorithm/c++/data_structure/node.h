@@ -10,7 +10,7 @@
 
 #include <memory>
 
-#include "problem.h"
+#include "basic_search/problem.h"
 
 /**
  * @brief Represents a node in a search tree

@@ -2,8 +2,8 @@
 #include <stack>
 #include <vector>
 
+#include "data_structure/basic_search/problem.h"
 #include "data_structure/node.h"
-#include "data_structure/problem.h"
 #include "search_algorithm.h"
 
 using namespace search_algorithm;
@@ -12,7 +12,8 @@ using namespace search_algorithm;
 // 4th edition
 
 template <typename State, typename Action, typename CostType>
-std::shared_ptr<Node<State, Action, CostType>> search_algorithm::IterativeDeepeningSearch(
+std::shared_ptr<Node<State, Action, CostType>>
+search_algorithm::IterativeDeepeningSearch(
     Problem<State, Action, CostType> const& problem) {
     std::shared_ptr<Node<State, Action, CostType>> result = nullptr;
 
