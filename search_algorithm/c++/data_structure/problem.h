@@ -103,7 +103,7 @@ class Problem {
      *
      * @return The initial state
      */
-    virtual TState GetInitialState() const { return initial_state_; }
+    TState GetInitialState() const { return initial_state_; }
 
     /**
      * @brief Gets a string representation of a state (optional override)
@@ -124,15 +124,13 @@ class Problem {
      *
      * The heuristic function estimates the cost from the given state to
      * the nearest goal state. Used by informed search algorithms like A*
-     * and greedy best-first search. Default implementation returns 0
+     * and greedy best-first search. Default implementation must return 0
      * (admissible but not informative).
      *
      * @param state The state to evaluate
-     * @return Heuristic estimate of cost to goal (default: 0)
+     * @return Heuristic estimate of cost to goal
      */
-    virtual CostType Heuristic(const TState& state) const {
-        return 0;  // Default: admissible but uninformative heuristic
-    }
+    virtual CostType Heuristic(const TState& state) const = 0;
 };
 
 #endif  // SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_
