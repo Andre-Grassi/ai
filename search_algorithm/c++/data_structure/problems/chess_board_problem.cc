@@ -10,12 +10,12 @@ using namespace chess_board;
 
 State ChessBoardProblem::GenerateInitialState(const int preset_state) const {
     State s;
-    switch (preset_state){
+    switch (preset_state) {
         case 1:
             s = State(5, std::vector<uint64_t>(8, '#'));
-            for (int i{1}; i<=4; ++i){
+            for (int i{1}; i <= 4; ++i) {
                 s[2][i] = Piece::WHITE_KNIGHT;
-                s[1][i+1] = Piece::BISHOP;
+                s[1][i + 1] = Piece::BISHOP;
             }
 
             s[1][1] = Piece::BLACK_KNIGHT;
@@ -27,8 +27,8 @@ State ChessBoardProblem::GenerateInitialState(const int preset_state) const {
             return s;
 
         case 2:
-            s = State(6, std::vector<uint64_t>(6, '#')); 
-            for (int i{1}; i<=4; ++i){
+            s = State(6, std::vector<uint64_t>(6, '#'));
+            for (int i{1}; i <= 4; ++i) {
                 s[1][i] = Piece::WHITE_KNIGHT;
                 s[2][i] = Piece::BISHOP;
                 s[3][i] = Piece::ROOK;
@@ -39,17 +39,17 @@ State ChessBoardProblem::GenerateInitialState(const int preset_state) const {
             return s;
 
         default:
-            throw std::logic_error("GenerateInitialState:\
-                Random initial board case not implemented, use preset 1 or 2"); 
+            throw std::logic_error(
+                "GenerateInitialState:\
+                Random initial board case not implemented, use preset 1 or 2");
     }
 }
 
-
-std::unique_ptr<State> ChessBoardProblem::GetResult(const State& state,
-                                                const Action& action) const {
+std::unique_ptr<State> ChessBoardProblem::GetResult(
+    const State& state, const Action& action) const {
     auto new_state = std::make_unique<State>(state);
 
-    //simplificar
+    // simplificar
     int row = action.fromRow;
     int col = action.fromCol;
     int toRow = action.toRow;
@@ -59,7 +59,8 @@ std::unique_ptr<State> ChessBoardProblem::GetResult(const State& state,
     (*new_state)[row][col] = Piece::EMPTY;  // origem fica vazia
 
     // Caso especial: promoção de peão
-    if (piece == Piece::PAWN && toRow == 1)//hardcoded toRow 1 faz virar rainha
+    if (piece == Piece::PAWN &&
+        toRow == 1)  // hardcoded toRow 1 faz virar rainha
         (*new_state)[row][col] = Piece::QUEEN;
     else
         (*new_state)[toRow][toCol] = piece;
@@ -67,7 +68,7 @@ std::unique_ptr<State> ChessBoardProblem::GetResult(const State& state,
     return new_state;
 }
 
-//retorna todos os movimentos possiveis em coordenadas (x, y, dx, dy)
+// retorna todos os movimentos possiveis em coordenadas (x, y, dx, dy)
 std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
     std::vector<Action> actions;
 
@@ -75,43 +76,47 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
     int num_cols = state[0].size();
 
     for (int row = 0; row < num_rows; ++row)
-        for (int col = 0; col < num_cols; ++col){
+        for (int col = 0; col < num_cols; ++col) {
             int64_t cell = state[row][col];
-            if (cell == Piece::BORDER || cell == EMPTY) continue; // vazio
-            
-            //mapeia todos os movimentos possíveis
-            switch (cell){
-                case WHITE_KNIGHT: case BLACK_KNIGHT:{
-                    const int row_move[8] = {-2,-2,-1,-1,1,1,2,2};
-                    const int col_move[8] = {-1,1,-2,2,-2,2,-1,1};
-                    for (int i{0}; i < 8; ++i){
+            if (cell == Piece::BORDER || cell == EMPTY) continue;  // vazio
+
+            // mapeia todos os movimentos possíveis
+            switch (cell) {
+                case WHITE_KNIGHT:
+                case BLACK_KNIGHT: {
+                    const int row_move[8] = {-2, -2, -1, -1, 1, 1, 2, 2};
+                    const int col_move[8] = {-1, 1, -2, 2, -2, 2, -1, 1};
+                    for (int i{0}; i < 8; ++i) {
                         int dest_row = row + row_move[i];
                         int dest_col = col + col_move[i];
                         if (dest_row >= 0 && dest_row < num_rows &&
-                                    dest_col >= 0 && dest_col < num_cols &&
-                                    state[dest_row][dest_col] == Piece::EMPTY)
+                            dest_col >= 0 && dest_col < num_cols &&
+                            state[dest_row][dest_col] == Piece::EMPTY)
                             actions.emplace_back(row, col, dest_row, dest_col);
                     }
                     break;
-                } case ROOK:{
-                    const int row_move[4] = {-1,1,0,0};
-                    const int col_move[4] = {0,0,-1,1};
-                    for (int i = 0; i < 4; ++i){
+                }
+                case ROOK: {
+                    const int row_move[4] = {-1, 1, 0, 0};
+                    const int col_move[4] = {0, 0, -1, 1};
+                    for (int i = 0; i < 4; ++i) {
                         int dest_row = row, dest_col = col;
                         while (true) {
                             dest_row += row_move[i];
                             dest_col += col_move[i];
-                            if (dest_row < 0 || dest_row >= num_rows || dest_col < 0 ||
-                            dest_col >= num_cols || state[dest_row][dest_col] != EMPTY)
+                            if (dest_row < 0 || dest_row >= num_rows ||
+                                dest_col < 0 || dest_col >= num_cols ||
+                                state[dest_row][dest_col] != EMPTY)
                                 break;
 
                             actions.emplace_back(row, col, dest_row, dest_col);
                         }
                     }
                     break;
-                } case BISHOP:{
-                    const int row_move[4] = {-1,-1,1,1};
-                    const int col_move[4] = {-1,1,-1,1};
+                }
+                case BISHOP: {
+                    const int row_move[4] = {-1, -1, 1, 1};
+                    const int col_move[4] = {-1, 1, -1, 1};
                     for (int i = 0; i < 4; ++i) {
                         int dest_row = row;
                         int dest_col = col;
@@ -119,17 +124,18 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                             dest_row += row_move[i];
                             dest_col += col_move[i];
                             if (dest_row < 0 || dest_row >= num_rows ||
-                                    dest_col < 0 || dest_col >= num_cols ||
-                                    state[dest_row][dest_col] != Piece::EMPTY)
+                                dest_col < 0 || dest_col >= num_cols ||
+                                state[dest_row][dest_col] != Piece::EMPTY)
                                 break;
 
                             actions.emplace_back(row, col, dest_row, dest_col);
                         }
                     }
                     break;
-                } case QUEEN:{
-                    const int row_move[8] = {-1,-1,-1,0,0,1,1,1};
-                    const int col_move[8] = {-1,0,1,-1,1,-1,0,1};
+                }
+                case QUEEN: {
+                    const int row_move[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+                    const int col_move[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
                     for (int i = 0; i < 8; ++i) {
                         int dest_row = row;
                         int dest_col = col;
@@ -137,16 +143,17 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                             dest_row += row_move[i];
                             dest_col += col_move[i];
                             if (dest_row < 0 || dest_row >= num_rows ||
-                                    dest_col < 0 || dest_col >= num_cols ||
-                                    state[dest_row][dest_col] != Piece::EMPTY)
+                                dest_col < 0 || dest_col >= num_cols ||
+                                state[dest_row][dest_col] != Piece::EMPTY)
                                 break;
 
                             actions.emplace_back(row, col, dest_row, dest_col);
                         }
                     }
                     break;
-                } case PAWN:{
-                    int dest_row = row - 1;//peao andando pra cima
+                }
+                case PAWN: {
+                    int dest_row = row - 1;  // peao andando pra cima
                     if (dest_row >= 0 && dest_row < num_rows)
                         if (state[dest_row][col] == Piece::EMPTY)
                             actions.emplace_back(row, col, dest_row, col);
@@ -158,14 +165,13 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
     return actions;
 }
 
-double ChessBoardProblem::Heuristic(const State& state) const {
+ChessCostType ChessBoardProblem::Heuristic(const State& state) const {
     return 0;
 }
 
 void ChessBoardProblem::PrintState(const State& state) const {
-    for (auto r : state){
-        for (auto v: r)
-            std::cout << static_cast<char>(v);
+    for (auto r : state) {
+        for (auto v : r) std::cout << static_cast<char>(v);
         std::cout << '\n';
     }
     std::cout << std::endl;
@@ -188,32 +194,30 @@ bool ChessBoardProblem::IsGoal(const State& state) const {
     return true;
 }
 
-
 State ChessBoardProblem::GenerateGoalState(const int preset_state) const {
     State s;
-    switch (preset_state){
+    switch (preset_state) {
         case 1:
             s = State(5, std::vector<uint64_t>(8, '#'));
-            for (int i{1}; i<=2; ++i)
-                for (int j{1}; j<=6; ++j)
-                    s[i][j] = Piece::ANY;
+            for (int i{1}; i <= 2; ++i)
+                for (int j{1}; j <= 6; ++j) s[i][j] = Piece::ANY;
 
             s[3][5] = Piece::ANY;
             s[3][6] = Piece::BLACK_KNIGHT;
             return s;
 
         case 2:
-            s = State(6, std::vector<uint64_t>(6, '#')); 
-            for (int i{1}; i<=3; ++i)
-                for (int j{1}; j<=4; ++j)
-                    s[i][j] = Piece::ANY;
+            s = State(6, std::vector<uint64_t>(6, '#'));
+            for (int i{1}; i <= 3; ++i)
+                for (int j{1}; j <= 4; ++j) s[i][j] = Piece::ANY;
 
             s[4][4] = Piece::ANY;
             s[4][1] = Piece::QUEEN;
             return s;
 
         default:
-            throw std::logic_error("GenerateInitialState:\
-                Random initial board case not implemented, use preset 1 or 2"); 
+            throw std::logic_error(
+                "GenerateInitialState:\
+                Random initial board case not implemented, use preset 1 or 2");
     }
 }
