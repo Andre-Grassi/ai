@@ -35,17 +35,17 @@ using ChessCostType = float;  // WARNING: Apenas um placeholder por enquanto
 
 class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
    private:
-    State initial_state_;
-    State goal_state_;
-
     // preset 1 ou 2 pra definir qual dos 2 exemplos do enunciado usar,
     // 0 usa um tabuleiro aleatorio resolvivel --nao implementado, dificil
     State GenerateInitialState(const int preset_state) const;
     State GenerateGoalState(const int preset_state) const;
 
+    State goal_state_;
+
    public:
     ChessBoardProblem(int preset_state = 0)
-        : initial_state_(GenerateInitialState(preset_state)),
+        : Problem<State, Action, ChessCostType>(
+              GenerateInitialState(preset_state)),
           goal_state_(GenerateGoalState(preset_state)) {}
 
     virtual ~ChessBoardProblem() = default;
@@ -58,7 +58,7 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
         const State& state, const Action& action) const override;
 
     virtual ChessCostType GetActionCost(const State&, const Action&,
-                                   const State&) const {
+                                        const State&) const {
         return 1.0;  // Uniform cost for all actions
     }
 

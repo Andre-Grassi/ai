@@ -19,7 +19,11 @@ int main() {
 
     std::shared_ptr<Node<chess_board::State, chess_board::Action,
                          chess_board::ChessCostType>>
-        solution = search_algorithm::BreadthFirstSearch(*problem);
+        solution =
+            search_algorithm::BreadthFirstSearch<chess_board::State,
+                                                 chess_board::Action,
+                                                 chess_board::ChessCostType>(
+                *problem);
 
     if (solution) {
         std::cout << "Goal State Found!" << std::endl;
