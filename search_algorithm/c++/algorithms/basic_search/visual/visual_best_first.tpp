@@ -2,7 +2,7 @@
 #include <set>
 #include <vector>
 
-#include "data_structure/problem.h"
+#include "data_structure/basic_search/problem.h"
 #include "data_structure/visual/terminal_ui.h"
 #include "data_structure/visual/visual_node.h"
 #include "visual_search.h"
@@ -49,9 +49,7 @@ visual_search::VisualBestFirstSearch(
 
     // Increase depth limit until solution is found
     while (!frontier.empty()) {
-        
-
-        /*
+                /*
          * Print Tree
          */
         ui.RefreshAll();
