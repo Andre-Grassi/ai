@@ -15,19 +15,24 @@ int main() {
     using ChessNode = Node<chess_board::State, chess_board::Action,
                            chess_board::ChessCostType>;
 
-    // Create a Chess Board problem -- Parametro: 1 ou 2 pra definir o
-    // tabuleiro inicial igual no enunciado
-    auto problem = std::make_unique<chess_board::ChessBoardProblem>(1);
+    // Get the problem preset from cin
+    int preset;
+    std::cout << "Enter problem preset (1 or 2): " << std::endl;
+    std::cin >> preset;
+
+    // Create a Chess Board problem -- Parameter: 1 or 2 to set the
+    // initial board as in the assignment statement
+    chess_board::ChessBoardProblem problem(preset);
 
     // Get initial state
-    auto initial_state = problem->GetInitialState();
+    chess_board::State initial_state = problem.GetInitialState();
 
     // Display initial state
-    problem->PrintState(initial_state);
+    problem.PrintState(initial_state);
 
     std::shared_ptr<ChessNode> solution = search_algorithm::BestFirstSearch<
         chess_board::State, chess_board::Action, chess_board::ChessCostType,
-        Comparator>(*problem);
+        Comparator>(problem);
 
     if (!solution) {
         std::cout << "Goal State Not Found." << std::endl;
@@ -48,12 +53,12 @@ int main() {
         chess_board::Action &top_action = action_stack.top();
         action_stack.pop();
 
-        problem->PrintAction(top_action);
+        problem.PrintAction(top_action);
         std::cout << std::endl;
     }
 
     std::cout << std::endl;
-    problem->PrintState(solution->GetState());
+    problem.PrintState(solution->GetState());
 
     return 0;
 }
