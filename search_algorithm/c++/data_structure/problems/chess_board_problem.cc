@@ -165,8 +165,71 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
     return actions;
 }
 
-ChessCostType ChessBoardProblem::Heuristic(const State& state) const {
-    return 0;
+ChessCostType ChessBoardProblem::Heuristic(const State &state) const {
+    const int rows = static_cast<int>(state.size());
+    const int cols = rows ? static_cast<int>(state[0].size()) : 0;
+    
+    if (rows == 0 || cols == 0) return static_cast<ChessCostType>(0.0);
+    if (IsGoal(state)) return static_cast<ChessCostType>(0.0);
+
+    // Identifica qual problema baseado no preset_state_
+    bool isProblem1 = (preset_state_ == 1);
+    bool isProblem2 = (preset_state_ == 2);
+
+    // Heurística admissível para Problema 1: Cavalo negro em (3,6)
+    if (isProblem1) {
+        auto [knight_r, knight_c] = FindPiecePosition(state, Piece::BLACK_KNIGHT);
+        
+        if (knight_r == -1) return static_cast<ChessCostType>(0.0);
+        
+        const int goal_r = 3, goal_c = 6;
+        int dx = abs(knight_r - goal_r);
+        int dy = abs(knight_c - goal_c);
+        
+        // Heurística ADMISSÍVEL conservadora: distância de Chebyshev
+        // Esta é uma subestimativa garantida do custo real
+        ChessCostType h = static_cast<ChessCostType>(std::max(dx, dy));
+        
+        return h;
+    }
+
+    // Heurística admissível para Problema 2: Peão → Rainha → (4,1)
+    if (isProblem2) {
+        const int promotion_row = 1;
+        const int queen_goal_r = 4, queen_goal_c = 1;
+        
+        auto [queen_r, queen_c] = FindPiecePosition(state, Piece::QUEEN);
+        auto [pawn_r, pawn_c] = FindPiecePosition(state, Piece::PAWN);
+        
+        // Fase 2: Rainha existe
+        if (queen_r != -1) {
+            int dr = abs(queen_r - queen_goal_r);
+            int dc = abs(queen_c - queen_goal_c);
+            
+            // Heurística admissível para Rainha (Distância de Chebyshev)
+            ChessCostType h = static_cast<ChessCostType>(std::max(dr, dc));
+            return h;
+        }
+        // Fase 1: Peão existe
+        else if (pawn_r != -1) {
+            // Custo mínimo absoluto para peão chegar à linha de promoção
+            // Esta é uma subestimativa garantida
+            ChessCostType pawn_cost = static_cast<ChessCostType>(pawn_r - promotion_row);
+            
+            // Custo mínimo absoluto da rainha (Distância de Chebyshev)
+            int dr = abs(promotion_row - queen_goal_r);
+            int dc = abs(pawn_c - queen_goal_c);
+            ChessCostType queen_cost = static_cast<ChessCostType>(std::max(dr, dc));
+            
+            // Soma de heurísticas admissíveis é admissível
+            return pawn_cost + queen_cost;
+        }
+        
+        return static_cast<ChessCostType>(0.0);
+    }
+
+    // Caso padrão: heurística admissível conservadora
+    return static_cast<ChessCostType>(0.0);
 }
 
 void ChessBoardProblem::PrintState(const State& state) const {
