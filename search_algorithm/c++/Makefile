@@ -14,10 +14,11 @@ DATA_STRUCTURE_DIR = data_structure
 PROBLEMS_DIR = data_structure/basic_search/problems
 BASIC_ALGORITHMS_DIR = algorithms/basic_search
 BASIC_ALGORITHMS_VISUAL_DIR = algorithms/basic_search/visual
+ADVERSARIAL_ALGORITHMS_DIR = algorithms/adversarial_search
 BUILD_DIR = build
 BIN_DIR = bin
 
-MAIN_FILE = chess_main.cc
+MAIN_FILE = tile_main.cc
 #MAIN_FILE = tile_main.cc
 EXAMPLES_DIR = examples
 
