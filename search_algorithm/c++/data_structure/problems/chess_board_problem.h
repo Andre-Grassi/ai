@@ -24,9 +24,15 @@ enum Piece : int64_t {
 class Action {
    public:
     Action() = default;
-    Action(int fromRow, int fromCol, int toRow, int toCol)
-        : fromRow(fromRow), fromCol(fromCol), toRow(toRow), toCol(toCol) {}
+    Action(Piece piece, int fromRow, int fromCol, int toRow, int toCol)
+        : piece(piece),
+          fromRow(fromRow),
+          fromCol(fromCol),
+          toRow(toRow),
+          toCol(toCol) {}
     int fromRow, fromCol, toRow, toCol;
+    Piece
+        piece;  // Used only to show which piece was moved when printing actions
 };
 
 using State = std::vector<std::vector<uint64_t>>;  // 2D grid representation

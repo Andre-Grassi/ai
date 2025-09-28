@@ -80,6 +80,9 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
             int64_t cell = state[row][col];
             if (cell == Piece::BORDER || cell == EMPTY) continue;  // vazio
 
+            // Variable used only for readability
+            Piece piece_to_move = (Piece)cell;
+
             // mapeia todos os movimentos possíveis
             switch (cell) {
                 case WHITE_KNIGHT:
@@ -92,7 +95,8 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                         if (dest_row >= 0 && dest_row < num_rows &&
                             dest_col >= 0 && dest_col < num_cols &&
                             state[dest_row][dest_col] == Piece::EMPTY)
-                            actions.emplace_back(row, col, dest_row, dest_col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, dest_col);
                     }
                     break;
                 }
@@ -109,7 +113,8 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                                 state[dest_row][dest_col] != EMPTY)
                                 break;
 
-                            actions.emplace_back(row, col, dest_row, dest_col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, dest_col);
                         }
                     }
                     break;
@@ -128,7 +133,8 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                                 state[dest_row][dest_col] != Piece::EMPTY)
                                 break;
 
-                            actions.emplace_back(row, col, dest_row, dest_col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, dest_col);
                         }
                     }
                     break;
@@ -147,7 +153,8 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                                 state[dest_row][dest_col] != Piece::EMPTY)
                                 break;
 
-                            actions.emplace_back(row, col, dest_row, dest_col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, dest_col);
                         }
                     }
                     break;
@@ -156,7 +163,8 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                     int dest_row = row - 1;  // peao andando pra cima
                     if (dest_row >= 0 && dest_row < num_rows)
                         if (state[dest_row][col] == Piece::EMPTY)
-                            actions.emplace_back(row, col, dest_row, col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, col);
                     break;
                 }
             }
@@ -289,7 +297,8 @@ State ChessBoardProblem::GenerateGoalState(const int preset_state) const {
 }
 
 void ChessBoardProblem::PrintAction(const Action& action) const {
-    std::cout << "PEÇA " << std::to_string(action.fromRow) + " "
+    std::cout << (char)action.piece
+              << " " + std::to_string(action.fromRow) + " "
               << std::to_string(action.fromCol) + " "
               << std::to_string(action.toRow) + " "
               << std::to_string(action.toCol);
