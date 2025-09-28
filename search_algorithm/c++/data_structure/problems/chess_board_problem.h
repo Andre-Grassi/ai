@@ -42,11 +42,26 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
 
     State goal_state_;
 
+    int preset_state_;  // 1 para Problema1, 2 para Problema2, etc.
+
+    private:
+        // Função auxiliar para encontrar a posição de uma peça específica
+        std::pair<int, int> FindPiecePosition(const State& state, Piece piece_to_find) const {
+            for (int r = 0; r < state.size(); ++r) {
+                for (int c = 0; c < state[r].size(); ++c) {
+                    if (state[r][c] == piece_to_find) {
+                        return {r, c};
+                    }
+                }
+            }
+            return {-1, -1}; // Peça não encontrada
+        }
    public:
     ChessBoardProblem(int preset_state = 0)
         : Problem<State, Action, ChessCostType>(
               GenerateInitialState(preset_state)),
-          goal_state_(GenerateGoalState(preset_state)) {}
+          goal_state_(GenerateGoalState(preset_state)),
+          preset_state_(preset_state) {}
 
     virtual ~ChessBoardProblem() = default;
 
