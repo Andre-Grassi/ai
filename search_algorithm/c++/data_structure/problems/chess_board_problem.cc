@@ -305,10 +305,11 @@ void ChessBoardProblem::PrintAction(const Action& action) const {
 
 std::pair<int, int> ChessBoardProblem::FindPiecePosition(
     const State& state, Piece piece_to_find) const {
-    for (int r = 0; r < state.size(); ++r) {
-        for (int c = 0; c < state[r].size(); ++c) {
-            if (state[r][c] == piece_to_find) {
-                return {r, c};  // Piece found
+    for (size_t r = 0; r < state.size(); ++r) {
+        for (size_t c = 0; c < state[r].size(); ++c) {
+            if (static_cast<Piece>(state[r][c]) == piece_to_find) {
+                return {static_cast<int>(r),
+                        static_cast<int>(c)};  // Piece found
             }
         }
     }
