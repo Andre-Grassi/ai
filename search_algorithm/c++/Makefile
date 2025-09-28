@@ -1,11 +1,9 @@
 # Makefile for C++ Search Algorithm Project
-# Author: Generated for search_algorithm project
 
 # Compiler and flags
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O2 -g 
 INCLUDES = -I. -Idata_structure -Ialgorithms
-LDFLAGS = -lncurses
 RELAXED_FLAGS = -Wno-unused-parameter -Wno-unused-variable
 
 # Directories
@@ -13,13 +11,9 @@ SRC_DIR = .
 DATA_STRUCTURE_DIR = data_structure
 PROBLEMS_DIR = data_structure/problems
 ALGORITHMS_DIR = algorithms
-VISUAL_DIR = algorithms/visual
 BUILD_DIR = build
-BIN_DIR = bin
 
 MAIN_FILE = chess_main.cc
-#MAIN_FILE = tile_main.cc
-EXAMPLES_DIR = examples
 
 # Source files
 SOURCES = $(wildcard $(PROBLEMS_DIR)/*.cc)
@@ -33,15 +27,9 @@ HEADERS = $(wildcard $(DATA_STRUCTURE_DIR)/*.h) \
           $(wildcard $(PROBLEMS_DIR)/*.h) \
           $(wildcard $(ALGORITHMS_DIR)/*.h) \
           $(wildcard $(ALGORITHMS_DIR)/*.tpp) \
-          $(wildcard $(VISUAL_DIR)/*.h) \
-          $(wildcard $(VISUAL_DIR)/*.tpp)
 
 # Target executable
-TARGET = $(BIN_DIR)/$(basename $(MAIN_FILE))
-
-# Examples
-EXAMPLE_SOURCES = $(wildcard $(EXAMPLES_DIR)/*.cc)
-EXAMPLE_TARGETS = $(EXAMPLE_SOURCES:$(EXAMPLES_DIR)/%.cc=$(BIN_DIR)/%)
+TARGET = $(basename $(MAIN_FILE))
 
 # Default target
 all: directories $(TARGET)
@@ -49,27 +37,16 @@ all: directories $(TARGET)
 # Create necessary directories
 directories:
 	@mkdir -p $(BUILD_DIR)/$(PROBLEMS_DIR)
-	@mkdir -p $(BIN_DIR)
 
 # Main target
 $(TARGET): $(OBJECTS) $(MAIN_FILE)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $(MAIN_FILE) $(OBJECTS) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $(MAIN_FILE) $(OBJECTS)
 
 # Object files rule
 $(BUILD_DIR)/%.o: %.cc $(HEADERS)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-# Examples target - compile all examples
-examples: directories $(EXAMPLE_TARGETS)
-
-# Rule to compile each example
-$(BIN_DIR)/%: $(EXAMPLES_DIR)/%.cc $(OBJECTS) $(HEADERS)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(OBJECTS) $(LDFLAGS)
-
-# Test target (if you want to create a test executable)
-test: directories $(OBJECTS) test_main.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(BIN_DIR)/test_search test_main.cc $(OBJECTS) $(LDFLAGS)
 
 # Debug build
 debug: CXXFLAGS += -DDEBUG -g3 -O0
@@ -79,13 +56,9 @@ debug: all
 relaxed: CXXFLAGS += $(RELAXED_FLAGS)
 relaxed: all
 
-# Release build
-release: CXXFLAGS += -DNDEBUG -O3
-release: all
-
 # Clean build artifacts
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm -rf $(BUILD_DIR) $(TARGET)
 
 # Clean and rebuild
 rebuild: clean all
@@ -98,33 +71,6 @@ info:
 	@echo "Sources: $(SOURCES)"
 	@echo "Objects: $(OBJECTS)"
 	@echo "Headers: $(HEADERS)"
-	@echo "Example Sources: $(EXAMPLE_SOURCES)"
-	@echo "Example Targets: $(EXAMPLE_TARGETS)"
-
-# Install (copy to system path - optional)
-install: $(TARGET)
-	sudo cp $(TARGET) /usr/local/bin/
-
-# Uninstall
-uninstall:
-	sudo rm -f /usr/local/bin/search_algorithm
-
-# Format code using clang-format (if available)
-format:
-	@if command -v clang-format >/dev/null 2>&1; then \
-		find . -name "*.h" -o -name "*.cc" -o -name "*.cpp" -o -name "*.tpp" | xargs clang-format -i; \
-		echo "Code formatted with clang-format"; \
-	else \
-		echo "clang-format not found. Please install it for code formatting."; \
-	fi
-
-# Run static analysis with cppcheck (if available)
-check:
-	@if command -v cppcheck >/dev/null 2>&1; then \
-		cppcheck --enable=all --std=c++17 --inline-suppr $(SRC_DIR); \
-	else \
-		echo "cppcheck not found. Please install it for static analysis."; \
-	fi
 
 # Generate documentation with Doxygen (if available)
 docs:
@@ -138,7 +84,6 @@ docs:
 help:
 	@echo "Available targets:"
 	@echo "  all       - Build the project (default)"
-	@echo "  examples  - Build all example executables"
 	@echo "  test      - Build test executable"
 	@echo "  debug     - Build with debug flags"
 	@echo "  release   - Build with release optimizations"
@@ -154,7 +99,7 @@ help:
 	@echo "  help      - Show this help message"
 
 # Phony targets
-.PHONY: all directories examples test debug release clean rebuild info install uninstall format check docs help relaxed
+.PHONY: all directories debug clean rebuild info format check docs help relaxed
 
 # Dependency tracking (automatically generated)
 -include $(OBJECTS:.o=.d)
