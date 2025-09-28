@@ -76,16 +76,12 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
 
     for (int row = 0; row < num_rows; ++row)
         for (int col = 0; col < num_cols; ++col) {
-            int64_t cell = state[row][col];
-            if (cell == Piece::BORDER || cell == EMPTY) continue;  // vazio
-
-            // Variable used only for readability
-            Piece piece_to_move = (Piece)cell;
+            Piece piece_to_move = static_cast<Piece>(state[row][col]);
 
             // Map all possible moves
-            switch (cell) {
-                case WHITE_KNIGHT:
-                case BLACK_KNIGHT: {
+            switch (piece_to_move) {
+                case Piece::WHITE_KNIGHT:
+                case Piece::BLACK_KNIGHT: {
                     const int row_move[8] = {-2, -2, -1, -1, 1, 1, 2, 2};
                     const int col_move[8] = {-1, 1, -2, 2, -2, 2, -1, 1};
                     for (int i{0}; i < 8; ++i) {
@@ -99,7 +95,7 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                     }
                     break;
                 }
-                case ROOK: {
+                case Piece::ROOK: {
                     const int row_move[4] = {-1, 1, 0, 0};
                     const int col_move[4] = {0, 0, -1, 1};
                     for (int i = 0; i < 4; ++i) {
@@ -118,7 +114,7 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                     }
                     break;
                 }
-                case BISHOP: {
+                case Piece::BISHOP: {
                     const int row_move[4] = {-1, -1, 1, 1};
                     const int col_move[4] = {-1, 1, -1, 1};
                     for (int i = 0; i < 4; ++i) {
@@ -138,7 +134,7 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                     }
                     break;
                 }
-                case QUEEN: {
+                case Piece::QUEEN: {
                     const int row_move[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
                     const int col_move[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
                     for (int i = 0; i < 8; ++i) {
@@ -158,7 +154,7 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                     }
                     break;
                 }
-                case PAWN: {
+                case Piece::PAWN: {
                     int dest_row = row - 1;  // pawn moving up
                     if (dest_row >= 0 && dest_row < num_rows)
                         if (state[dest_row][col] == Piece::EMPTY)
@@ -166,6 +162,11 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                                                  dest_row, col);
                     break;
                 }
+
+                case Piece::EMPTY:
+                case Piece::BORDER:
+                case Piece::ANY:
+                    break;  // No moves for these pieces
             }
         }
 
