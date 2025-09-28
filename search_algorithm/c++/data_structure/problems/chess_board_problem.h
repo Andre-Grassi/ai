@@ -39,9 +39,10 @@ struct Action {
           fromCol(fromCol),
           toRow(toRow),
           toCol(toCol) {}
-    int fromRow, fromCol, toRow, toCol;
+          
     Piece piece;  /// < Used only to show which piece was moved when printing
                   /// actions
+    int fromRow, fromCol, toRow, toCol;
 };
 
 using State = std::vector<std::vector<uint64_t>>;  /// < 2D grid representation
