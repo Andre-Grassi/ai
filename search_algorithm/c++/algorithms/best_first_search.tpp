@@ -16,7 +16,6 @@ template <typename State, typename Action, typename CostType>
 using NodePtrVector =
     std::vector<std::shared_ptr<Node<State, Action, CostType>>>;
 
-
 template <typename State, typename Action, typename CostType,
           typename Comparator>
 std::shared_ptr<Node<State, Action, CostType>>
@@ -43,7 +42,7 @@ search_algorithm::BestFirstSearch(
     std::set<State> reached = std::set<State>();
     reached.insert(root->GetState());
 
-    // Increase depth limit until solution is found
+    // Search
     while (!frontier.empty()) {
         std::shared_ptr<Node<State, Action, CostType>> node = frontier.top();
         frontier.pop();

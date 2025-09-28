@@ -115,7 +115,7 @@ class Problem {
      * @param state The state to convert to string
      * @return String representation of the state
      */
-    virtual std::string GetStateString(const TState& state) const {
+    virtual std::string GetStateString(const TState& /*state*/) const {
         return "State (no custom representation)";
     }
 

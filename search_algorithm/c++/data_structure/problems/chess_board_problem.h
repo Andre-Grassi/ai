@@ -3,11 +3,15 @@
 
 #include <vector>
 
-#include "../node.h"
-#include "../problem.h"
+#include "data_structure/node.h"
+#include "data_structure/problem.h"
 
 namespace chess_board {
 
+/**
+ * @brief Available chess pieces represented as integer values
+ * @note Only a subset of pieces are implemented for this problem
+ */
 enum Piece : int64_t {
     EMPTY = '_',
     BORDER = '#',
@@ -19,9 +23,14 @@ enum Piece : int64_t {
     WHITE_KNIGHT = 'c',
     BLACK_KNIGHT = 'k',
 };
-// Peças não utilizadas não foram implementadas
 
-class Action {
+/**
+ * @brief Action representation for moving a piece on the chess board
+ *
+ * An action consists of moving a specific piece from one position
+ * (fromRow, fromCol) to another position (toRow, toCol).
+ */
+struct Action {
    public:
     Action() = default;
     Action(Piece piece, int fromRow, int fromCol, int toRow, int toCol)
@@ -30,41 +39,32 @@ class Action {
           fromCol(fromCol),
           toRow(toRow),
           toCol(toCol) {}
+          
+    Piece piece;  /// < Used only to show which piece was moved when printing
+                  /// actions
     int fromRow, fromCol, toRow, toCol;
-    Piece
-        piece;  // Used only to show which piece was moved when printing actions
 };
 
-using State = std::vector<std::vector<uint64_t>>;  // 2D grid representation
+using State = std::vector<std::vector<uint64_t>>;  /// < 2D grid representation
 
-using ChessCostType = float;  // WARNING: Apenas um placeholder por enquanto
+using ChessCostType =
+    float;  ///< Cost type for actions and to calculate heuristics
 
+/**
+ * @brief Chess path finding puzzle problem implementation
+ * @tparam State State representation as a 2D grid of pieces
+ * @tparam Action Action representation for moving pieces
+ * @tparam ChessCostType Cost type for actions and heuristics
+ */
 class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
-   private:
-    // preset 1 ou 2 pra definir qual dos 2 exemplos do enunciado usar,
-    // 0 usa um tabuleiro aleatorio resolvivel --nao implementado, dificil
-    State GenerateInitialState(const int preset_state) const;
-    State GenerateGoalState(const int preset_state) const;
-
-    State goal_state_;
-
-    int preset_state_;  // 1 para Problema1, 2 para Problema2, etc.
-
-   private:
-    // Função auxiliar para encontrar a posição de uma peça específica
-    std::pair<int, int> FindPiecePosition(const State& state,
-                                          Piece piece_to_find) const {
-        for (int r = 0; r < state.size(); ++r) {
-            for (int c = 0; c < state[r].size(); ++c) {
-                if (state[r][c] == piece_to_find) {
-                    return {r, c};
-                }
-            }
-        }
-        return {-1, -1};  // Peça não encontrada
-    }
-
    public:
+    /**
+     * @brief Constructs the problem with specified problem identifier
+     * @param preset_state Preset configuration identifier:
+     *                     - 1: Use Problem1 configuration from assignment
+     *                     - 2: Use Problem2 configuration from assignment
+     *                     - 0: Use random solvable board (not implemented)
+     */
     ChessBoardProblem(int preset_state = 0)
         : Problem<State, Action, ChessCostType>(
               GenerateInitialState(preset_state)),
@@ -91,7 +91,45 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
 
     void PrintState(const State& state) const;
 
+    /** @brief Prints the details of an action
+     *
+     * Print as follows: "<piece> <fromRow> <fromCol> <toRow> <toCol>"
+     *
+     * @param action The action to print
+     */
     void PrintAction(const Action& action) const;
+
+   private:
+    State goal_state_;  /// < Target configuration to reach
+    int preset_state_;  /// < Identifier of the statement problem (1 or 2)
+
+    /**
+     * @brief Generates the initial state based on preset configuration
+     * @param preset_state Preset configuration identifier:
+     *                     - 1: Use Problem1 configuration from assignment
+     *                     - 2: Use Problem2 configuration from assignment
+     *                     - 0: Use random solvable board (not implemented)
+     * @return The initial state configuration
+     */
+    State GenerateInitialState(const int preset_state) const;
+
+    /**
+     * @brief Generates the goal state based on preset configuration
+     * @param preset_state Identifier of the statement problem (1 or 2)
+     * @return The goal state configuration
+     */
+    State GenerateGoalState(const int preset_state) const;
+
+    /**
+     * @brief Auxiliary function to find the position of a specific piece on the
+     * board
+     * @param state The current board state to search
+     * @param piece_to_find The piece to locate on the board
+     * @return std::pair<int, int> The (row, col) position of the piece, or (-1,
+     * -1) if not found
+     */
+    std::pair<int, int> FindPiecePosition(const State& state,
+                                          Piece piece_to_find) const;
 };
 
 }  // namespace chess_board
