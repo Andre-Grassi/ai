@@ -24,9 +24,15 @@ enum Piece : int64_t {
 class Action {
    public:
     Action() = default;
-    Action(int fromRow, int fromCol, int toRow, int toCol)
-        : fromRow(fromRow), fromCol(fromCol), toRow(toRow), toCol(toCol) {}
+    Action(Piece piece, int fromRow, int fromCol, int toRow, int toCol)
+        : piece(piece),
+          fromRow(fromRow),
+          fromCol(fromCol),
+          toRow(toRow),
+          toCol(toCol) {}
     int fromRow, fromCol, toRow, toCol;
+    Piece
+        piece;  // Used only to show which piece was moved when printing actions
 };
 
 using State = std::vector<std::vector<uint64_t>>;  // 2D grid representation
@@ -44,18 +50,20 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
 
     int preset_state_;  // 1 para Problema1, 2 para Problema2, etc.
 
-    private:
-        // Função auxiliar para encontrar a posição de uma peça específica
-        std::pair<int, int> FindPiecePosition(const State& state, Piece piece_to_find) const {
-            for (int r = 0; r < state.size(); ++r) {
-                for (int c = 0; c < state[r].size(); ++c) {
-                    if (state[r][c] == piece_to_find) {
-                        return {r, c};
-                    }
+   private:
+    // Função auxiliar para encontrar a posição de uma peça específica
+    std::pair<int, int> FindPiecePosition(const State& state,
+                                          Piece piece_to_find) const {
+        for (int r = 0; r < state.size(); ++r) {
+            for (int c = 0; c < state[r].size(); ++c) {
+                if (state[r][c] == piece_to_find) {
+                    return {r, c};
                 }
             }
-            return {-1, -1}; // Peça não encontrada
         }
+        return {-1, -1};  // Peça não encontrada
+    }
+
    public:
     ChessBoardProblem(int preset_state = 0)
         : Problem<State, Action, ChessCostType>(
@@ -82,6 +90,8 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
     State GetGoalState() const { return goal_state_; }
 
     void PrintState(const State& state) const;
+
+    void PrintAction(const Action& action) const;
 };
 
 }  // namespace chess_board
