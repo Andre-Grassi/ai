@@ -34,7 +34,7 @@ class Problem {
     TState initial_state_;  ///< The starting state of the problem
 
    public:
-    Problem(TState initial_state) : initial_state_(initial_state) {}
+    Problem(const TState& initial_state) : initial_state_(initial_state) {}
 
     /**
      * @brief Virtual destructor
