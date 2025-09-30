@@ -6,12 +6,11 @@
 
 // Reference: Artificial Intelligence: A Modern Approach 4ed., p. 193
 
-// TODO instead of using player index hardcoded, pass the player as TPlayer
-
 /**
  * @brief Class for games to be used in adversarial search
  */
-template <typename TState, typename TAction, typename TUtility>
+template <typename TState, typename TAction, typename TUtility,
+          typename TPlayer>
 class Game {
    public:
     Game(const TState& initial_state) : initial_state_(initial_state) {}
@@ -42,8 +41,7 @@ class Game {
     /**
      * @return The payoff for the player when the games ends in the given state
      */
-    virtual TUtility GetUtility(const TState& state,
-                                int player_index) const = 0;
+    virtual TUtility GetUtility(const TState& state, const TPlayer& player) const = 0;
 
    protected:
     TState initial_state_;
