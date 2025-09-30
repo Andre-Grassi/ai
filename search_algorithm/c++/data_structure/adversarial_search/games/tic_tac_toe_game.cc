@@ -86,21 +86,25 @@ bool TicTacToeGame::IsTerminal(const State& state) const {
 
     // Check if someone won, even though the board is not completely filled
     if (!is_board_full)
-        if (CheckWin(state, 0) || CheckWin(state, 1) == false) return false;
+        if (CalculateWinner(state) != Player::kNoPlayer) return false;
 
     // Game ended on a draw or someone won
     return true;
 }
 
-Utility TicTacToeGame::GetUtility(const State& state, int player_index) const {
+Utility TicTacToeGame::GetUtility(const State& state,
+                                  const Player& player) const {
     if (!IsTerminal(state))
         throw std::logic_error("GetUtility called on non-terminal state");
 
-    // Check if there is any winning player
-    // TODO COMPLETE HERE
+    Player winner = CalculateWinner(state);
+    // DEBUG does this comparison work?? Comparing classes
+    if (winner == Player::kNoPlayer) return 0;  // Draw
+    if (winner == player) return 1;             // Win
+    return -1;                                  // Loss
 }
 
-Player TicTacToeGame::CheckWin(const State& state, int player_index) const {
+Player TicTacToeGame::CalculateWinner(const State& state) const {
     if (!IsTerminal(state))
         return Player::kNoPlayer;  // Non terminal state, no winners
 
@@ -114,7 +118,8 @@ Player TicTacToeGame::CheckWin(const State& state, int player_index) const {
              j++, other_symbol = state[i * kSideSize + j]) {
         }
 
-        if (other_symbol == reference_symbol) return (Player)reference_symbol;
+        if (other_symbol == reference_symbol)
+            return static_cast<Player>(reference_symbol);
     }
 
     // Check if there is any column completed
@@ -127,7 +132,8 @@ Player TicTacToeGame::CheckWin(const State& state, int player_index) const {
              j++, other_symbol = state[j * kSideSize + i]) {
         }
 
-        if (other_symbol == reference_symbol) return (Player)reference_symbol;
+        if (other_symbol == reference_symbol)
+            return static_cast<Player>(reference_symbol);
     }
 
     // Check if the main diagonal is completed
@@ -137,7 +143,8 @@ Player TicTacToeGame::CheckWin(const State& state, int player_index) const {
          i < kGridDimension && reference_symbol == other_symbol;
          i += kSideSize + 1, other_symbol = state[i]) {
     }
-    if (other_symbol == reference_symbol) return (Player)reference_symbol;
+    if (other_symbol == reference_symbol)
+        return static_cast<Player>(reference_symbol);
 
     // Check if the secondary diagonal is completed
     Symbol reference_symbol = state[0];
@@ -146,7 +153,8 @@ Player TicTacToeGame::CheckWin(const State& state, int player_index) const {
          i < kGridDimension && reference_symbol == other_symbol;
          i += kSideSize - 1, other_symbol = state[i]) {
     }
-    if (other_symbol == reference_symbol) return (Player)reference_symbol;
+    if (other_symbol == reference_symbol)
+        return static_cast<Player>(reference_symbol);
 
     // Draw
     return Player::kNoPlayer;

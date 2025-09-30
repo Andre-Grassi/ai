@@ -38,7 +38,7 @@ struct Action {
 
 using Utility = int8_t;  // -1 (loss), 0 (draw), +1 (win)
 
-class TicTacToeGame : public Game<State, Action, Utility> {
+class TicTacToeGame : public Game<State, Action, Utility, Player> {
    public:
     TicTacToeGame() : Game(CreateEmptyBoard()) {}
 
@@ -56,7 +56,7 @@ class TicTacToeGame : public Game<State, Action, Utility> {
 
     // Player 0 = X
     // Player 1 = O
-    Utility GetUtility(const State& state, int player_index) const override;
+    Utility GetUtility(const State& state, const Player& player) const override;
 
    private:
     static State CreateEmptyBoard() {
@@ -65,8 +65,8 @@ class TicTacToeGame : public Game<State, Action, Utility> {
         return board;
     }
 
-    // @return 1 -> player X won, -1 -> pX lost, 0 -> draw or non terminal state
-    Player CheckWin(const State& state, int player_index) const;
+    // @return Player that won, kNoPlayer if draw or non terminal state
+    Player CalculateWinner(const State& state) const;
 };
 };  // namespace tic_tac_toe_game
 #endif  // SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_TIC_TAC_TOE_GAME_H_
