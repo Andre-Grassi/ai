@@ -108,12 +108,14 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
     if (!IsTerminal(state))
         return Player::kNoPlayer;  // Non terminal state, no winners
 
+    Symbol reference_symbol, other_symbol;
+
     // Check if there is any line completed
     for (int i = 0; i < kSideSize; i++) {
-        Symbol reference_symbol = state[i * kSideSize];
+        reference_symbol = state[i * kSideSize];
         if (reference_symbol == Symbol::kEmpty) continue;
 
-        Symbol other_symbol = state[i * kSideSize + 1];
+        other_symbol = state[i * kSideSize + 1];
         for (int j = 1; j < kSideSize && other_symbol == reference_symbol;
              j++, other_symbol = state[i * kSideSize + j]) {
         }
@@ -124,10 +126,10 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
 
     // Check if there is any column completed
     for (int i = 0; i < kSideSize; i++) {
-        Symbol reference_symbol = state[i];
+        reference_symbol = state[i];
         if (reference_symbol == Symbol::kEmpty) continue;
 
-        Symbol other_symbol = state[1 * kSideSize + i];
+        other_symbol = state[1 * kSideSize + i];
         for (int j = 1; j < kSideSize && other_symbol == reference_symbol;
              j++, other_symbol = state[j * kSideSize + i]) {
         }
@@ -137,8 +139,8 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
     }
 
     // Check if the main diagonal is completed
-    Symbol reference_symbol = state[0];
-    Symbol other_symbol = state[kSideSize + 1];
+    reference_symbol = state[0];
+    other_symbol = state[kSideSize + 1];
     for (int i = kSideSize + 1;
          i < kGridDimension && reference_symbol == other_symbol;
          i += kSideSize + 1, other_symbol = state[i]) {
@@ -147,8 +149,8 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
         return static_cast<Player>(reference_symbol);
 
     // Check if the secondary diagonal is completed
-    Symbol reference_symbol = state[0];
-    Symbol other_symbol = state[kSideSize - 1];
+    reference_symbol = state[0];
+    other_symbol = state[kSideSize - 1];
     for (int i = kSideSize - 1;
          i < kGridDimension && reference_symbol == other_symbol;
          i += kSideSize - 1, other_symbol = state[i]) {
