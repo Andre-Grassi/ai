@@ -1,9 +1,9 @@
 #include <iostream>
 #include <memory>
 
-#include "algorithms/visual/visual_search.h"
+#include "algorithms/basic_search/visual/visual_search.h"
+#include "data_structure/basic_search/problems/sliding_tile_problem.h"
 #include "data_structure/node_comparator.h"
-#include "data_structure/problems/sliding_tile_problem.h"
 #include "data_structure/visual/visual_node.h"
 
 int main() {
