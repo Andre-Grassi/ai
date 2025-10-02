@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "data_structure/basic_search/problem.h"
-#include "node.h"
+#include "data_structure/node.h"
 
 namespace chess_board {
 

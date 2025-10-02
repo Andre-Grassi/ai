@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "data_structure/basic_search/problem.h"
-#include "node.h"
+#include "data_structure/node.h"
 
 #define BLANK_TILE 0  ///< Value representing the blank tile in the puzzle
 

@@ -1,10 +1,10 @@
 #include <iostream>
 #include <memory>
 
-#include "algorithms/search_algorithm.h"
+#include "algorithms/basic_search/search_algorithm.h"
+#include "data_structure/basic_search/problems/sliding_tile_problem.h"
 #include "data_structure/node.h"
 #include "data_structure/node_comparator.h"
-#include "data_structure/problems/sliding_tile_problem.h"
 
 int main() {
     using NodeType =
@@ -36,7 +36,8 @@ int main() {
     problem->PrintState(initial_state);
 
     std::shared_ptr<NodeType> solution =
-        search_algorithm::BestFirstSearch<TState, TAction, TCost, Comparator>(*problem);
+        search_algorithm::BestFirstSearch<TState, TAction, TCost, Comparator>(
+            *problem);
 
     problem->PrintState(solution->GetState());
 
