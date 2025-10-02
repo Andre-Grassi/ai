@@ -29,8 +29,8 @@ using State =
 // Action/Move is a struct that tells where the player is "drawing" its symbol
 struct Action {
    public:
-    int cell_index;
     Symbol player_symbol;
+    int cell_index;
 
     Action(Symbol player_symbol, int cell_index)
         : player_symbol(player_symbol), cell_index(cell_index) {};
