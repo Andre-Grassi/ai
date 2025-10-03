@@ -23,14 +23,18 @@ const uint8_t kSideSize = 3;
 const uint8_t kGridDimension = kSideSize * kSideSize;
 
 // State is the board configuration
+// Using array to define fixed dimension
 using State =
     std::array<Symbol, kGridDimension>;  // 0 to kGridDimension - 1 indexing
 
 // Action/Move is a struct that tells where the player is "drawing" its symbol
 struct Action {
    public:
+    // FIX passa PLayer and not Symbol
     Symbol player_symbol;
     int cell_index;
+
+    Action() : player_symbol(Symbol::kEmpty), cell_index(-1) {}
 
     Action(Symbol player_symbol, int cell_index)
         : player_symbol(player_symbol), cell_index(cell_index) {};
@@ -43,7 +47,7 @@ class TicTacToeGame : public Game<State, Action, Utility, Player> {
     TicTacToeGame() : Game(CreateEmptyBoard()) {}
 
     // If even number of X -> X player will play, otherwise its O turn
-    int GetPlayerToMove(const State& state) const override;
+    Player GetPlayerToMove(const State& state) const override;
 
     // Return vector with the position of all the empty cells
     std::vector<Action> GetActions(const State& state) const override;
@@ -57,6 +61,8 @@ class TicTacToeGame : public Game<State, Action, Utility, Player> {
     // Player 0 = X
     // Player 1 = O
     Utility GetUtility(const State& state, const Player& player) const override;
+
+    virtual std::string GetStateString(const State& state) const override;
 
    private:
     static State CreateEmptyBoard() {

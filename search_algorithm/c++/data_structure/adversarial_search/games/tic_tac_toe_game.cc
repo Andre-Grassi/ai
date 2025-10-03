@@ -1,14 +1,16 @@
 #include "tic_tac_toe_game.h"
 
 #include <memory>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 using namespace tic_tac_toe_game;
 
-int TicTacToeGame::GetPlayerToMove(const State& state) const {
+Player TicTacToeGame::GetPlayerToMove(const State& state) const {
     // If the game has ended, no player can play
-    if (IsTerminal(state)) return -1;
+    if (IsTerminal(state)) return Player::kNoPlayer;
 
     uint8_t cross_num = 0;
 
@@ -16,9 +18,9 @@ int TicTacToeGame::GetPlayerToMove(const State& state) const {
     for (Symbol symbol : state)
         if (symbol == Symbol::kX) cross_num++;
 
-    if (cross_num % 2 == 0) return int(Player::kX);
+    if (cross_num % 2 == 0) return Player::kX;
 
-    return int(Player::kO);
+    return Player::kO;
 }
 
 std::vector<Action> TicTacToeGame::GetActions(const State& state) const {
@@ -160,4 +162,15 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
 
     // Draw
     return Player::kNoPlayer;
+}
+
+std::string TicTacToeGame::GetStateString(const State& state) const {
+    std::stringstream state_ss;
+    for (int i = 0; i < kGridDimension; i += kSideSize) {
+        for (int j = 0; j < kSideSize; j++)
+            state_ss << std::to_string(static_cast<int>(state[i + j]));
+        state_ss << std::endl;
+    }
+
+    return state_ss.str();
 }
