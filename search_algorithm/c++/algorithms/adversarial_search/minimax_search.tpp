@@ -8,52 +8,62 @@
 using namespace adversarial_search_algorithm;
 
 // Auxiliary functions
-template <typename TState, typename TAction, typename TUtility>
+template <typename TState, typename TAction, typename TUtility,
+          typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
-    const Game<TState, TAction, TUtility>& game, const TState& state,
-    const int player_index) {
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
+    const TPlayer& player);
+
+template <typename TState, typename TAction, typename TUtility,
+          typename TPlayer>
+std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
+    const TPlayer& player);
+
+template <typename TState, typename TAction, typename TUtility,
+          typename TPlayer>
+std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
+    const TPlayer& player) {
     // In terminal state, just return the utility for the player, because there
     // are no more moves to make
     if (game.IsTerminal(state)) {
-        TUtility utility = game.GetUtility(state, player_index);
-        nullptr_t no_action = nullptr;
-        return std::make_pair<TUtility, std::unique_ptr<TAction>>(utility,
-                                                                  no_action);
+        TUtility utility = game.GetUtility(state, player);
+        // Using nullptr to indicate that there is no action to be taken
+        return {utility, nullptr};
     }
 
     TUtility min_expected_utility =
-        std::numeric_limits<TUtility>::inifity();  // + inf
+        std::numeric_limits<TUtility>::infinity();  // + inf
     std::unique_ptr<TAction> worst_action = std::make_unique<TAction>();
 
     for (TAction action : game.GetActions(state)) {
-        TUtility curr_utility;
-        std::unique_ptr<TAction> curr_action;
+        TUtility curr_expected_utility;
 
-        std::tie<TUtility, std::unique_ptr<TAction>>(curr_utility,
-                                                     curr_action) =
-            MaxValue(game, game.GetResult(state, curr_action), player_index);
+        std::tie(curr_expected_utility, std::ignore) =
+            MaxValue<TState, TAction, TUtility, TPlayer>(
+                game, *(game.GetResult(state, action)), player);
 
-        if (curr_utility < min_expected_utility) {
-            min_expected_utility = curr_utility;
-            worst_action = curr_action;
+        if (curr_expected_utility < min_expected_utility) {
+            min_expected_utility = curr_expected_utility;
+            *worst_action = action;
         }
     }
 
-    return std::make_pair<TUtility, std::unique_ptr<TAction>>(
-        min_expected_utility, worst_action);
+    return {min_expected_utility, std::move(worst_action)};
 }
 
-template <typename TState, typename TAction, typename TUtility>
+template <typename TState, typename TAction, typename TUtility,
+          typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
-    const Game<TState, TAction, TUtility>& game, const TState& state,
-    const int player_index) {
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
+    const TPlayer& player) {
     // In terminal state, just return the utility for the player, because there
     // are no more moves to make
     if (game.IsTerminal(state)) {
-        TUtility utility = game.GetUtility(state, player_index);
-        nullptr_t no_action = nullptr;
-        return std::make_pair<TUtility, std::unique_ptr<TAction>>(utility,
-                                                                  no_action);
+        TUtility utility = game.GetUtility(state, player);
+        // Using nullptr to indicate that there is no action to be taken
+        return {utility, nullptr};
     }
 
     TUtility max_expected_utility =
@@ -63,32 +73,32 @@ std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
     // Get the maximum of the minimum utilities (considering that the adversary
     // plays optimally) and the corresponding action
     for (TAction action : game.GetActions(state)) {
-        TUtility curr_utility;
-        std::unique_ptr<TAction> curr_action;
-        std::tie<TUtility, std::unique_ptr<TAction>>(curr_utility,
-                                                     curr_action) =
-            MinValue<TState, std::unique_ptr<TAction>, TUtility>(
-                game, game.GetResult(state, curr_action), player_index);
+        TUtility curr_expected_utility;
+        std::tie(curr_expected_utility, std::ignore) =
+            MinValue<TState, TAction, TUtility, TPlayer>(
+                game, *(game.GetResult(state, action)), player);
 
-        if (curr_utility > max_expected_utility) {
-            max_expected_utility = curr_utility;
-            best_action = curr_action;
+        if (curr_expected_utility > max_expected_utility) {
+            max_expected_utility = curr_expected_utility;
+            *best_action = action;
         }
     }
 
-    return std::make_pair<TUtility, std::unique_ptr<TAction>>(
-        max_expected_utility, best_action);
+    return {max_expected_utility, std::move(best_action)};
 }
 
-template <typename TState, typename TAction, typename TUtility>
+template <typename TState, typename TAction, typename TUtility,
+          typename TPlayer>
 std::unique_ptr<TAction> adversarial_search_algorithm::MinimaxSearch(
-    const Game<TState, TAction, TUtility>& game, const TState& state) {
-    int player_index = game.GetPlayerToMove(state);
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state) {
+    TPlayer player = game.GetPlayerToMove(state);
 
     std::unique_ptr<TAction> best_action;
 
-    std::tie<TUtility, std::unique_ptr<TAction>>(std::ignore, best_action) =
-        MaxValue(game, state, player_index);
+    // std::tie without template parameters to let it deduce.
+    // An error was ocurring because of the std::ignore, it probably has a
+    // specific type
+    std::tie(std::ignore, best_action) = MaxValue(game, state, player);
 
     return best_action;
 }
