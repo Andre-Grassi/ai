@@ -4,9 +4,10 @@
 #include "data_structure/adversarial_search/game.h"
 
 namespace adversarial_search_algorithm {
-template <typename TState, typename TAction, typename TUtility>
+template <typename TState, typename TAction, typename TUtility,
+          typename TPlayer>
 std::unique_ptr<TAction> MinimaxSearch(
-    const Game<TState, TAction, TUtility>& game, const TState& state);
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state);
 
 }  // namespace adversarial_search_algorithm
 
