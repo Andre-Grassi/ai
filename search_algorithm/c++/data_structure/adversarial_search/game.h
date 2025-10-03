@@ -1,6 +1,7 @@
 #ifndef SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_GAME_H_
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_GAME_H_
 
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -18,7 +19,7 @@ class Game {
     /**
      * @return Index of the player whose turn it is to move in the state given
      */
-    virtual int GetPlayerToMove(const TState& state) const = 0;
+    virtual TPlayer GetPlayerToMove(const TState& state) const = 0;
 
     /**
      * @return The vector of legal moves in the state given
@@ -41,7 +42,28 @@ class Game {
     /**
      * @return The payoff for the player when the games ends in the given state
      */
-    virtual TUtility GetUtility(const TState& state, const TPlayer& player) const = 0;
+    virtual TUtility GetUtility(const TState& state,
+                                const TPlayer& player) const = 0;
+
+    virtual TState GetInitialState() const { return initial_state_; }
+
+    /**
+     * @brief Gets a string representation of a state (optional override)
+     *
+     * Provides a default string representation of states for debugging
+     * and display purposes. Derived classes can override this method
+     * to provide more meaningful representations.
+     *
+     * @param state The state to convert to string
+     * @return String representation of the state
+     */
+    virtual std::string GetStateString(const TState& /*state*/) const {
+        return "State (no custom representation)";
+    }
+
+    virtual void PrintState(const TState& state) const {
+        std::cout << GetStateString(state);
+    }
 
    protected:
     TState initial_state_;
