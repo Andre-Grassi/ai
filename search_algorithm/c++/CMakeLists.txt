@@ -56,7 +56,7 @@ file(GLOB EXAMPLE_SOURCES "examples/*.cc")
 foreach(example_file ${EXAMPLE_SOURCES})
     get_filename_component(example_name ${example_file} NAME_WE)
     add_executable(${example_name} ${example_file})
-    target_link_libraries(${example_name} PRIVATE problems ${CURSES_LIBRARIES})
+    target_link_libraries(${example_name} PRIVATE problems games ${CURSES_LIBRARIES})
 endforeach()
 
 
