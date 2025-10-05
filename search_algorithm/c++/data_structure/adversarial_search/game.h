@@ -42,8 +42,7 @@ class Game {
     /**
      * @return The payoff for the player when the games ends in the given state
      */
-    virtual TUtility GetUtility(const TState& state,
-                                const TPlayer& player) const = 0;
+    virtual TUtility GetUtility(const TState& state) const = 0;
 
     virtual TState GetInitialState() const { return initial_state_; }
 

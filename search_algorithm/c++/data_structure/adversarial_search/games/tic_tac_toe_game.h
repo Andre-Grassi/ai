@@ -40,7 +40,8 @@ struct Action {
         : player_symbol(player_symbol), cell_index(cell_index) {};
 };
 
-using Utility = int8_t;  // -1 (loss), 0 (draw), +1 (win)
+// TODO change to int8_t after debugging
+using Utility = int;  // -1 (loss), 0 (draw), +1 (win)
 
 class TicTacToeGame : public Game<State, Action, Utility, Player> {
    public:
@@ -60,7 +61,7 @@ class TicTacToeGame : public Game<State, Action, Utility, Player> {
 
     // Player 0 = X
     // Player 1 = O
-    Utility GetUtility(const State& state, const Player& player) const override;
+    Utility GetUtility(const State& state) const override;
 
     virtual std::string GetStateString(const State& state) const override;
 

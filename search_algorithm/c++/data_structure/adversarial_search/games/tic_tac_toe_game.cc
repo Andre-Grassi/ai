@@ -13,14 +13,21 @@ Player TicTacToeGame::GetPlayerToMove(const State& state) const {
     if (IsTerminal(state)) return Player::kNoPlayer;
 
     uint8_t cross_num = 0;
+    uint8_t nought_num = 0;
 
-    // Count number of crosses
+    // Count number of crosses and noughts
     for (Symbol symbol : state)
-        if (symbol == Symbol::kX) cross_num++;
+        if (symbol == Symbol::kX)
+            cross_num++;
+        else if (symbol == Symbol::kO)
+            nought_num++;
 
-    if (cross_num % 2 == 0) return Player::kX;
+    if (cross_num == 0) return Player::kX;  // Empty board
 
-    return Player::kO;
+    if (cross_num <= nought_num)
+        return Player::kX;
+    else
+        return Player::kO;
 }
 
 std::vector<Action> TicTacToeGame::GetActions(const State& state) const {
@@ -28,11 +35,13 @@ std::vector<Action> TicTacToeGame::GetActions(const State& state) const {
     actions.reserve(
         kGridDimension);  // Pre-allocate the maximum number of actions possible
 
-    if (IsTerminal(state)) return actions;  // Return empty vector //DEBUG
+    if (IsTerminal(state)) {
+        return actions;
+    }  // Return empty vector //DEBUG
     // is it truly empty?
 
     // Get the player which turn is right now
-    Player player = (Player)GetPlayerToMove(state);
+    Player player = static_cast<Player>(GetPlayerToMove(state));
     ;
 
     Symbol player_symbol;
@@ -56,7 +65,9 @@ std::vector<Action> TicTacToeGame::GetActions(const State& state) const {
 
 std::unique_ptr<State> TicTacToeGame::GetResult(const State& state,
                                                 const Action& action) const {
-    if (IsTerminal(state)) return nullptr;
+    if (IsTerminal(state)) {
+        return nullptr;
+    }
 
     Player player = (Player)GetPlayerToMove(state);
     Symbol action_symbol = action.player_symbol;
@@ -64,10 +75,14 @@ std::unique_ptr<State> TicTacToeGame::GetResult(const State& state,
 
     // Check if the player turn is the same as the symbol being played.
     // Which means that the player X can't play O and vice-versa.
-    if ((int)action_symbol != (int)player) return nullptr;
+    if ((int)action_symbol != (int)player) {
+        return nullptr;
+    }
 
     // Check if the place that the player will play is already occupied
-    if (state[ply_index] != Symbol::kEmpty) return nullptr;
+    if (state[ply_index] != Symbol::kEmpty) {
+        return nullptr;
+    }
 
     // Valid action
     std::unique_ptr<State> new_state = std::make_unique<State>(
@@ -81,35 +96,39 @@ std::unique_ptr<State> TicTacToeGame::GetResult(const State& state,
 
 bool TicTacToeGame::IsTerminal(const State& state) const {
     bool is_board_full = true;
-    // Check if all the cells are non-empty
+    bool is_board_empty = true;
+
+    // Check if the board is full or empty
     for (Symbol cell_symbol : state)
-        // If cell is empty, the board has not been completed
-        if (cell_symbol == Symbol::kEmpty) is_board_full = false;
+        if (cell_symbol == Symbol::kEmpty)
+            is_board_full = false;  // Non-full, there are empty cells
+        else
+            is_board_empty = false;  // Non-empty, there are cells occupied
 
     // Check if someone won, even though the board is not completely filled
-    if (!is_board_full)
-        if (CalculateWinner(state) != Player::kNoPlayer) return false;
+    if (!is_board_full) {
+        if (is_board_empty) return false;  // Empty board -> non terminal
+        if (CalculateWinner(state) != Player::kNoPlayer)
+            return true;  // Board not full, and we have a winner -> terminal
+        return false;     // Board not full, and no winner -> non terminal
+    }
 
-    // Game ended on a draw or someone won
+    // Game ended on a draw or someone won -> terminal
     return true;
 }
 
-Utility TicTacToeGame::GetUtility(const State& state,
-                                  const Player& player) const {
+Utility TicTacToeGame::GetUtility(const State& state) const {
     if (!IsTerminal(state))
         throw std::logic_error("GetUtility called on non-terminal state");
 
     Player winner = CalculateWinner(state);
     // DEBUG does this comparison work?? Comparing classes
     if (winner == Player::kNoPlayer) return 0;  // Draw
-    if (winner == player) return 1;             // Win
-    return -1;                                  // Loss
+    if (winner == Player::kX) return 1;         // X Win
+    return -1;                                  // O win
 }
 
 Player TicTacToeGame::CalculateWinner(const State& state) const {
-    if (!IsTerminal(state))
-        return Player::kNoPlayer;  // Non terminal state, no winners
-
     Symbol reference_symbol, other_symbol;
 
     // Check if there is any line completed
@@ -117,13 +136,13 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
         reference_symbol = state[i * kSideSize];
         if (reference_symbol == Symbol::kEmpty) continue;
 
-        other_symbol = state[i * kSideSize + 1];
-        for (int j = 1; j < kSideSize && other_symbol == reference_symbol;
-             j++, other_symbol = state[i * kSideSize + j]) {
+        int j;
+        for (j = 1;
+             j < kSideSize && reference_symbol == state[i * kSideSize + j];
+             j++) {
         }
 
-        if (other_symbol == reference_symbol)
-            return static_cast<Player>(reference_symbol);
+        if (j >= kSideSize) return static_cast<Player>(reference_symbol);
     }
 
     // Check if there is any column completed
@@ -131,36 +150,39 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
         reference_symbol = state[i];
         if (reference_symbol == Symbol::kEmpty) continue;
 
-        other_symbol = state[1 * kSideSize + i];
-        for (int j = 1; j < kSideSize && other_symbol == reference_symbol;
-             j++, other_symbol = state[j * kSideSize + i]) {
+        int j;
+        for (j = 1; j < kSideSize && other_symbol == state[j * kSideSize + i];
+             j++) {
         }
 
-        if (other_symbol == reference_symbol)
-            return static_cast<Player>(reference_symbol);
+        if (j >= kSideSize) return static_cast<Player>(reference_symbol);
     }
 
     // Check if the main diagonal is completed
     reference_symbol = state[0];
-    other_symbol = state[kSideSize + 1];
-    for (int i = kSideSize + 1;
-         i < kGridDimension && reference_symbol == other_symbol;
-         i += kSideSize + 1, other_symbol = state[i]) {
+    if (reference_symbol != Symbol::kEmpty) {
+        int i;
+        for (i = kSideSize + 1;
+             i < kGridDimension && reference_symbol == state[i];
+             i += kSideSize + 1) {
+        }
+
+        if (i >= kGridDimension) return static_cast<Player>(reference_symbol);
     }
-    if (other_symbol == reference_symbol)
-        return static_cast<Player>(reference_symbol);
 
     // Check if the secondary diagonal is completed
     reference_symbol = state[0];
-    other_symbol = state[kSideSize - 1];
-    for (int i = kSideSize - 1;
-         i < kGridDimension && reference_symbol == other_symbol;
-         i += kSideSize - 1, other_symbol = state[i]) {
-    }
-    if (other_symbol == reference_symbol)
-        return static_cast<Player>(reference_symbol);
+    if (reference_symbol != Symbol::kEmpty) {
+        int i;
+        for (i = kSideSize - 1;
+             i < kGridDimension && reference_symbol == state[i];
+             i += kSideSize - 1) {
+        }
 
-    // Draw
+        if (i >= kGridDimension) return static_cast<Player>(reference_symbol);
+    }
+
+    // Draw (but if it's not a terminal state, then this is not a draw)
     return Player::kNoPlayer;
 }
 
