@@ -190,8 +190,15 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
 std::string TicTacToeGame::GetStateString(const State& state) const {
     std::stringstream state_ss;
     for (int i = 0; i < kGridDimension; i += kSideSize) {
-        for (int j = 0; j < kSideSize; j++)
-            state_ss << std::to_string(static_cast<int>(state[i + j]));
+        for (int j = 0; j < kSideSize; j++) {
+            char player_char = '_';
+            if (state[i + j] == Symbol::kO)
+                player_char = 'O';
+            else if (state[i + j] == Symbol::kX)
+                player_char = 'X';
+
+            state_ss << player_char;
+        }
         state_ss << std::endl;
     }
 
