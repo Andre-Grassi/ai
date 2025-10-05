@@ -129,7 +129,7 @@ Utility TicTacToeGame::GetUtility(const State& state) const {
 }
 
 Player TicTacToeGame::CalculateWinner(const State& state) const {
-    Symbol reference_symbol, other_symbol;
+    Symbol reference_symbol;
 
     // Check if there is any line completed
     for (int i = 0; i < kSideSize; i++) {
@@ -151,7 +151,8 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
         if (reference_symbol == Symbol::kEmpty) continue;
 
         int j;
-        for (j = 1; j < kSideSize && other_symbol == state[j * kSideSize + i];
+        for (j = 1;
+             j < kSideSize && reference_symbol == state[j * kSideSize + i];
              j++) {
         }
 
