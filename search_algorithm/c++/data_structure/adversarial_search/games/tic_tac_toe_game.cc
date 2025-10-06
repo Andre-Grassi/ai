@@ -166,15 +166,17 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
     }
 
     // Check if the secondary diagonal is completed
-    reference_symbol = state[0];
+    reference_symbol = state[kSideSize - 1];
     if (reference_symbol != Symbol::kEmpty) {
         int i;
-        for (i = kSideSize - 1;
-             i < kGridDimension && reference_symbol == state[i];
+        for (i = kSideSize - 1 + kSideSize - 1;
+             i <= kGridDimension - 1 - (kSideSize - 1) &&
+             reference_symbol == state[i];
              i += kSideSize - 1) {
         }
 
-        if (i >= kGridDimension) return static_cast<Player>(reference_symbol);
+        if (i > kGridDimension - 1 - (kSideSize - 1))
+            return static_cast<Player>(reference_symbol);
     }
 
     // Draw (but if it's not a terminal state, then this is not a draw)
