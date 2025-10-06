@@ -9,6 +9,8 @@
 
 /**
  * @brief Class for games to be used in adversarial search
+ * @tparam TPlayer: the struct or class representing the player, which MUST
+ * have a IsMax public method. That will be used in minimax search
  */
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
@@ -17,7 +19,7 @@ class Game {
     Game(const TState& initial_state) : initial_state_(initial_state) {}
 
     /**
-     * @return Index of the player whose turn it is to move in the state given
+     * @return Player whose turn it is to move in the state given
      */
     virtual TPlayer GetPlayerToMove(const TState& state) const = 0;
 
