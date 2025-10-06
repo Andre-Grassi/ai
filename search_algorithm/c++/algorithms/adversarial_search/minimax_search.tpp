@@ -125,10 +125,13 @@ std::unique_ptr<TAction> adversarial_search_algorithm::MinimaxSearch(
 
     std::unique_ptr<TAction> best_action;
 
-    // std::tie without template parameters to let it deduce.
-    // An error was ocurring because of the std::ignore, it probably has a
-    // specific type
-    std::tie(std::ignore, best_action) = MaxValue(game, state, player);
+    if (player.IsMax())
+        // std::tie without template parameters to let it deduce.
+        // An error was ocurring because of the std::ignore, it probably has a
+        // specific type
+        std::tie(std::ignore, best_action) = MaxValue(game, state, player);
+    else
+        std::tie(std::ignore, best_action) = MinValue(game, state, player);
 
     return best_action;
 }
