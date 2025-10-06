@@ -10,7 +10,7 @@ using namespace tic_tac_toe_game;
 
 Player TicTacToeGame::GetPlayerToMove(const State& state) const {
     // If the game has ended, no player can play
-    if (IsTerminal(state)) return Player::kNoPlayer;
+    if (IsTerminal(state)) return Player(Symbol::kEmpty);
 
     uint8_t cross_num = 0;
     uint8_t nought_num = 0;
@@ -22,12 +22,12 @@ Player TicTacToeGame::GetPlayerToMove(const State& state) const {
         else if (symbol == Symbol::kO)
             nought_num++;
 
-    if (cross_num == 0) return Player::kX;  // Empty board
+    if (cross_num == 0) return Player(Symbol::kX);  // Empty board
 
     if (cross_num <= nought_num)
-        return Player::kX;
+        return Player(Symbol::kX);
     else
-        return Player::kO;
+        return Player(Symbol::kO);
 }
 
 std::vector<Action> TicTacToeGame::GetActions(const State& state) const {
@@ -44,18 +44,12 @@ std::vector<Action> TicTacToeGame::GetActions(const State& state) const {
     Player player = static_cast<Player>(GetPlayerToMove(state));
     ;
 
-    Symbol player_symbol;
-    if (player == Player::kO)
-        player_symbol = Symbol::kO;
-    else
-        player_symbol = Symbol::kX;
-
     // Attribute for each empty cell a possible action
     for (int i = 0; i < kGridDimension; i++) {
         Symbol cell_symbol = state[i];
 
         if (cell_symbol == Symbol::kEmpty) {
-            Action action(player_symbol, i);
+            Action action(player.symbol, i);
             actions.emplace_back(action);
         }
     }
@@ -69,13 +63,13 @@ std::unique_ptr<State> TicTacToeGame::GetResult(const State& state,
         return nullptr;
     }
 
-    Player player = (Player)GetPlayerToMove(state);
+    Player player = GetPlayerToMove(state);
     Symbol action_symbol = action.player_symbol;
     int ply_index = action.cell_index;
 
     // Check if the player turn is the same as the symbol being played.
     // Which means that the player X can't play O and vice-versa.
-    if ((int)action_symbol != (int)player) {
+    if (action_symbol != player.symbol) {
         return nullptr;
     }
 
@@ -108,7 +102,7 @@ bool TicTacToeGame::IsTerminal(const State& state) const {
     // Check if someone won, even though the board is not completely filled
     if (!is_board_full) {
         if (is_board_empty) return false;  // Empty board -> non terminal
-        if (CalculateWinner(state) != Player::kNoPlayer)
+        if ((CalculateWinner(state)).symbol != Symbol::kEmpty)
             return true;  // Board not full, and we have a winner -> terminal
         return false;     // Board not full, and no winner -> non terminal
     }
@@ -122,10 +116,10 @@ Utility TicTacToeGame::GetUtility(const State& state) const {
         throw std::logic_error("GetUtility called on non-terminal state");
 
     Player winner = CalculateWinner(state);
-    // DEBUG does this comparison work?? Comparing classes
-    if (winner == Player::kNoPlayer) return 0;  // Draw
-    if (winner == Player::kX) return 1;         // X Win
-    return -1;                                  // O win
+
+    if (winner == Player(Symbol::kEmpty)) return 0;  // Draw
+    if (winner == Player(Symbol::kX)) return 1;      // X Win
+    return -1;                                       // O win
 }
 
 Player TicTacToeGame::CalculateWinner(const State& state) const {
@@ -184,7 +178,7 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
     }
 
     // Draw (but if it's not a terminal state, then this is not a draw)
-    return Player::kNoPlayer;
+    return Player(Symbol::kEmpty);
 }
 
 std::string TicTacToeGame::GetStateString(const State& state) const {

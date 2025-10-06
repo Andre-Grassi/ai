@@ -17,7 +17,28 @@ enum class Symbol {
 
 // Player and symbols must be coherent, which means that
 // (int)Symbol::kX == (int)Player::kX and the same for kO
-enum class Player { kX = 1, kO = -1, kNoPlayer = 0 };
+class Player {
+   public:
+    Symbol symbol;
+    bool is_max;
+
+    Player() : symbol(Symbol::kEmpty), is_max(false) {}
+    Player(Symbol symbol) : symbol(symbol) {
+        if (symbol == Symbol::kX)
+            is_max = true;
+        else
+            is_max = false;
+    }
+
+    bool IsMax() const { return is_max; }
+
+    // Compare players by their symbol (X or O)
+    bool operator==(const Player& other) const {
+        return this->symbol == other.symbol;
+    }
+
+    bool operator!=(const Player& other) const { return !(*this == other); }
+};
 
 const uint8_t kSideSize = 3;
 const uint8_t kGridDimension = kSideSize * kSideSize;
