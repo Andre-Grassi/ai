@@ -11,6 +11,8 @@ int main() {
 
     State current_state = game.GetInitialState();
     while (!game.IsTerminal(current_state)) {
+        std::cout << std::endl;
+
         std::unique_ptr<Action> best_action =
             adversarial_search_algorithm::MinimaxSearch(game, current_state);
 
