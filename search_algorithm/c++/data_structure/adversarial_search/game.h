@@ -7,6 +7,18 @@
 
 // Reference: Artificial Intelligence: A Modern Approach 4ed., p. 193
 
+// Boilerplate to create has_is_max test
+template <typename T, typename = void>
+struct has_is_max : std::false_type {};
+
+template <typename T>
+struct has_is_max<T, std::void_t<decltype(std::declval<T>().IsMax())>>
+    : std::true_type {};
+
+// Auxiliar variable for easier usage
+template <typename T>
+inline constexpr bool has_is_max_v = has_is_max<T>::value;
+
 /**
  * @brief Class for games to be used in adversarial search
  * @tparam TPlayer: the struct or class representing the player, which MUST
@@ -16,6 +28,11 @@ template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 class Game {
    public:
+    // Verifies in compilaion time if the TPlayer has IsMax method
+    static_assert(
+        has_is_max_v<TPlayer>,
+        "The type TPlayer used in Game<> must have a method 'bool IsMax()'.");
+
     Game(const TState& initial_state) : initial_state_(initial_state) {}
 
     /**
