@@ -34,6 +34,11 @@ std::unique_ptr<TAction> MinimaxSearch(
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
+std::unique_ptr<TAction> MinimaxSearchWithPruning(
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state);
+
+template <typename TState, typename TAction, typename TUtility,
+          typename TPlayer>
 std::tuple<std::unique_ptr<TAction>, std::map<int, std::vector<TState>>,
            TUtility>
 MinimaxSearchStoreTree(const Game<TState, TAction, TUtility, TPlayer>& game,
@@ -43,5 +48,6 @@ MinimaxSearchStoreTree(const Game<TState, TAction, TUtility, TPlayer>& game,
 
 #include "minimax_search.tpp"
 #include "minimax_search_store_tree.tpp"
+#include "minimax_search_with_pruning.tpp"
 
 #endif  // ALGORITHMS_ADVERSARIAL_SEARCH_ADVERSARIAL_SEARCH_ALGORITHM_H_
