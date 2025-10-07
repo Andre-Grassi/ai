@@ -1,4 +1,5 @@
 #include <limits>
+#include <map>
 #include <tuple>
 #include <utility>  // for std::pair, not the Utility from the game
 
@@ -13,19 +14,24 @@ template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    const TPlayer& player);
+    const TPlayer& player, std::map<int, std::vector<TState>>& levels,
+    int depth);
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    const TPlayer& player);
+    const TPlayer& player, std::map<int, std::vector<TState>>& levels,
+    int depth);
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    const TPlayer& player) {
+    const TPlayer& player, std::map<int, std::vector<TState>>& levels,
+    int depth) {
+    levels[depth].push_back(state);
+
     // In terminal state, just return the utility for the player, because there
     // are no more moves to make
     if (game.IsTerminal(state)) {
@@ -43,8 +49,8 @@ std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
         TPlayer enemy = game.GetPlayerToMove(*new_state);
 
         std::tie(curr_expected_utility, std::ignore) =
-            MaxValue<TState, TAction, TUtility, TPlayer>(game, *new_state,
-                                                         enemy);
+            MaxValue<TState, TAction, TUtility, TPlayer>(
+                game, *new_state, enemy, levels, depth + 1);
 
         if (curr_expected_utility < min_expected_utility) {
             min_expected_utility = curr_expected_utility;
@@ -59,7 +65,10 @@ template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    const TPlayer& player) {
+    const TPlayer& player, std::map<int, std::vector<TState>>& levels,
+    int depth) {
+    levels[depth].push_back(state);
+
     // In terminal state, just return the utility for the player, because there
     // are no more moves to make
     if (game.IsTerminal(state)) {
@@ -78,8 +87,8 @@ std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
         TPlayer enemy = game.GetPlayerToMove(*new_state);
 
         std::tie(curr_expected_utility, std::ignore) =
-            MinValue<TState, TAction, TUtility, TPlayer>(game, *new_state,
-                                                         enemy);
+            MinValue<TState, TAction, TUtility, TPlayer>(
+                game, *new_state, enemy, levels, depth + 1);
 
         if (curr_expected_utility > max_expected_utility) {
             max_expected_utility = curr_expected_utility;
@@ -92,19 +101,21 @@ std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
-std::unique_ptr<TAction> adversarial_search_algorithm::MinimaxSearch(
+std::tuple<std::unique_ptr<TAction>, std::map<int, std::vector<TState>>,
+           TUtility>
+adversarial_search_algorithm::MinimaxSearchStoreTree(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state) {
+    std::map<int, std::vector<TState>> levels;
+
     TPlayer player = game.GetPlayerToMove(state);
 
     std::unique_ptr<TAction> best_action;
+    TUtility value;
 
     if (player.IsMax())
-        // std::tie without template parameters to let it deduce.
-        // An error was ocurring because of the std::ignore, it probably has a
-        // specific type
-        std::tie(std::ignore, best_action) = MaxValue(game, state, player);
+        std::tie(value, best_action) = MaxValue(game, state, player, levels, 0);
     else
-        std::tie(std::ignore, best_action) = MinValue(game, state, player);
+        std::tie(value, best_action) = MinValue(game, state, player, levels, 0);
 
-    return best_action;
+    return {std::move(best_action), std::move(levels), value};
 }
