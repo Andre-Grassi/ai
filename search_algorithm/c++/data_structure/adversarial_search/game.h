@@ -21,31 +21,47 @@ inline constexpr bool has_is_max_v = has_is_max<T>::value;
 
 /**
  * @brief Class for games to be used in adversarial search
+ * @tparam TState: the type of the state representation.
+ * @tparam TAction: the type of the action representation.
+ * @tparam TUtility: the type of the utility value. If it is not a primitive
+ * type, then you must implement operators for comparison.
  * @tparam TPlayer: the struct or class representing the player, which MUST
- * have a IsMax public method. That will be used in minimax search
+ * have a IsMax public method. That will be used in minimax search.
  */
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 class Game {
    public:
-    // Verifies in compilaion time if the TPlayer has IsMax method
+    /**
+     * @brief Verifies in compilaion time if the TPlayer has IsMax method
+     */
     static_assert(
         has_is_max_v<TPlayer>,
         "The type TPlayer used in Game<> must have a method 'bool IsMax()'.");
 
     Game(const TState& initial_state) : initial_state_(initial_state) {}
 
+    ~Game() = default;
+
     /**
-     * @return Player whose turn it is to move in the state given
+     * @brief Gets the player whose turn it is to move in the given state.
+     * @param state State to determine which player's turn it is.
+     * @return Player that can move.
      */
     virtual TPlayer GetPlayerToMove(const TState& state) const = 0;
 
     /**
+     * @brief Gets all legal moves for the player to move in the given state.
+     * @param state State to get legal moves from.
      * @return The vector of legal moves in the state given
      */
     virtual std::vector<TAction> GetActions(const TState& state) const = 0;
 
     /**
+     * @brief Gets the pointer to state that results from taking an action in a
+     * state.
+     * @param state State to take action from.
+     * @param action Action to apply.
      * @return Pointer to the state resulting from taking the action, or nullptr
      * if action is invalid
      */
@@ -53,13 +69,20 @@ class Game {
                                               const TAction& action) const = 0;
 
     /**
+     * @brief Determines if the given state is a terminal state (game over).
+     * @param state State to check for terminal condition.
      * @return True when the game is over, and false otherwise
      * @note States where the game has ended are called terminal states
      */
     virtual bool IsTerminal(const TState& state) const = 0;
 
     /**
-     * @return The payoff for the player when the games ends in the given state
+     * @brief Gets the utility value of a terminal state.
+     * @param state Terminal state to evaluate.
+     * @return The payoff for the player when the games ends in the given state.
+     * @note The utility is from the point of view of the MAX player always.
+     * @warning This method should only be called on terminal states, otherwise
+     * will throw an error.
      */
     virtual TUtility GetUtility(const TState& state) const = 0;
 
