@@ -41,7 +41,7 @@ std::vector<Action> TicTacToeGame::GetActions(const State& state) const {
     // is it truly empty?
 
     // Get the player which turn is right now
-    Player player = static_cast<Player>(GetPlayerToMove(state));
+    Player player = GetPlayerToMove(state);
     ;
 
     // Attribute for each empty cell a possible action
@@ -136,7 +136,7 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
              j++) {
         }
 
-        if (j >= kSideSize) return static_cast<Player>(reference_symbol);
+        if (j >= kSideSize) return Player(reference_symbol);
     }
 
     // Check if there is any column completed
@@ -150,7 +150,7 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
              j++) {
         }
 
-        if (j >= kSideSize) return static_cast<Player>(reference_symbol);
+        if (j >= kSideSize) return Player(reference_symbol);
     }
 
     // Check if the main diagonal is completed
@@ -162,7 +162,7 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
              i += kSideSize + 1) {
         }
 
-        if (i >= kGridDimension) return static_cast<Player>(reference_symbol);
+        if (i >= kGridDimension) return Player(reference_symbol);
     }
 
     // Check if the secondary diagonal is completed
@@ -176,7 +176,7 @@ Player TicTacToeGame::CalculateWinner(const State& state) const {
         }
 
         if (i > kGridDimension - 1 - (kSideSize - 1))
-            return static_cast<Player>(reference_symbol);
+            return Player(reference_symbol);
     }
 
     // Draw (but if it's not a terminal state, then this is not a draw)
