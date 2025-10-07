@@ -9,14 +9,21 @@
 
 namespace tic_tac_toe_game {
 
+/**
+ * @brief Symbol that each player uses to mark the board.
+ * The kEmpty symbol is a "wild card", can represent empty cells of the board
+ * and also a draw (more explanation about this in the class).
+ */
 enum class Symbol {
-    kX = 1,      // Cross
-    kO = -1,     // Nought
+    kX = 1,      // Cross (X)
+    kO = -1,     // Nought (O)
     kEmpty = 0,  // Empty cell
 };
 
-// Player and symbols must be coherent, which means that
-// (int)Symbol::kX == (int)Player::kX and the same for kO
+/**
+ * @note The Max player will always be the player using X symbol
+ * and the Min player will always be the player using O symbol.
+ */
 class Player {
    public:
     Symbol symbol;
@@ -40,15 +47,24 @@ class Player {
     bool operator!=(const Player& other) const { return !(*this == other); }
 };
 
-const uint8_t kSideSize = 3;
-const uint8_t kGridDimension = kSideSize * kSideSize;
+const uint8_t kSideSize = 3;  ///< Number of cells per side of the board
+const uint8_t kGridDimension =
+    kSideSize * kSideSize;  ///< Total number of cells
 
-// State is the board configuration
-// Using array to define fixed dimension
+/**
+ * @brief State representing the board configuration as a 1D array.
+ * Indexed from * 0 to kGridDimension-1
+ * @note Using array instead of vector to define fixed dimension.
+ */
 using State =
     std::array<Symbol, kGridDimension>;  // 0 to kGridDimension - 1 indexing
 
 // Action/Move is a struct that tells where the player is "drawing" its symbol
+/**
+ * @brief Action representing a player's move on the board.
+ * It specifies which player (by its symbol) is making the move and the cell
+ * index.
+ */
 struct Action {
    public:
     // FIX passa PLayer and not Symbol
@@ -61,27 +77,43 @@ struct Action {
         : player_symbol(player_symbol), cell_index(cell_index) {};
 };
 
-// TODO change to int8_t after debugging
-using Utility = int;  // -1 (loss), 0 (draw), +1 (win)
+/**
+ * @note For debugging, use int, because the debugger shows int8_t as char.
+ */
+using Utility = int8_t;  // -1 (loss), 0 (draw), +1 (win)
 
+/**
+ * @brief Class representing the Tic-Tac-Toe game.
+ *
+ * Implements the Game interface for a standard 3x3 Tic-Tac-Toe game.
+ * Players alternate placing X and O on the board, aiming to get three in a
+ * row. The game ends when one player wins or the board is full (draw).
+ *
+ * State: 1D array of 9 Symbols (X, O, Empty)
+ * Action: Player's symbol and cell index (0-8)
+ * Utility: -1 (loss), 0 (draw), +1 (win) from MAX player's perspective
+ * Player: Struct with symbol and IsMax() method
+ */
 class TicTacToeGame : public Game<State, Action, Utility, Player> {
    public:
     TicTacToeGame() : Game(CreateEmptyBoard()) {}
 
-    // If even number of X -> X player will play, otherwise its O turn
     Player GetPlayerToMove(const State& state) const override;
 
-    // Return vector with the position of all the empty cells
     std::vector<Action> GetActions(const State& state) const override;
 
     std::unique_ptr<State> GetResult(const State& state,
                                      const Action& action) const override;
 
-    // True if no cell is equal to kEmpty or if someone won
+    /**
+     * @return True if the game is over (win or draw), false otherwise
+     */
     bool IsTerminal(const State& state) const override;
 
-    // Player 0 = X
-    // Player 1 = O
+    /**
+     * @return +1 if MAX (X) wins, -1 if MIN (O) wins, 0 for draw
+     * @warning Only call on terminal states
+     */
     Utility GetUtility(const State& state) const override;
 
     virtual std::string GetStateString(const State& state) const override;
@@ -93,7 +125,10 @@ class TicTacToeGame : public Game<State, Action, Utility, Player> {
         return board;
     }
 
-    // @return Player that won, kNoPlayer if draw or non terminal state
+    /**
+     * @return Player that won. If it's a draw or a non terminal state, the
+     * player's symbol will be kEmpty.
+     */
     Player CalculateWinner(const State& state) const;
 };
 };  // namespace tic_tac_toe_game
