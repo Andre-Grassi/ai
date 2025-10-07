@@ -1,3 +1,10 @@
+/**
+ * @file game.h
+ * @brief Base class for adversarial search games
+ * @author Andre Grassi
+ * @date 2025
+ */
+
 #ifndef SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_GAME_H_
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_GAME_H_
 

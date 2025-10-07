@@ -1,3 +1,10 @@
+/**
+ * @file tic_tac_toe_game.h
+ * @brief Implementation of a specific game: Tic-Tac-Toe
+ * @author Andre Grassi
+ * @date 2025
+ */
+
 #ifndef SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_TIC_TAC_TOE_GAME_H_
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_TIC_TAC_TOE_GAME_H_
 
@@ -67,7 +74,8 @@ using State =
  */
 struct Action {
    public:
-    // FIX passa PLayer and not Symbol
+    // Optimize passa PLayer and not Symbol -> maybe this would be worse
+    // actually??
     Symbol player_symbol;
     int cell_index;
 
