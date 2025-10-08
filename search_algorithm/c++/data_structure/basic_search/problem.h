@@ -8,6 +8,7 @@
 #ifndef SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_
 #define SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -132,6 +133,10 @@ class Problem {
      * @return Heuristic estimate of cost to goal
      */
     virtual CostType Heuristic(const TState& state) const = 0;
+
+    virtual void PrintState(const TState& state) const {
+        std::cout << GetStateString(state);
+    }
 };
 
 #endif  // SEARCH_ALG_DATA_STRUCTURE_PROBLEM_H_
