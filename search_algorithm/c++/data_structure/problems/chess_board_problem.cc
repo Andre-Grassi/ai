@@ -5,6 +5,8 @@
 #include <iostream>
 #include <numeric>
 #include <stdexcept>
+#include <queue>
+#include <limits>
 
 using namespace chess_board;
 
@@ -56,11 +58,11 @@ std::unique_ptr<State> ChessBoardProblem::GetResult(
     int toCol = action.toCol;
 
     Piece piece = static_cast<Piece>((*new_state)[row][col]);
-    (*new_state)[row][col] = Piece::EMPTY;  // origem fica vazia
+    (*new_state)[row][col] = Piece::EMPTY;  // Empty origin cell
 
-    // Caso especial: promoção de peão
+    // Special case: pawn promotion
     if (piece == Piece::PAWN &&
-        toRow == 1)  // hardcoded toRow 1 faz virar rainha
+        toRow == 1)  // hardcoded toRow 1 makes the pawn a queen
         (*new_state)[row][col] = Piece::QUEEN;
     else
         (*new_state)[toRow][toCol] = piece;
@@ -68,7 +70,6 @@ std::unique_ptr<State> ChessBoardProblem::GetResult(
     return new_state;
 }
 
-// retorna todos os movimentos possiveis em coordenadas (x, y, dx, dy)
 std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
     std::vector<Action> actions;
 
@@ -77,13 +78,12 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
 
     for (int row = 0; row < num_rows; ++row)
         for (int col = 0; col < num_cols; ++col) {
-            int64_t cell = state[row][col];
-            if (cell == Piece::BORDER || cell == EMPTY) continue;  // vazio
+            Piece piece_to_move = static_cast<Piece>(state[row][col]);
 
-            // mapeia todos os movimentos possíveis
-            switch (cell) {
-                case WHITE_KNIGHT:
-                case BLACK_KNIGHT: {
+            // Map all possible moves
+            switch (piece_to_move) {
+                case Piece::WHITE_KNIGHT:
+                case Piece::BLACK_KNIGHT: {
                     const int row_move[8] = {-2, -2, -1, -1, 1, 1, 2, 2};
                     const int col_move[8] = {-1, 1, -2, 2, -2, 2, -1, 1};
                     for (int i{0}; i < 8; ++i) {
@@ -92,11 +92,12 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                         if (dest_row >= 0 && dest_row < num_rows &&
                             dest_col >= 0 && dest_col < num_cols &&
                             state[dest_row][dest_col] == Piece::EMPTY)
-                            actions.emplace_back(row, col, dest_row, dest_col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, dest_col);
                     }
                     break;
                 }
-                case ROOK: {
+                case Piece::ROOK: {
                     const int row_move[4] = {-1, 1, 0, 0};
                     const int col_move[4] = {0, 0, -1, 1};
                     for (int i = 0; i < 4; ++i) {
@@ -109,12 +110,13 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                                 state[dest_row][dest_col] != EMPTY)
                                 break;
 
-                            actions.emplace_back(row, col, dest_row, dest_col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, dest_col);
                         }
                     }
                     break;
                 }
-                case BISHOP: {
+                case Piece::BISHOP: {
                     const int row_move[4] = {-1, -1, 1, 1};
                     const int col_move[4] = {-1, 1, -1, 1};
                     for (int i = 0; i < 4; ++i) {
@@ -128,12 +130,13 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                                 state[dest_row][dest_col] != Piece::EMPTY)
                                 break;
 
-                            actions.emplace_back(row, col, dest_row, dest_col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, dest_col);
                         }
                     }
                     break;
                 }
-                case QUEEN: {
+                case Piece::QUEEN: {
                     const int row_move[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
                     const int col_move[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
                     for (int i = 0; i < 8; ++i) {
@@ -147,88 +150,155 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
                                 state[dest_row][dest_col] != Piece::EMPTY)
                                 break;
 
-                            actions.emplace_back(row, col, dest_row, dest_col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, dest_col);
                         }
                     }
                     break;
                 }
-                case PAWN: {
-                    int dest_row = row - 1;  // peao andando pra cima
+                case Piece::PAWN: {
+                    int dest_row = row - 1;  // pawn moving up
                     if (dest_row >= 0 && dest_row < num_rows)
                         if (state[dest_row][col] == Piece::EMPTY)
-                            actions.emplace_back(row, col, dest_row, col);
+                            actions.emplace_back(piece_to_move, row, col,
+                                                 dest_row, col);
                     break;
                 }
+
+                case Piece::EMPTY:
+                case Piece::BORDER:
+                case Piece::ANY:
+                    break;  // No moves for these pieces
             }
         }
 
     return actions;
 }
 
-ChessCostType ChessBoardProblem::Heuristic(const State &state) const {
+auto
+knight_next_jump (int knight_r, int knight_c) -> std::vector<std::pair<int, int>> {
+    // Deslocamentos fixos do cavalo (dr, dc)
+    std::vector<std::pair<int, int>> moves = {
+        {-2, -1}, {-2, 1},
+        {-1, -2}, {-1, 2},
+        { 1, -2}, { 1, 2},
+        { 2, -1}, { 2, 1}
+    };
+
+    std::vector<std::pair<int, int>> possible_squares;
+
+    for (const auto& move : moves){
+        int new_r = knight_r + move.first;
+        int new_c = knight_c + move.second;
+
+        if (new_r >= 0 && new_r < BOARDDIMENSION &&
+            new_c >= 0 && new_c < BOARDDIMENSION)
+        {
+            possible_squares.push_back({new_r, new_c});
+        }
+    }
+
+    return possible_squares;
+}
+
+std::vector<std::vector<ChessCostType>> KnightLookupTable(int goal_r, int goal_c) {
+    const ChessCostType UNVISITED = std::numeric_limits<ChessCostType>::max();
+    std::vector<std::vector<ChessCostType>> LookupTable
+                    (BOARDDIMENSION, std ::vector<ChessCostType>(BOARDDIMENSION, UNVISITED));
+    
+    std::pair<int, int> coordinates;
+    std::vector<std::pair<int, int>> next_squares;
+    
+    std::queue<std::pair<int, int>> tree;
+    
+    ChessCostType current_value;
+
+    LookupTable[goal_r][goal_c] = static_cast<ChessCostType>(0.0);
+    tree.push({goal_r, goal_c});
+    
+    while (!tree.empty()){
+        std::pair<int, int> coordinates = tree.front();
+        tree.pop();
+
+        current_value = LookupTable[coordinates.first][coordinates.second];
+        next_squares = knight_next_jump(coordinates.first, coordinates.second);
+        
+        for (const auto& square : next_squares){
+            if (LookupTable[square.first][square.second] == UNVISITED) {
+                LookupTable[square.first][square.second] = current_value + 1.0;
+                tree.push(square);
+            }
+        }
+    }
+
+    return LookupTable;
+}
+
+ChessCostType ChessBoardProblem::Heuristic(const State& state) const {
     const int rows = static_cast<int>(state.size());
     const int cols = rows ? static_cast<int>(state[0].size()) : 0;
-    
+
     if (rows == 0 || cols == 0) return static_cast<ChessCostType>(0.0);
     if (IsGoal(state)) return static_cast<ChessCostType>(0.0);
 
-    // Identifica qual problema baseado no preset_state_
+    const ChessCostType UNVISITED = std::numeric_limits<ChessCostType>::max();
+
+    // Identify which problem it is based on preset_state_
     bool isProblem1 = (preset_state_ == 1);
     bool isProblem2 = (preset_state_ == 2);
 
-    // Heurística admissível para Problema 1: Cavalo negro em (3,6)
+    // Admissible heuristic for Problem 1: Black knight at (3,6)
     if (isProblem1) {
-        auto [knight_r, knight_c] = FindPiecePosition(state, Piece::BLACK_KNIGHT);
-        
-        if (knight_r == -1) return static_cast<ChessCostType>(0.0);
-        
-        const int goal_r = 3, goal_c = 6;
-        int dx = abs(knight_r - goal_r);
-        int dy = abs(knight_c - goal_c);
-        
-        // Heurística ADMISSÍVEL conservadora: distância de Chebyshev
-        // Esta é uma subestimativa garantida do custo real
-        ChessCostType h = static_cast<ChessCostType>(std::max(dx, dy));
-        
-        return h;
-    }
+        auto [knight_r, knight_c] =
+            FindPiecePosition(state, Piece::BLACK_KNIGHT);
 
-    // Heurística admissível para Problema 2: Peão → Rainha → (4,1)
-    if (isProblem2) {
-        const int promotion_row = 1;
-        const int queen_goal_r = 4, queen_goal_c = 1;
-        
-        auto [queen_r, queen_c] = FindPiecePosition(state, Piece::QUEEN);
-        auto [pawn_r, pawn_c] = FindPiecePosition(state, Piece::PAWN);
-        
-        // Fase 2: Rainha existe
-        if (queen_r != -1) {
-            int dr = abs(queen_r - queen_goal_r);
-            int dc = abs(queen_c - queen_goal_c);
+        if (knight_r == -1) return static_cast<ChessCostType>(0.0);
+
+        if (knight_r >= 0 && knight_r < BOARDDIMENSION &&
+            knight_c >= 0 && knight_c < BOARDDIMENSION)
+            return LookupTable[knight_r][knight_c];
             
-            // Heurística admissível para Rainha (Distância de Chebyshev)
-            ChessCostType h = static_cast<ChessCostType>(std::max(dr, dc));
-            return h;
-        }
-        // Fase 1: Peão existe
-        else if (pawn_r != -1) {
-            // Custo mínimo absoluto para peão chegar à linha de promoção
-            // Esta é uma subestimativa garantida
-            ChessCostType pawn_cost = static_cast<ChessCostType>(pawn_r - promotion_row);
-            
-            // Custo mínimo absoluto da rainha (Distância de Chebyshev)
-            int dr = abs(promotion_row - queen_goal_r);
-            int dc = abs(pawn_c - queen_goal_c);
-            ChessCostType queen_cost = static_cast<ChessCostType>(std::max(dr, dc));
-            
-            // Soma de heurísticas admissíveis é admissível
-            return pawn_cost + queen_cost;
-        }
-        
         return static_cast<ChessCostType>(0.0);
     }
 
-    // Caso padrão: heurística admissível conservadora
+    // Admissible heuristic for Problem 2: Pawn → Queen → (4,1)
+    if (isProblem2) {
+        const int promotion_row = 1;
+        const int queen_goal_r = 4, queen_goal_c = 1;
+
+        auto [queen_r, queen_c] = FindPiecePosition(state, Piece::QUEEN);
+        auto [pawn_r, pawn_c] = FindPiecePosition(state, Piece::PAWN);
+
+        // Phase 2: Queen exists
+        if (queen_r != -1) {
+            int dr = abs(queen_r - queen_goal_r);
+            int dc = abs(queen_c - queen_goal_c);
+
+            // Admissible heuristic for Queen (Chebyshev distance)
+            ChessCostType h = static_cast<ChessCostType>(std::max(dr, dc));
+            return h;
+        }
+        // Phase 1: Pawn exists
+        else if (pawn_r != -1) {
+            // Minimum cost for pawn to reach promotion row
+            // This is a guaranteed underestimate
+            ChessCostType pawn_cost =
+                static_cast<ChessCostType>(pawn_r - promotion_row);
+
+            // Absolute minimum cost for queen (Chebyshev distance)
+            int dr = abs(promotion_row - queen_goal_r);
+            int dc = abs(pawn_c - queen_goal_c);
+            ChessCostType queen_cost =
+                static_cast<ChessCostType>(std::max(dr, dc));
+
+            // Sum of admissible heuristics is admissible
+            return pawn_cost + queen_cost;
+        }
+
+        return static_cast<ChessCostType>(0.0);
+    }
+
+    // Default case: admissible heuristic, but not informative
     return static_cast<ChessCostType>(0.0);
 }
 
@@ -283,4 +353,25 @@ State ChessBoardProblem::GenerateGoalState(const int preset_state) const {
                 "GenerateInitialState:\
                 Random initial board case not implemented, use preset 1 or 2");
     }
+}
+
+void ChessBoardProblem::PrintAction(const Action& action) const {
+    std::cout << (char)action.piece
+              << " " + std::to_string(action.fromRow) + " "
+              << std::to_string(action.fromCol) + " "
+              << std::to_string(action.toRow) + " "
+              << std::to_string(action.toCol);
+}
+
+std::pair<int, int> ChessBoardProblem::FindPiecePosition(
+    const State& state, Piece piece_to_find) const {
+    for (size_t r = 0; r < state.size(); ++r) {
+        for (size_t c = 0; c < state[r].size(); ++c) {
+            if (static_cast<Piece>(state[r][c]) == piece_to_find) {
+                return {static_cast<int>(r),
+                        static_cast<int>(c)};  // Piece found
+            }
+        }
+    }
+    return {-1, -1};  // Piece not found
 }
