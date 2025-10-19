@@ -3,7 +3,9 @@
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <numeric>
+#include <queue>
 #include <stdexcept>
 
 using namespace chess_board;
@@ -12,7 +14,7 @@ State ChessBoardProblem::GenerateInitialState(const int preset_state) const {
     State s;
     switch (preset_state) {
         case 1:
-            s = State(5, std::vector<uint64_t>(8, '#'));
+            s = State(5, std::vector<Piece>(8, Piece::BORDER));
             for (int i{1}; i <= 4; ++i) {
                 s[2][i] = Piece::WHITE_KNIGHT;
                 s[1][i + 1] = Piece::BISHOP;
@@ -27,7 +29,7 @@ State ChessBoardProblem::GenerateInitialState(const int preset_state) const {
             return s;
 
         case 2:
-            s = State(6, std::vector<uint64_t>(6, '#'));
+            s = State(6, std::vector<Piece>(6, Piece::BORDER));
             for (int i{1}; i <= 4; ++i) {
                 s[1][i] = Piece::WHITE_KNIGHT;
                 s[2][i] = Piece::BISHOP;
@@ -173,12 +175,70 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
     return actions;
 }
 
+auto knight_next_jump(int knight_r, int knight_c, int board_height,
+                      int board_width) -> std::vector<std::pair<int, int>> {
+    // Deslocamentos fixos do cavalo (dr, dc)
+    std::vector<std::pair<int, int>> moves = {
+        {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1}};
+
+    std::vector<std::pair<int, int>> possible_squares;
+
+    for (const auto& move : moves) {
+        int new_r = knight_r + move.first;
+        int new_c = knight_c + move.second;
+
+        if (new_r >= 0 && new_r < board_height && new_c >= 0 &&
+            new_c < board_width) {
+            possible_squares.push_back({new_r, new_c});
+        }
+    }
+
+    return possible_squares;
+}
+
+std::vector<std::vector<ChessCostType>>
+ChessBoardProblem::GenerateKnightLookupTable(int goal_r, int goal_c) {
+    const ChessCostType UNVISITED = std::numeric_limits<ChessCostType>::max();
+    std::vector<std::vector<ChessCostType>> LookupTable(
+        board_height_, std::vector<ChessCostType>(board_width_, UNVISITED));
+
+    std::pair<int, int> coordinates;
+    std::vector<std::pair<int, int>> next_squares;
+
+    std::queue<std::pair<int, int>> tree;
+
+    ChessCostType current_value;
+
+    LookupTable[goal_r][goal_c] = static_cast<ChessCostType>(0.0);
+    tree.push({goal_r, goal_c});
+
+    while (!tree.empty()) {
+        std::pair<int, int> coordinates = tree.front();
+        tree.pop();
+
+        current_value = LookupTable[coordinates.first][coordinates.second];
+        next_squares = knight_next_jump(coordinates.first, coordinates.second,
+                                        board_height_, board_width_);
+
+        for (const auto& square : next_squares) {
+            if (LookupTable[square.first][square.second] == UNVISITED) {
+                LookupTable[square.first][square.second] = current_value + 1.0;
+                tree.push(square);
+            }
+        }
+    }
+
+    return LookupTable;
+}
+
 ChessCostType ChessBoardProblem::Heuristic(const State& state) const {
     const int rows = static_cast<int>(state.size());
     const int cols = rows ? static_cast<int>(state[0].size()) : 0;
 
     if (rows == 0 || cols == 0) return static_cast<ChessCostType>(0.0);
     if (IsGoal(state)) return static_cast<ChessCostType>(0.0);
+
+    const ChessCostType UNVISITED = std::numeric_limits<ChessCostType>::max();
 
     // Identify which problem it is based on preset_state_
     bool isProblem1 = (preset_state_ == 1);
@@ -191,15 +251,11 @@ ChessCostType ChessBoardProblem::Heuristic(const State& state) const {
 
         if (knight_r == -1) return static_cast<ChessCostType>(0.0);
 
-        const int goal_r = 3, goal_c = 6;
-        int dx = abs(knight_r - goal_r);
-        int dy = abs(knight_c - goal_c);
+        if (knight_r >= 0 && knight_r < board_height_ && knight_c >= 0 &&
+            knight_c < board_width_)
+            return knight_lookup_table_[knight_r][knight_c];
 
-        // Admissible heuristic: Chebyshev distance
-        // This is a guaranteed underestimate of the true cost
-        ChessCostType h = static_cast<ChessCostType>(std::max(dx, dy));
-
-        return h;
+        return static_cast<ChessCostType>(0.0);
     }
 
     // Admissible heuristic for Problem 2: Pawn → Queen → (4,1)
@@ -272,7 +328,7 @@ State ChessBoardProblem::GenerateGoalState(const int preset_state) const {
     State s;
     switch (preset_state) {
         case 1:
-            s = State(5, std::vector<uint64_t>(8, '#'));
+            s = State(5, std::vector<Piece>(8, Piece::BORDER));
             for (int i{1}; i <= 2; ++i)
                 for (int j{1}; j <= 6; ++j) s[i][j] = Piece::ANY;
 
@@ -281,7 +337,7 @@ State ChessBoardProblem::GenerateGoalState(const int preset_state) const {
             return s;
 
         case 2:
-            s = State(6, std::vector<uint64_t>(6, '#'));
+            s = State(6, std::vector<Piece>(6, Piece::BORDER));
             for (int i{1}; i <= 3; ++i)
                 for (int j{1}; j <= 4; ++j) s[i][j] = Piece::ANY;
 
