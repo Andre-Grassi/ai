@@ -2,7 +2,7 @@
 
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O2 -g 
+CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O3
 INCLUDES = -I. -Idata_structure -Ialgorithms
 RELAXED_FLAGS = -Wno-unused-parameter -Wno-unused-variable
 
