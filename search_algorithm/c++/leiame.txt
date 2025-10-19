@@ -51,6 +51,5 @@ problema.
     absoluto entre as diferenças de suas coordenadas (max(Δx, Δy)), equivalente 
     ao número mínimo de passos de um rei no xadrez para ir de um ponto ao outro.
 
-
-
+Obs: é possível gerar a documentação do código com `make docs`.
 
