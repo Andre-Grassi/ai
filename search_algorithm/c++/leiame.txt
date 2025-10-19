@@ -1,0 +1,56 @@
+Alunos:
+* Andre Grassi de Jesus, GRR 20235169
+* Cauê Samonek, GRR 20232339
+* Ricardo Faria, GRR 20235161
+
+# Organização do Código Fonte
+    A estrutura de dados da busca está no diretório /data_stucture.
+
+    Nesse diretório, está implementada a classe nodo da árvore de busca, em 
+node.h e node.tpp.
+
+    A definição da classe abstrata do problema está em problem.h.
+
+    Os comparadores dos nodos estão em node_comparator.h. Há mais de um 
+comparador, porém somente o que usa a comparação do A* é utilizado, ou seja, o
+CompareByAStar.
+
+    A implementação concreta do problema do trabalho está em 
+/data_stucture/problems, nos arquivos chess_board_problem.h e
+chess_board_problem.cc.
+
+    Já os algoritmos de busca estão implementados em /algorithms sob o namespace
+search_algorithm, definido em search_algorithm.h. Há vários algoritmos de busca
+porém o utilizado é o BestFirstSearch, com o comparador de nodos do A*, para,
+justamente, realizar a busca A*. Eles recebem um problema como argumento e
+retornam o nodo solução.
+
+# O código dos problemas
+    Ambos os problemas estão definidos em ChessBoardProblem. O problema 1 e 2
+são instanciados por meio do construtor, passando como parâmetro o número do
+problema.
+
+## Heurísticas
+    * Problema 1: para a heurística do problema 1, é gerada uma look up table 
+    dos custos esperados para cada posição do cavalo no tabuleiro durante a
+    instanciação do objeto do problema. Depois, a heurística apenas retorna os
+    valores presentes na tabela para a posição do cavalo, sem a necessidade de
+    recalcular toda vez.
+
+    * Problema 2: Essa heurística trata um problema em duas fases: promover o 
+    peão e, depois, posicionar a dama. 
+    Primeiro procura a dama; se já existe, calcula a distância de Chebyshev dela
+    até a casa objetivo porque a dama pode mover-se como rei. Esse valor é 
+    admissível. 
+    Se a dama ainda não surgiu, mede quantas linhas faltam para o peão alcançar
+    a fileira de promoção, soma a isso a mesma distância de Chebyshev da futura 
+    dama (na casa de promoção, mesma coluna do peão) até o objetivo; ambas as
+    parcelas são estimativas inferiores, e a soma permanece admissível. 
+    Se não há peça alguma relevante, retorna zero.
+    Obs: A distância de Chebyshev entre dois pontos em um grid é o maior valor
+    absoluto entre as diferenças de suas coordenadas (max(Δx, Δy)), equivalente 
+    ao número mínimo de passos de um rei no xadrez para ir de um ponto ao outro.
+
+
+
+

@@ -258,7 +258,7 @@ bool ChessBoardProblem::IsGoal(const State& state) const {
             auto goal_cell = goal_state_[r][c];
             auto curr_cell = state[r][c];
 
-            if (goal_cell == Piece::ANY) continue;  // ignora '?'
+            if (goal_cell == Piece::ANY) continue;  // Ignores '?'
             if (curr_cell != goal_cell) return false;
         }
     }
@@ -296,7 +296,7 @@ State ChessBoardProblem::GenerateGoalState(const int preset_state) const {
 
 auto knight_next_jump(int knight_r, int knight_c, int board_height,
                       int board_width) -> std::vector<std::pair<int, int>> {
-    // Deslocamentos fixos do cavalo (dr, dc)
+    // Fixed knight moves (dr, dc)
     std::vector<std::pair<int, int>> moves = {
         {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1}};
 
