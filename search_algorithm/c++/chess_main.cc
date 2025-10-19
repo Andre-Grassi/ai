@@ -14,7 +14,10 @@ int main() {
     // Create a Chess Board problem -- Parametro: 1 ou 2 pra definir o tabuleiro
     // inicial igual no enunciado
     auto problem = std::make_unique<chess_board::ChessBoardProblem>(2);
-
+    auto LookupTable =
+        std::make_unique<chess_board::ChessBoardProblem::KnightLookupTable()>;
+        //aqui tem que criar a tabela, sla como hehe
+        
     // Get initial state
     auto initial_state = problem->GetInitialState();
     std::cout << "Initial State Created Successfully!" << std::endl;

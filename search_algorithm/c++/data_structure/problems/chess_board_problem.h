@@ -6,6 +6,8 @@
 #include "../node.h"
 #include "../problem.h"
 
+#define BOARDDIMENSION 8
+
 namespace chess_board {
 
 enum Piece : int64_t {
@@ -76,6 +78,8 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
                                         const State&) const {
         return 1.0;  // Uniform cost for all actions
     }
+
+    std::vector<std::vector<ChessCostType>> KnightLookupTable(int goal_r, int goal_c);
 
     ChessCostType Heuristic(const State& state) const override;
 
