@@ -6,15 +6,13 @@
 #include "data_structure/node.h"
 #include "data_structure/problem.h"
 
-#define BOARDDIMENSION 8
-
 namespace chess_board {
 
 /**
  * @brief Available chess pieces represented as integer values
  * @note Only a subset of pieces are implemented for this problem
  */
-enum Piece : int64_t {
+enum Piece : char {
     EMPTY = '_',
     BORDER = '#',
     ANY = '?',
@@ -41,13 +39,13 @@ struct Action {
           fromCol(fromCol),
           toRow(toRow),
           toCol(toCol) {}
-          
+
     Piece piece;  /// < Used only to show which piece was moved when printing
                   /// actions
     int fromRow, fromCol, toRow, toCol;
 };
 
-using State = std::vector<std::vector<uint64_t>>;  /// < 2D grid representation
+using State = std::vector<std::vector<Piece>>;  /// < 2D grid representation
 
 using ChessCostType =
     float;  ///< Cost type for actions and to calculate heuristics
@@ -71,7 +69,9 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
         : Problem<State, Action, ChessCostType>(
               GenerateInitialState(preset_state)),
           goal_state_(GenerateGoalState(preset_state)),
-          preset_state_(preset_state) {}
+          preset_state_(preset_state),
+          board_height_(initial_state_.size()),
+          board_width_(initial_state_[0].size()) {}
 
     virtual ~ChessBoardProblem() = default;
 
@@ -86,8 +86,6 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
                                         const State&) const {
         return 1.0;  // Uniform cost for all actions
     }
-
-    std::vector<std::vector<ChessCostType>> KnightLookupTable(int goal_r, int goal_c);
 
     ChessCostType Heuristic(const State& state) const override;
 
@@ -106,6 +104,10 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
    private:
     State goal_state_;  /// < Target configuration to reach
     int preset_state_;  /// < Identifier of the statement problem (1 or 2)
+    int board_height_;  /// < Height of the chess board
+    int board_width_;   /// < Width of the chess board
+    std::vector<std::vector<ChessCostType>>
+        knight_lookup_table_;  ///< Heuristic table for knight moves
 
     /**
      * @brief Generates the initial state based on preset configuration
@@ -134,6 +136,15 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
      */
     std::pair<int, int> FindPiecePosition(const State& state,
                                           Piece piece_to_find) const;
+
+    /**
+     * @brief Generates a lookup table for knight moves to be used as heuristic
+     * @param goal_r The goal row position for the knight
+     * @param goal_c The goal column position for the knight
+     * @return 2D vector representing the lookup table with costs
+     */
+    std::vector<std::vector<ChessCostType>> GenerateKnightLookupTable(
+        int goal_r, int goal_c);
 };
 
 }  // namespace chess_board
