@@ -78,7 +78,7 @@ std::vector<Action> ChessBoardProblem::GetActions(const State& state) const {
 
     for (int row = 0; row < num_rows; ++row)
         for (int col = 0; col < num_cols; ++col) {
-            Piece piece_to_move = static_cast<Piece>(state[row][col]);
+            Piece piece_to_move = state[row][col];
 
             // Map all possible moves
             switch (piece_to_move) {
@@ -353,7 +353,7 @@ State ChessBoardProblem::GenerateGoalState(const int preset_state) const {
 }
 
 void ChessBoardProblem::PrintAction(const Action& action) const {
-    std::cout << (char)action.piece
+    std::cout << static_cast<char>(action.piece)
               << " " + std::to_string(action.fromRow) + " "
               << std::to_string(action.fromCol) + " "
               << std::to_string(action.toRow) + " "
