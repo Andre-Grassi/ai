@@ -71,7 +71,15 @@ class ChessBoardProblem : public Problem<State, Action, ChessCostType> {
           goal_state_(GenerateGoalState(preset_state)),
           preset_state_(preset_state),
           board_height_(initial_state_.size()),
-          board_width_(initial_state_[0].size()) {}
+          board_width_(initial_state_[0].size()) {
+        // Initialize knight heuristic lookup table in problem 1
+        if (preset_state_ == 1) {
+            int goal_row_knight = 3;
+            int goal_col_knight = 6;
+            knight_lookup_table_ =
+                GenerateKnightLookupTable(goal_row_knight, goal_col_knight);
+        }
+    }
 
     virtual ~ChessBoardProblem() = default;
 
