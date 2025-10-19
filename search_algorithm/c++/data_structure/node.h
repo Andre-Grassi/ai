@@ -12,6 +12,8 @@
 
 #include "basic_search/problem.h"
 
+// FIX: change CostType to TCost
+
 /**
  * @brief Represents a node in a search tree
  *
@@ -89,7 +91,7 @@ class Node
     TState state_;
     std::shared_ptr<NodeType> parent_;
     TAction action_;
-    float path_cost_;
+    float path_cost_; // FIX must be CostType
     uint64_t depth_;
 
     /**
