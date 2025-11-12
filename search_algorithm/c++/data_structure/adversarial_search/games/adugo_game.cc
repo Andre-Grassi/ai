@@ -1,12 +1,21 @@
 #include "adugo_game.h"
 
+#include <algorithm>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <optional>
 
 using namespace adugo_game;
+
+const std::pair<std::vector<int>, std::vector<int>>* VerifyInMap (int position) {   //verifica se o ponto pertence ao tabuleiro
+    auto homeowner = kGridDimensionNeighborhood.find(position);                     //retorna um ponteiro para o pair do map se existir no tabuleiro
+    if(homeowner == kGridDimensionNeighborhood.end())
+        return nullptr;
+    return &(homeowner->second);
+}
 
 Player AdugoGame::GetPlayerToMove(const State& state) const {
     // If the game has ended, no player can play
@@ -15,19 +24,150 @@ Player AdugoGame::GetPlayerToMove(const State& state) const {
     return Player(this->playerToMove);
 }
 
-//--------------------IMPLEMENTOBA
-//state eh um vetor de 35 Symbol, tem q ver na enum no .h quais sao cada pra
-//tratar as movimentacoes de cada bixo do jeito certo
+bool AdugoGame::IsNeighbor(int position1, int position2)const {
+    const std::pair<std::vector<int>,std::vector<int>>* neighbor = VerifyInMap(position1);
+    if (!neighbor)
+        return false; //se ta fora do mapa, nao e vizinho de ninguem
+
+    if (std::find(neighbor->first.begin(), neighbor->first.end(), position2) != neighbor->first.end())
+        return true;    //se achou no mapa de vizinhanca, e vizinho
+
+    return false;
+}
+
+std::optional<int> AdugoGame::FindMiddlePosition(int position1, int position3)const {  //retorna a posicao no meio de outras 2, se estiverem as 3 alinhadas
+    std::vector<int> possibilities;
+
+    auto collection1 = VerifyInMap(position1);
+    auto collection3 = VerifyInMap(position3);
+
+    if (!collection1 || !collection3)
+        return std::nullopt;
+    
+    if (IsNeighbor(position1, position3))   //se sao vizinhos diretos, nao ha ponto no meio
+        return std::nullopt;
+
+    for (const auto neighbor : collection1->first){
+        if (std::find(collection3->first.begin(), collection3->first.end(), neighbor) != collection3->first.end())
+            possibilities.push_back(neighbor);
+    }
+
+    if (possibilities.size() == 1){
+        return possibilities[0];
+    }
+
+    return std::nullopt;
+}
+
+std::vector<int> AdugoGame::FindCommonConnections(int position1, int position2)const {
+    std::vector<int>common_lines;
+   
+    const std::pair<std::vector<int>,std::vector<int>>* tiger = VerifyInMap(position1);
+    const std::pair<std::vector<int>,std::vector<int>>* dog = VerifyInMap(position2);
+    
+    if (!tiger || !dog)
+        return common_lines;
+
+    for (int tiger_pos : tiger->second){   //separa as retas comuns entre os pontos
+        for (int dog_pos : dog->second){
+            if (tiger_pos == dog_pos)
+                common_lines.emplace_back(tiger_pos);
+        }
+    }
+
+    return common_lines;
+}
+
+bool AdugoGame::IsAligned(int position1, int position2, int position3, std::vector<int>common_lines)const {
+    if (position1 == position2 || position1 == position3 || position2 == position3)
+        return false;   //necessario 3 pontos distintos para o abate
+
+    if (IsNeighbor(position1, position2) && IsNeighbor(position2, position3)){ //precisam ser 3 pontos vizinhos
+        const std::pair<std::vector<int>, std::vector<int>>* empty_possibilities = VerifyInMap(position3);
+        if(!empty_possibilities)    //se nao tem 3 ponto, nao tem porque ver se ta alinhado
+            return false;
+        for (int emp : empty_possibilities->second){
+            for (int com : common_lines){   //se houver reta comum entre os 3 pontos, estao alinhados
+                if (emp == com)
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
+void AdugoGame::AddIndirectNeighbors(const State& state, Player player, 
+        std::vector<Action>& actions, int original_position, int current_position)const {
+
+    const std::pair<std::vector<int>,std::vector<int>>* neighbors = VerifyInMap(current_position);
+    if (!neighbors)
+        return;     //se current_position nao ta no tabuleiro, retorna
+
+    for (int neighbor : neighbors->first){ //pra cada vizinho do cachorro, verifica se ha casa vazia e alinhada com cachorro/onca
+        if (state[neighbor] == Symbol::kEmpty && IsAligned(original_position, current_position, 
+                neighbor, this->FindCommonConnections(original_position, current_position)))
+            actions.emplace_back(player.symbol, original_position, neighbor);
+    }
+
+    return;
+}
+
 std::vector<Action> AdugoGame::GetPlayerActions(const State& state, Player player) const {
     std::vector<Action> actions;
-    //mapear jogadas possiveis de onca/cachorros <<-- depende das infos de 'player'
-    //usar de exemplo o codigo do jogo da velha
+
+    for (int i = 0; i < kGridDimension; i++) {
+        if (state[i] == player.symbol) {
+            auto homeowner = kGridDimensionNeighborhood.find(i);
+            if (homeowner == kGridDimensionNeighborhood.end())
+                continue;    //posicao do player fora do mapa
+                            //continua para caso for cachorro
+            
+            const std::pair<std::vector<int>,std::vector<int>>& neighbors = homeowner->second;
+
+            for (int neighbor_pos : neighbors.first) {
+                if (player.symbol == Symbol::kO) {
+                    if (state[neighbor_pos] == Symbol::kEmpty) 
+                        actions.emplace_back(player.symbol, homeowner->first, neighbor_pos);
+                    else if (state[neighbor_pos] == Symbol::kC)
+                        AddIndirectNeighbors(state, player, actions, homeowner->first, neighbor_pos);
+                }
+                else if (player.symbol == Symbol::kC && state[neighbor_pos] == Symbol::kEmpty) {
+                    actions.emplace_back(player.symbol, homeowner->first, neighbor_pos);
+                }
+            }
+        }
+    }
+    
     return actions;
 }
 
-//--------------------IMPLEMENTOBA
 std::unique_ptr<State> AdugoGame::GetResult(const State& state, const Action& action) const {
-    return nullptr;
+    if (IsTerminal(state))
+        return nullptr;
+
+    Player player = GetPlayerToMove(state);
+    Symbol action_symbol = action.player_symbol;
+    int ply_index = action.cell_index_origin;
+    int dest_index = action.cell_index_destination;
+
+    if (action_symbol != player.symbol)
+        return nullptr;
+
+    if (state[dest_index] == Symbol::kBlock) 
+        return nullptr;
+
+    std::unique_ptr<State> new_state = std::make_unique<State>(state);
+
+    if (!IsNeighbor(ply_index, dest_index)) {  //caso da onca matar o cachoro, limpa a antiga casa do cachorro
+        auto middle = FindMiddlePosition(ply_index, dest_index);    //se ha somente um vizinho entre ambos e os 3 estao alinhados, houve abate
+        if (middle.has_value() && IsAligned(ply_index, middle.value(), dest_index, FindCommonConnections(ply_index, dest_index)))
+            (*new_state)[middle.value()] = Symbol::kEmpty;
+    }
+
+    (*new_state)[ply_index] = Symbol::kEmpty;   //player sai da posicao original
+    (*new_state)[dest_index] = action_symbol;   //player chega ao destino
+
+    return new_state;
 }
 
 std::vector<Action> AdugoGame::GetActions(const State& state) const {
@@ -40,16 +180,16 @@ bool AdugoGame::IsTerminal(const State& state) const {
     return true;//alguem ganhou
 }
 
-//-------- mexi quase nd, n sei se ta certo ja ou nem
+//eai??
 Utility AdugoGame::GetUtility(const State& state) const {
     if (!IsTerminal(state))
         throw std::logic_error("GetUtility called on non-terminal state");
 
     Player winner = CalculateWinner(state);
 
-    if (winner == Player(Symbol::kEmpty)) return 0;  // Draw
-    if (winner == Player(Symbol::kC)) return 1;      // C Win
-    return -1;                                       // O win
+    if (winner == Player(Symbol::kEmpty)) return 0; // Draw
+    if (winner == Player(Symbol::kC)) return 1;     // C Win
+    return -1;                                      // O win
 }
 
 Player AdugoGame::CalculateWinner(const State& state) const {
@@ -78,6 +218,7 @@ Player AdugoGame::CalculateWinner(const State& state) const {
     return Player(reference_symbol);
 }
 
+//p imprimir bonitinho
 std::string AdugoGame::GetStateString(const State& state) const {
     std::vector<std::string> lines = {
         "  1    2    3    4    5",
