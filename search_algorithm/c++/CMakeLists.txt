@@ -29,7 +29,9 @@ set(BASIC_SEARCH_PROBLEMS_SOURCES
 
 # Game sources (.cc)
 set(ADVERSARIAL_SEARCH_GAMES_SOURCES
-    "data_structure/adversarial_search/games/tic_tac_toe_game.cc")
+    "data_structure/adversarial_search/games/tic_tac_toe_game.cc"
+    "data_structure/adversarial_search/games/adugo_game.cc"
+)
 
 ### Libraries ###
 add_library(problems STATIC ${BASIC_SEARCH_PROBLEMS_SOURCES})
@@ -46,8 +48,8 @@ endif()
 
 ### Targets ###
 # Main target
-set(MAIN_EXECUTABLE "tile_main")
-set (MAIN_SOURCE "tile_main.cc")    
+set(MAIN_EXECUTABLE "adugo_main")
+set (MAIN_SOURCE "adugo_main.cc")    
 add_executable(${MAIN_EXECUTABLE} ${MAIN_SOURCE})
 target_link_libraries(${MAIN_EXECUTABLE} PRIVATE problems games ${CURSES_LIBRARIES})
 
