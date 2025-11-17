@@ -23,14 +23,15 @@ Player AdugoGame::GetPlayerToMove(const State& state) const {
     // If the game has ended, no player can play
     if (IsTerminal(state)) return Player(Symbol::kEmpty);
 
-    return Player(this->playerToMove);
+    return state.player_to_move;
 }
 
 bool AdugoGame::IsNeighbor(int position1, int position2) const {
     const std::pair<std::vector<int>, std::vector<int>>* neighbor =
         VerifyInMap(position1);
-    if (!neighbor) return false;  // se ta fora do mapa, nao e vizinho de
-                                  // ninguem
+    if (!neighbor)
+        return false;  // se ta fora do mapa, nao e vizinho de
+                       // ninguem
 
     if (std::find(neighbor->first.begin(), neighbor->first.end(), position2) !=
         neighbor->first.end())
@@ -195,6 +196,12 @@ std::unique_ptr<State> AdugoGame::GetResult(const State& state,
     (*new_state)[ply_index] = Symbol::kEmpty;  // player sai da posicao original
     (*new_state)[dest_index] = action_symbol;  // player chega ao destino
 
+    // Switch turn to the other player
+    if (player.symbol == Symbol::kC)
+        new_state->player_to_move = Player(Symbol::kO);
+    else
+        new_state->player_to_move = Player(Symbol::kC);
+
     return new_state;
 }
 
@@ -226,7 +233,7 @@ Player AdugoGame::CalculateWinner(const State& state) const {
     // onca ganha se matar 5 cachorros
     int dog_count = 0;
     int dog_limit = 9;  // 14-5 | total dogos - 5 mortos, enum?
-    for (Symbol v : state)
+    for (Symbol v : state.board)
         if (v == Symbol::kC) dog_count++;
     if (dog_count <= dog_limit) return Player(Symbol::kO);
 
