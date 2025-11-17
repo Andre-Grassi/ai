@@ -31,7 +31,7 @@ brew install cmake ncurses
 
 ### Standard Build
 
-1. **Create a build directory** (recommended out-of-source build):
+1. **Create a build directory**:
    ```bash
    mkdir build
    cd build
@@ -51,6 +51,16 @@ brew install cmake ncurses
    ```bash
    make
    ```
+
+### Build specific files
+```bash
+cmake --build . --target <target_name>
+```
+
+Example:
+```bash
+cmake --build . --target adugo_main
+```
 
 ### Relaxed Build Mode
 
