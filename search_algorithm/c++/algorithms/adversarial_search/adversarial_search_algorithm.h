@@ -37,11 +37,13 @@ template <typename TState, typename TAction, typename TUtility,
 std::unique_ptr<TAction> MinimaxSearchWithPruning(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state);
 
-// Heuristic Alpha-Beta pruning Minimax (can avoid cycles)
+// Heuristic Alpha-Beta pruning Minimax with transposition table (can avoid
+// cycles)
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::unique_ptr<TAction> HeuristicMinimaxSearch(
-    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state);
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
+    std::map<TState, TUtility> transposition_table);
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>

@@ -14,19 +14,22 @@ template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    const TPlayer& player, TUtility alpha, TUtility beta);
+    const TPlayer& player, TUtility alpha, TUtility beta,
+    std::map<TState, TUtility> transposition_table);
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    const TPlayer& player, TUtility alpha, TUtility beta);
+    const TPlayer& player, TUtility alpha, TUtility beta,
+    std::map<TState, TUtility> transposition_table);
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    const TPlayer& player, TUtility alpha, TUtility beta, int depth) {
+    const TPlayer& player, TUtility alpha, TUtility beta, int depth,
+    std::map<TState, TUtility> transposition_table) {
     // When the depth cutoff is reached or it's a terminal state, just return
     // the expected value (or utility, if terminal).
     if (game.IsCutoff(state, depth)) {
@@ -41,11 +44,20 @@ std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
     for (TAction action : game.GetActions(state)) {
         TUtility curr_expected_value;
         std::unique_ptr<TState> new_state = game.GetResult(state, action);
-        TPlayer enemy = game.GetPlayerToMove(*new_state);
 
-        std::tie(curr_expected_value, std::ignore) =
-            MaxValue<TState, TAction, TUtility, TPlayer>(
-                game, *new_state, enemy, alpha, beta, depth + 1);
+        auto it = transposition_table.find(*new_state);
+        if (it != transposition_table.end())
+            // Key exists
+            curr_expected_value = it->second;
+        else {
+            TPlayer enemy = game.GetPlayerToMove(*new_state);
+
+            std::tie(curr_expected_value, std::ignore) =
+                MaxValue<TState, TAction, TUtility, TPlayer>(
+                    game, *new_state, enemy, alpha, beta, depth + 1,
+                    transposition_table);
+            transposition_table[*new_state] = curr_expected_value;
+        }
 
         if (curr_expected_value < min_expected_value) {
             min_expected_value = curr_expected_value;
@@ -63,8 +75,10 @@ template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    const TPlayer& player, TUtility alpha, TUtility beta,
-    int depth) {  // Google suggets int instead of size_t or unsigned
+    const TPlayer& player, TUtility alpha, TUtility beta, int depth,
+    std::map<TState, TUtility>
+        transposition_table) {  // Google suggets int instead of size_t or
+                                // unsigned
     // When the depth cutoff is reached or it's a terminal state, just return
     // the expected value (or utility, if terminal).
     if (game.IsCutoff(state, depth)) {
@@ -80,11 +94,21 @@ std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
     for (TAction action : actions) {
         TUtility curr_expected_value;
         std::unique_ptr<TState> new_state = game.GetResult(state, action);
-        TPlayer enemy = game.GetPlayerToMove(*new_state);
 
-        std::tie(curr_expected_value, std::ignore) =
-            MinValue<TState, TAction, TUtility, TPlayer>(
-                game, *new_state, enemy, alpha, beta, depth + 1);
+        auto it = transposition_table.find(*new_state);
+        if (it != transposition_table.end())
+            // Key exists
+            curr_expected_value = it->second;
+        else {
+            TPlayer enemy = game.GetPlayerToMove(*new_state);
+
+            std::tie(curr_expected_value, std::ignore) =
+                MinValue<TState, TAction, TUtility, TPlayer>(
+                    game, *new_state, enemy, alpha, beta, depth + 1,
+                    transposition_table);
+
+            transposition_table[*new_state] = curr_expected_value;
+        }
 
         if (curr_expected_value > max_expected_value) {
             max_expected_value = curr_expected_value;
@@ -101,21 +125,23 @@ std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::unique_ptr<TAction> adversarial_search_algorithm::HeuristicMinimaxSearch(
-    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state) {
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
+    std::map<TState, TUtility> transposition_table) {  // OPTIMIZE use unord_map
     TPlayer player = game.GetPlayerToMove(state);
     std::unique_ptr<TAction> best_action;
     int initial_depth = 0;
 
+    // OPTIMIZE pass transposition_table by reference?
     if (player.IsMax())
         // std::tie without template parameters to let it deduce.
-        // An error was ocurring because of the std::ignore, it probably has a
-        // specific type
-        std::tie(std::ignore, best_action) =
-            MaxValue(game, state, player, negative_infinity<TUtility>(),
-                     positive_infinity<TUtility>(), initial_depth);
+        // An error was ocurring because of the std::ignore, it probably has
+        // a specific type
+        std::tie(std::ignore, best_action) = MaxValue(
+            game, state, player, negative_infinity<TUtility>(),
+            positive_infinity<TUtility>(), initial_depth, transposition_table);
     else
-        std::tie(std::ignore, best_action) =
-            MinValue(game, state, player, negative_infinity<TUtility>(),
-                     positive_infinity<TUtility>(), initial_depth);
+        std::tie(std::ignore, best_action) = MinValue(
+            game, state, player, negative_infinity<TUtility>(),
+            positive_infinity<TUtility>(), initial_depth, transposition_table);
     return best_action;
 }
