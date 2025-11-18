@@ -52,6 +52,7 @@ MinimaxSearchStoreTree(const Game<TState, TAction, TUtility, TPlayer>& game,
 
 }  // namespace adversarial_search_algorithm
 
+#include "heuristic_minimax.tpp"
 #include "minimax_search.tpp"
 #include "minimax_search_store_tree.tpp"
 #include "minimax_search_with_pruning.tpp"
