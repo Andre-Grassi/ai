@@ -97,7 +97,7 @@ class Game {
      * @note Not only the depth can be used to determine cutoff, but also
      * features of the state itself.
      */
-    virtual bool IsCutoff(const TState& state, int depth) const {
+    virtual bool IsCutoff(const TState& /*state*/, int /*depth*/) const {
         return false;
     }
 
@@ -122,7 +122,7 @@ class Game {
      * @note For terminal states, GetEval = GetUtility, for non-terminal states,
      * Utility(loss) <= GetEval <= Utility(win).
      */
-    virtual TUtility GetEval(const TState& state) const {
+    virtual TUtility GetEval(const TState& /*state*/) const {
         throw std::logic_error("GetEval not implemented for this game");
     }
 
