@@ -184,8 +184,8 @@ using Board = std::array<Symbol, kGridDimension>;  // 0 to kGridDimension - 1
 
 struct State {
    public:
-    Player player_to_move;
     Board board;
+    Player player_to_move;
 
     State(Board board_array, Player player_to_move)
         : board(board_array), player_to_move(player_to_move) {}
