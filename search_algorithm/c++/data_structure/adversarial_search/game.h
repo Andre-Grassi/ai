@@ -9,6 +9,7 @@
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_GAME_H_
 
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <vector>
 
@@ -46,7 +47,9 @@ class Game {
         has_is_max_v<TPlayer>,
         "The type TPlayer used in Game<> must have a method 'bool IsMax()'.");
 
-    Game(const TState& initial_state) : initial_state_(initial_state) {}
+    Game(const TState& initial_state,
+         int max_depth = std::numeric_limits<int>::max())
+        : initial_state_(initial_state), max_depth_(max_depth) {}
 
     ~Game() = default;
 
@@ -145,6 +148,10 @@ class Game {
 
    protected:
     TState initial_state_;
+    int max_depth_;  ///< Maximum search depth for depth-limited algorithms,
+                     ///< default is maximum int value, which is impossible to
+                     ///< compute for any reasonable game tree. So change it
+                     ///< when needed.
 };
 
 #endif  // SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_GAME_H_
