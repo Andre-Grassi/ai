@@ -239,6 +239,10 @@ using Utility = int8_t;  // -1 (loss), 0 (draw), +1 (win)
  */
 class AdugoGame : public Game<State, Action, Utility, Player> {
    public:
+    static const int kNumStartingDogs = 14;  ///< Number of dogs at game start
+    static const int kNumDogsToCapture =
+        5;  ///< Number of dogs the jaguar must capture to win
+
     AdugoGame() : Game(CreateInitialBoard()) {}
 
     Player GetPlayerToMove(const State& state) const override;
@@ -259,6 +263,8 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
      * @warning Only call on terminal states
      */
     Utility GetUtility(const State& state) const override;
+
+    Utility GetEval(const State& state) const override;
 
     virtual std::string GetStateString(const State& state) const override;
 

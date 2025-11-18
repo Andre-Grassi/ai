@@ -10,6 +10,16 @@
 
 using namespace adugo_game;
 
+// Auxiliary function to count symbols in the board.
+// For example, to count how many 'C' are in the current state.
+int CountSymbolsInState(const State& state, Symbol symbol) {
+    int count = 0;
+    for (const Symbol cell : state.board)
+        if (cell == symbol) count++;
+
+    return count;
+}
+
 const std::pair<std::vector<int>, std::vector<int>>* VerifyInMap(
     int position) {  // verifica se o ponto pertence ao tabuleiro
     auto homeowner = kGridDimensionNeighborhood.find(
@@ -227,14 +237,27 @@ Utility AdugoGame::GetUtility(const State& state) const {
     return -1;                                       // O win
 }
 
+// Heuristic = (Captured_dogs * capture_weight) + (jaguar_mobility *
+// mobility_weight)
+Utility AdugoGame::GetEval(const State& state) const {
+    const int capture_weight = 100;
+    const int mobility_weight = 1;
+
+    int captured_dogs =
+        kNumStartingDogs - CountSymbolsInState(state, Symbol::kC);
+    int jaguar_mobility = GetPlayerActions(state, Player(Symbol::kO)).size();
+
+    return (captured_dogs * capture_weight) +
+           (jaguar_mobility * mobility_weight);
+}
+
 Player AdugoGame::CalculateWinner(const State& state) const {
     Symbol reference_symbol;
 
     // onca ganha se matar 5 cachorros
-    int dog_count = 0;
-    int dog_limit = 9;  // 14-5 | total dogos - 5 mortos, enum?
-    for (Symbol v : state.board)
-        if (v == Symbol::kC) dog_count++;
+    int dog_count = CountSymbolsInState(state, Symbol::kC);
+    int dog_limit = kNumStartingDogs -
+                    kNumDogsToCapture;  // 14-5 | total dogos - 5 mortos, enum?
     if (dog_count <= dog_limit) return Player(Symbol::kO);
 
     // verifica se cachorros ganharam
