@@ -87,8 +87,8 @@ class Game {
      * @brief (Optional) Determines if the given state is a cutoff state.
      * @param state State to check for cutoff condition.
      * @param depth Current depth in the search tree.
-     * @return True when the search should be cut off at this state, false
-     * otherwise.
+     * @return True when the search should be cut off at this state (including
+     * terminal states), false otherwise.
      * @note This method is optional and can be overridden in derived classes in
      * case of using depth-limited search algorithms, such as heuristic minimax.
      * @note Not only the depth can be used to determine cutoff, but also
