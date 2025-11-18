@@ -116,6 +116,8 @@ class Game {
      * case of using heuristic search algorithms, such as heuristic minimax.
      * @note The evaluation is from the point of view of the MAX player always.
      * @note Unlike GetUtility, this method can be called on any state.
+     * @note For terminal states, GetEval = GetUtility, for non-terminal states,
+     * Utility(loss) <= GetEval <= Utility(win).
      */
     virtual TUtility GetEval(const TState& state) const {
         throw std::logic_error("GetEval not implemented for this game");
