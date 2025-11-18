@@ -37,6 +37,12 @@ template <typename TState, typename TAction, typename TUtility,
 std::unique_ptr<TAction> MinimaxSearchWithPruning(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state);
 
+// Heuristic Alpha-Beta pruning Minimax (can avoid cycles)
+template <typename TState, typename TAction, typename TUtility,
+          typename TPlayer>
+std::unique_ptr<TAction> HeuristicMinimaxSearch(
+    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state);
+
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::tuple<std::unique_ptr<TAction>, std::map<int, std::vector<TState>>,
