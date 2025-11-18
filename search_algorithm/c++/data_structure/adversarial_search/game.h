@@ -84,6 +84,21 @@ class Game {
     virtual bool IsTerminal(const TState& state) const = 0;
 
     /**
+     * @brief (Optional) Determines if the given state is a cutoff state.
+     * @param state State to check for cutoff condition.
+     * @param depth Current depth in the search tree.
+     * @return True when the search should be cut off at this state, false
+     * otherwise.
+     * @note This method is optional and can be overridden in derived classes in
+     * case of using depth-limited search algorithms, such as heuristic minimax.
+     * @note Not only the depth can be used to determine cutoff, but also
+     * features of the state itself.
+     */
+    virtual bool IsCutoff(const TState& state, int depth) const {
+        return false;
+    }
+
+    /**
      * @brief Gets the utility value of a terminal state.
      * @param state Terminal state to evaluate.
      * @return The payoff for the player when the games ends in the given state.
@@ -92,6 +107,19 @@ class Game {
      * will throw an error.
      */
     virtual TUtility GetUtility(const TState& state) const = 0;
+
+    /**
+     * @brief (Optional) Gets the heuristic evaluation of a state.
+     * @param state State to evaluate.
+     * @return The estimate of the expected utility of the given state.
+     * @note This method is optional and can be overridden in derived classes in
+     * case of using heuristic search algorithms, such as heuristic minimax.
+     * @note The evaluation is from the point of view of the MAX player always.
+     * @note Unlike GetUtility, this method can be called on any state.
+     */
+    virtual TUtility GetEval(const TState& state) const {
+        throw std::logic_error("GetEval not implemented for this game");
+    }
 
     virtual TState GetInitialState() const { return initial_state_; }
 
