@@ -14,7 +14,8 @@ int main() {
         std::cout << std::endl;
 
         std::unique_ptr<Action> best_action =
-            adversarial_search_algorithm::MinimaxSearch(game, current_state);
+            adversarial_search_algorithm::HeuristicMinimaxSearch(game,
+                                                                 current_state);
 
         std::unique_ptr<State> next_state =
             game.GetResult(current_state, *best_action);
