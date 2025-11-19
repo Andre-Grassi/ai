@@ -340,4 +340,21 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
     Player CalculateWinner(const State& state) const;
 };
 };  // namespace adugo_game
+
+// Hash specialization for State to be used in unordered_map
+namespace std {
+template <>
+struct hash<adugo_game::State> {
+    std::size_t operator()(const adugo_game::State& state) const {
+        size_t hash_value = 0;
+        // Hash the board
+        for (size_t i = 0; i < state.board.size(); ++i) {
+            hash_value ^= std::hash<int>{}(static_cast<int>(state.board[i])) +
+                          0x9e3779b9 + (hash_value << 6) + (hash_value >> 2);
+        }
+        return hash_value;
+    }
+};
+}  // namespace std
+
 #endif  // SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
