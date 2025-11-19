@@ -237,8 +237,8 @@ Utility AdugoGame::GetUtility(const State& state) const {
     return -1;                                       // O win
 }
 
-// Heuristic = (Captured_dogs * capture_weight) + (jaguar_mobility *
-// mobility_weight)
+// Heuristic = -((Captured_dogs * capture_weight) + (jaguar_mobility *
+// mobility_weight))
 Utility AdugoGame::GetEval(const State& state) const {
     const int capture_weight = 100;
     const int mobility_weight = 1;
@@ -247,8 +247,8 @@ Utility AdugoGame::GetEval(const State& state) const {
         kNumStartingDogs - CountSymbolsInState(state, Symbol::kC);
     int jaguar_mobility = GetPlayerActions(state, Player(Symbol::kO)).size();
 
-    return (captured_dogs * capture_weight) +
-           (jaguar_mobility * mobility_weight);
+    return -((captured_dogs * capture_weight) +
+             (jaguar_mobility * mobility_weight));
 }
 
 Player AdugoGame::CalculateWinner(const State& state) const {
