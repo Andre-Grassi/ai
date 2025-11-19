@@ -237,18 +237,31 @@ Utility AdugoGame::GetUtility(const State& state) const {
     return -1;                                       // O win
 }
 
-// Heuristic = -((Captured_dogs * capture_weight) + (jaguar_mobility *
-// mobility_weight))
 Utility AdugoGame::GetEval(const State& state) const {
+    // Weights
     const int capture_weight = 100;
     const int mobility_weight = 1;
+
+    const int max_jaguar_mobility = 8;  // If the jaguar has all moves available
+
+    const double max_jaguar_score = (kNumDogsToCapture * capture_weight) +
+                                    (max_jaguar_mobility * mobility_weight);
 
     int captured_dogs =
         kNumStartingDogs - CountSymbolsInState(state, Symbol::kC);
     int jaguar_mobility = GetPlayerActions(state, Player(Symbol::kO)).size();
 
-    return -((captured_dogs * capture_weight) +
-             (jaguar_mobility * mobility_weight));
+    double raw_jaguar_score =
+        (captured_dogs * capture_weight) + (jaguar_mobility * mobility_weight);
+    // Normalize to [0, 1]
+    double normalized_jaguar_score = (raw_jaguar_score / max_jaguar_score);
+
+    // Calculate dogs value based on jaguar score
+    // If jaguar score is 0 -> dogs value = 1 (best for dogs)
+    // If jaguar score is max -> dogs value = -1 (worst for dogs)
+    double dogs_value = 1.0 - (2.0 * normalized_jaguar_score);
+
+    return dogs_value;
 }
 
 Player AdugoGame::CalculateWinner(const State& state) const {
