@@ -278,7 +278,8 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
     Utility GetUtility(const State& state) const override;
 
     /**
-     * @brief Evaluates the current game state using a heuristic function.
+     * @brief Evaluates the current game state using a heuristic function. If
+     * it's terminal state, just return the utility with GetUtility().
      *
      * This function calculates a utility value from the dogs' perspective
      * using:
