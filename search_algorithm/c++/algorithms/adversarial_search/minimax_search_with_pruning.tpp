@@ -45,7 +45,7 @@ std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
 
         std::tie(curr_expected_utility, std::ignore) =
             MaxValue<TState, TAction, TUtility, TPlayer>(game, *new_state,
-                                                         enemy);
+                                                         enemy, alpha, beta);
 
         if (curr_expected_utility < min_expected_utility) {
             min_expected_utility = curr_expected_utility;
