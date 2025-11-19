@@ -180,9 +180,22 @@ const uint8_t kGridDimension = 35;
  * Indexed from * 0 to kGridDimension-1
  * @note Using array instead of vector to define fixed dimension.
  */
-using State = std::array<Symbol, kGridDimension>;  // 0 to kGridDimension - 1
+using Board = std::array<Symbol, kGridDimension>;  // 0 to kGridDimension - 1
 
-// Action/Move is a struct that tells where the player is "drawing" its symbol
+struct State {
+   public:
+    Board board;
+    Player player_to_move;
+
+    State(Board board_array, Player player_to_move)
+        : board(board_array), player_to_move(player_to_move) {}
+
+    Symbol& operator[](int index) { return board[index]; }
+    const Symbol& operator[](int index) const { return board[index]; }
+};
+
+// Action/Move is a struct that tells where the player is "drawing" its
+// symbol
 /**
  * @brief Action representing a player's move on the board.
  * It specifies which player (by its symbol) is making the move and the cell
@@ -226,10 +239,12 @@ using Utility = int8_t;  // -1 (loss), 0 (draw), +1 (win)
  */
 class AdugoGame : public Game<State, Action, Utility, Player> {
    public:
-    AdugoGame() : Game(CreateInitialBoard()) {}
+    static const int kNumStartingDogs = 14;  ///< Number of dogs at game start
+    static const int kNumDogsToCapture =
+        5;  ///< Number of dogs the jaguar must capture to win
+    static const int kMaxDepth = 10;  ///< Maximum search depth
 
-    Symbol playerToMove =
-        Symbol::kC;  // A ver, n sei mt bem como controlar qm ta jogando
+    AdugoGame() : Game(CreateInitialBoard(), kMaxDepth) {}
 
     Player GetPlayerToMove(const State& state) const override;
 
@@ -250,6 +265,8 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
      */
     Utility GetUtility(const State& state) const override;
 
+    Utility GetEval(const State& state) const override;
+
     virtual std::string GetStateString(const State& state) const override;
 
     std::optional<int> FindMiddlePosition(int position1, int position3) const;
@@ -265,7 +282,7 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
    private:
     // return the intial board
     static State CreateInitialBoard() {
-        State board;
+        Board board;
         board.fill(Symbol::kEmpty);
 
         // add blocked cells
@@ -279,7 +296,10 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
             for (int j{0}; j < 5; ++j) board[kBoardWidth * i + j] = Symbol::kC;
         board[kBoardWidth * 2 + 2] = Symbol::kO;
 
-        return board;
+        // Starting player is always the jaguar (Onca)
+        Player player_to_move(Symbol::kO);
+
+        return State(board, player_to_move);
     }
 
     /**
