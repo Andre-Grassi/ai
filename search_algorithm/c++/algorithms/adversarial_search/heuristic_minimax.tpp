@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <limits>
 #include <tuple>
+#include <unordered_map>
 #include <utility>  // for std::pair, not the Utility from the game
 
 #include "adversarial_search_algorithm.h"
@@ -15,21 +16,21 @@ template <typename TState, typename TAction, typename TUtility,
 std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
     const TPlayer& player, TUtility alpha, TUtility beta,
-    std::map<TState, TUtility> transposition_table);
+    std::unordered_map<TState, TUtility>& transposition_table);
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
     const TPlayer& player, TUtility alpha, TUtility beta,
-    std::map<TState, TUtility> transposition_table);
+    std::unordered_map<TState, TUtility>& transposition_table);
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::pair<TUtility, std::unique_ptr<TAction>> MinValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
     const TPlayer& player, TUtility alpha, TUtility beta, int depth,
-    std::map<TState, TUtility> transposition_table) {
+    std::unordered_map<TState, TUtility>& transposition_table) {
     // When the depth cutoff is reached or it's a terminal state, just return
     // the expected value (or utility, if terminal).
     if (game.IsCutoff(state, depth)) {
@@ -76,7 +77,7 @@ template <typename TState, typename TAction, typename TUtility,
 std::pair<TUtility, std::unique_ptr<TAction>> MaxValue(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
     const TPlayer& player, TUtility alpha, TUtility beta, int depth,
-    std::map<TState, TUtility>
+    std::unordered_map<TState, TUtility>&
         transposition_table) {  // Google suggets int instead of size_t or
                                 // unsigned
     // When the depth cutoff is reached or it's a terminal state, just return
@@ -126,7 +127,7 @@ template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::unique_ptr<TAction> adversarial_search_algorithm::HeuristicMinimaxSearch(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    std::map<TState, TUtility> transposition_table) {  // OPTIMIZE use unord_map
+    std::unordered_map<TState, TUtility>& transposition_table) {
     TPlayer player = game.GetPlayerToMove(state);
     std::unique_ptr<TAction> best_action;
     int initial_depth = 0;

@@ -2,6 +2,8 @@
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 
 #include <array>
+#include <cstddef>
+#include <functional>
 #include <map>
 #include <memory>
 #include <optional>
@@ -176,12 +178,16 @@ const uint8_t kBoardHeight = 7;
 const uint8_t kGridDimension = 35;
 
 /**
- * @brief State representing the board configuration as a 1D array.
+ * @brief Represent the board configuration as a 1D array.
  * Indexed from * 0 to kGridDimension-1
  * @note Using array instead of vector to define fixed dimension.
  */
 using Board = std::array<Symbol, kGridDimension>;  // 0 to kGridDimension - 1
 
+/**
+ * @brief State of the Adugo game. Stores the board and which player's turn it
+ * is.
+ */
 struct State {
    public:
     Board board;
@@ -190,8 +196,18 @@ struct State {
     State(Board board_array, Player player_to_move)
         : board(board_array), player_to_move(player_to_move) {}
 
+    /**
+     * @brief Access operator. Get the symbol from the board at the given index.
+     * @param index Index of the cell to access (0 to kGridDimension-1).
+     * @return Reference to the symbol at the specified index.
+     */
     Symbol& operator[](int index) { return board[index]; }
     const Symbol& operator[](int index) const { return board[index]; }
+
+    // Used for hashing and comparisons in unordered_map
+    bool operator==(const State& other) const {
+        return (this->board == other.board);  // Only the board matters
+    }
 };
 
 // Action/Move is a struct that tells where the player is "drawing" its
@@ -226,13 +242,9 @@ struct Action {
 using Utility = int8_t;  // -1 (loss), 0 (draw), +1 (win)
 
 /**
- * @brief Class representing the Tic-Tac-Toe game.
- *
- * Implements the Game interface for a standard 3x3 Tic-Tac-Toe game.
- * Players alternate placing X and O on the board, aiming to get three in a
- * row. The game ends when one player wins or the board is full (draw).
- *
- * State: 1D array of 31 Symbols (C, O, Block, Empty)
+ * @brief Class representing the Adugo game. The jaguar is MIN, and the dogs are
+ * MAX.
+ * State: Struct with the board and an indication of which player turn it is.
  * Action: Player's symbol and cell index (0-30)
  * Utility: -1 (loss), 0 (draw), +1 (win) from MAX player's perspective
  * Player: Struct with symbol and IsMax() method
@@ -265,6 +277,26 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
      */
     Utility GetUtility(const State& state) const override;
 
+    /**
+     * @brief Evaluates the current game state using a heuristic function. If
+     * it's terminal state, just return the utility with GetUtility().
+     *
+     * This function calculates a utility value from the dogs' perspective
+     * using:
+     *
+     * Heuristic = 1.0 - 2.0 * (jaguar_score / max_jaguar_score)
+     *
+     * Where:
+     * - jaguar_score = (captured_dogs * 100) + (jaguar_mobility * 1)
+     * - max_jaguar_score = (total_capturable_dogs * 100) + (max_mobility * 1)
+     *
+     * @param state The current game state to evaluate
+     * @return Utility value in range [-1, 1] where:
+     *         - 1.0 = best outcome for dogs (jaguar has no captures/mobility)
+     *         - -1.0 = worst outcome for dogs (jaguar has maximum
+     * captures/mobility)
+     *         - 0.0 = neutral/balanced position
+     */
     Utility GetEval(const State& state) const override;
 
     virtual std::string GetStateString(const State& state) const override;
@@ -309,4 +341,21 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
     Player CalculateWinner(const State& state) const;
 };
 };  // namespace adugo_game
+
+// Hash specialization for State to be used in unordered_map
+namespace std {
+template <>
+struct hash<adugo_game::State> {
+    std::size_t operator()(const adugo_game::State& state) const {
+        size_t hash_value = 0;
+        // Hash the board
+        for (size_t i = 0; i < state.board.size(); ++i) {
+            hash_value ^= std::hash<int>{}(static_cast<int>(state.board[i])) +
+                          0x9e3779b9 + (hash_value << 6) + (hash_value >> 2);
+        }
+        return hash_value;
+    }
+};
+}  // namespace std
+
 #endif  // SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_

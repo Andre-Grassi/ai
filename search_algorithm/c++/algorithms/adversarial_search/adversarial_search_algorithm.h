@@ -4,6 +4,7 @@
 #include <limits>
 #include <map>
 #include <tuple>
+#include <unordered_map>
 #include <utility>
 
 #include "data_structure/adversarial_search/game.h"
@@ -43,7 +44,7 @@ template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
 std::unique_ptr<TAction> HeuristicMinimaxSearch(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
-    std::map<TState, TUtility> transposition_table);
+    std::unordered_map<TState, TUtility>& transposition_table);
 
 template <typename TState, typename TAction, typename TUtility,
           typename TPlayer>
