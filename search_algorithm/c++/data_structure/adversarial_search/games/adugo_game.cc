@@ -238,6 +238,11 @@ Utility AdugoGame::GetUtility(const State& state) const {
 }
 
 Utility AdugoGame::GetEval(const State& state) const {
+    // If terminal, can calculate utility directly
+    if (IsTerminal(state)) {
+        return GetUtility(state);
+    }
+
     // Weights
     const int capture_weight = 100;
     const int mobility_weight = 1;
