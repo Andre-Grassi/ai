@@ -97,8 +97,8 @@ class Game {
      * @note Not only the depth can be used to determine cutoff, but also
      * features of the state itself.
      */
-    virtual bool IsCutoff(const TState& /*state*/, int depth) const {
-        return depth >= max_depth_;
+    virtual bool IsCutoff(const TState& state, int depth) const {
+        return (depth >= max_depth_) || IsTerminal(state);
     }
 
     /**
