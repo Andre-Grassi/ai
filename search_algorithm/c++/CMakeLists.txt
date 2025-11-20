@@ -33,12 +33,20 @@ set(ADVERSARIAL_SEARCH_GAMES_SOURCES
     "data_structure/adversarial_search/games/adugo_game.cc"
 )
 
+# Server/Tabuleiro sources (.c)
+set(SERVER_TABULEIRO_SOURCES
+    "jogo_da_onca/server/tabuleiro.c"
+)
+
 ### Libraries ###
 add_library(problems STATIC ${BASIC_SEARCH_PROBLEMS_SOURCES})
 target_include_directories(problems PUBLIC ${CMAKE_SOURCE_DIR})
 
 add_library(games STATIC ${ADVERSARIAL_SEARCH_GAMES_SOURCES})
 target_include_directories(games PUBLIC ${CMAKE_SOURCE_DIR})
+
+add_library(server STATIC ${SERVER_TABULEIRO_SOURCES})
+target_include_directories(server PUBLIC ${CMAKE_SOURCE_DIR})
 
 # ncurses
 find_package(Curses REQUIRED)
@@ -49,16 +57,16 @@ endif()
 ### Targets ###
 # Main target
 set(MAIN_EXECUTABLE "adugo_main")
-set (MAIN_SOURCE "adugo_main.cc")    
+set (MAIN_SOURCE "jogo_da_onca/adugo_main.cc")    
 add_executable(${MAIN_EXECUTABLE} ${MAIN_SOURCE})
-target_link_libraries(${MAIN_EXECUTABLE} PRIVATE problems games ${CURSES_LIBRARIES})
+target_link_libraries(${MAIN_EXECUTABLE} PRIVATE problems games server ${CURSES_LIBRARIES})
 
 # Examples target
 file(GLOB EXAMPLE_SOURCES "examples/*.cc")
 foreach(example_file ${EXAMPLE_SOURCES})
     get_filename_component(example_name ${example_file} NAME_WE)
     add_executable(${example_name} ${example_file})
-    target_link_libraries(${example_name} PRIVATE problems games ${CURSES_LIBRARIES})
+    target_link_libraries(${example_name} PRIVATE problems games server ${CURSES_LIBRARIES})
 endforeach()
 
 

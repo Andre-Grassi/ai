@@ -2,6 +2,7 @@
 
 #include "algorithms/adversarial_search/adversarial_search_algorithm.h"
 #include "data_structure/adversarial_search/games/adugo_game.h"
+#include "server/tabuleiro.h"
 
 int main() {
     using namespace adugo_game;
