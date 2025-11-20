@@ -7,6 +7,7 @@
 #include "algorithms/adversarial_search/adversarial_search_algorithm.h"
 #include "data_structure/adversarial_search/games/adugo_game.h"
 #include "server/tabuleiro.h"
+#include "tabuleiro_wrapper.h"
 
 struct Args {
    public:
@@ -30,11 +31,20 @@ int main(int argc, char** argv) {
     std::cout << "  IP: " << args.ip << "\n";
     std::cout << "  Port: " << args.port << "\n\n";
 
-    //
-    //
-    // TODO: Use the args to feed the server and play the game
-    //
-    //
+    TabuleiroWrapper tabuleiro;
+    tabuleiro.ConnectToServer(argc, argv);
+    while (true) {
+        Action action = tabuleiro.ReceiveAction();
+        // Print action information
+        std::cout << "Received action from server:\n";
+        std::cout << "  Player Symbol: "
+                  << static_cast<char>(action.player_symbol) << "\n";
+        std::cout << "  Origin Index: " << action.cell_index_origin << "\n";
+        std::cout << "  Destination Index: " << action.cell_index_destination
+                  << "\n";
+    }
+
+    return 0;
 
     // Initialize game
     AdugoGame game;
