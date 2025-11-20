@@ -2,3 +2,6 @@ search_algorithm/c++/bin
 search_algorithm/c++/build
 search_algorithm/c++/docs/doxygen
 *.rdb
+controlador
+exemplo1
+exemplo2
