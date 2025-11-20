@@ -38,6 +38,11 @@ set(SERVER_TABULEIRO_SOURCES
     "jogo_da_onca/server/tabuleiro.c"
 )
 
+# Tabuleiro wrapper (.cc)
+set(SERVER_TABULEIRO_WRAPPER_SOURCES
+    "jogo_da_onca/tabuleiro_wrapper.cc"
+)
+
 ### Libraries ###
 add_library(problems STATIC ${BASIC_SEARCH_PROBLEMS_SOURCES})
 target_include_directories(problems PUBLIC ${CMAKE_SOURCE_DIR})
@@ -47,6 +52,9 @@ target_include_directories(games PUBLIC ${CMAKE_SOURCE_DIR})
 
 add_library(tabuleiro STATIC ${SERVER_TABULEIRO_SOURCES})
 target_include_directories(tabuleiro PUBLIC ${CMAKE_SOURCE_DIR})
+
+add_library(tabuleiro_wrapper STATIC ${SERVER_TABULEIRO_WRAPPER_SOURCES})
+target_include_directories(tabuleiro_wrapper PUBLIC ${CMAKE_SOURCE_DIR})
 
 # ncurses
 find_package(Curses REQUIRED)
@@ -65,7 +73,7 @@ endif()
 set(MAIN_EXECUTABLE "adugo_main")
 set (MAIN_SOURCE "jogo_da_onca/adugo_main.cc")    
 add_executable(${MAIN_EXECUTABLE} ${MAIN_SOURCE})
-target_link_libraries(${MAIN_EXECUTABLE} PRIVATE problems games tabuleiro ${CURSES_LIBRARIES} ${HIREDIS_LIB})
+target_link_libraries(${MAIN_EXECUTABLE} PRIVATE problems games tabuleiro tabuleiro_wrapper ${CURSES_LIBRARIES} ${HIREDIS_LIB})
 add_dependencies(${MAIN_EXECUTABLE} tabuleiro)
 
 # Examples target
@@ -73,7 +81,7 @@ file(GLOB EXAMPLE_SOURCES "examples/*.cc")
 foreach(example_file ${EXAMPLE_SOURCES})
     get_filename_component(example_name ${example_file} NAME_WE)
     add_executable(${example_name} ${example_file})
-    target_link_libraries(${example_name} PRIVATE problems games tabuleiro ${CURSES_LIBRARIES})
+    target_link_libraries(${example_name} PRIVATE problems games tabuleiro tabuleiro_wrapper ${CURSES_LIBRARIES})
 endforeach()
 
 # Server makefile target
