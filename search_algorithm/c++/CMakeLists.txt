@@ -54,12 +54,18 @@ if (NOT Curses_FOUND)
     message(FATAL_ERROR "Curses library not found!")
 endif()
 
+# hiredis - Find the library
+find_library(HIREDIS_LIB hiredis)
+if (NOT HIREDIS_LIB)
+    message(FATAL_ERROR "hiredis library not found! Install it with: sudo apt-get install libhiredis-dev")
+endif()
+
 ### Targets ###
 # Main target
 set(MAIN_EXECUTABLE "adugo_main")
 set (MAIN_SOURCE "jogo_da_onca/adugo_main.cc")    
 add_executable(${MAIN_EXECUTABLE} ${MAIN_SOURCE})
-target_link_libraries(${MAIN_EXECUTABLE} PRIVATE problems games server ${CURSES_LIBRARIES})
+target_link_libraries(${MAIN_EXECUTABLE} PRIVATE problems games server ${CURSES_LIBRARIES} ${HIREDIS_LIB})
 
 # Examples target
 file(GLOB EXAMPLE_SOURCES "examples/*.cc")
@@ -68,7 +74,6 @@ foreach(example_file ${EXAMPLE_SOURCES})
     add_executable(${example_name} ${example_file})
     target_link_libraries(${example_name} PRIVATE problems games server ${CURSES_LIBRARIES})
 endforeach()
-
 
 # Doxygen documentation
 find_program(DOXYGEN doxygen)
@@ -80,5 +85,5 @@ if (DOXYGEN)
 else()
     message(STATUS "Doxygen not found, unable to generate documentation")
 endif()
-    
+
 
