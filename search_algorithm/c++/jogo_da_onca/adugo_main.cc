@@ -15,82 +15,8 @@ struct Args {
     int port;
 };
 
-void print_usage(const char* program_name) {
-    std::cout << "Usage:\n";
-    std::cout << "  " << program_name << " <side> [ip] [port]\n\n";
-    std::cout << "Arguments:\n";
-    std::cout << "  side    Side to play with (o or c) [required]\n";
-    std::cout
-        << "  ip      IP or hostname of Redis server (default: 127.0.0.1)\n";
-    std::cout << "  port    Port of Redis server (default: 10001)\n\n";
-    std::cout << "Options:\n";
-    std::cout << "  -h, --help    Display this help message\n";
-}
-
-Args ParseArgs(int argc, char** argv) {
-    // Default values
-    Args args;
-    args.side = '\0';
-    args.ip = "127.0.0.1";
-    args.port = 10001;
-
-    // Define long options (only help flag)
-    static struct option long_options[] = {{"help", no_argument, 0, 'h'},
-                                           {0, 0, 0, 0}};
-
-    // Parse command-line options
-    int opt;
-    int option_index = 0;
-    while ((opt = getopt_long(argc, argv, "h", long_options, &option_index)) !=
-           -1) {
-        switch (opt) {
-            case 'h':
-                print_usage(argv[0]);
-                std::exit(0);
-            case '?':
-                print_usage(argv[0]);
-                std::exit(1);
-            default:
-                print_usage(argv[0]);
-                std::exit(1);
-        }
-    }
-
-    // Parse positional arguments
-    if (optind >= argc) {
-        std::cerr << "Error: side argument is required\n\n";
-        print_usage(argv[0]);
-        std::exit(1);
-    }
-
-    // First positional argument: side
-    args.side = argv[optind][0];
-    if (args.side != 'o' && args.side != 'c') {
-        std::cerr << "Error: side must be 'o' or 'c'\n\n";
-        print_usage(argv[0]);
-        std::exit(1);
-    }
-    optind++;
-
-    // Second positional argument: IP (optional)
-    if (optind < argc) {
-        args.ip = argv[optind];
-        optind++;
-    }
-
-    // Third positional argument: port (optional)
-    if (optind < argc) {
-        args.port = std::atoi(argv[optind]);
-        if (args.port <= 0 || args.port > 65535) {
-            std::cerr << "Error: invalid port number\n\n";
-            print_usage(argv[0]);
-            std::exit(1);
-        }
-        optind++;
-    }
-
-    return args;
-}
+Args ParseArgs(int argc, char** argv);
+void PrintUsage(const char* program_name);
 
 int main(int argc, char** argv) {
     using namespace adugo_game;
@@ -132,4 +58,81 @@ int main(int argc, char** argv) {
     }
 
     return 0;
+}
+
+void PrintUsage(const char* program_name) {
+    std::cout << "Usage:\n";
+    std::cout << "  " << program_name << " <side> [ip] [port]\n\n";
+    std::cout << "Arguments:\n";
+    std::cout << "  side    Side to play with (o or c) [required]\n";
+    std::cout
+        << "  ip      IP or hostname of Redis server (default: 127.0.0.1)\n";
+    std::cout << "  port    Port of Redis server (default: 10001)\n\n";
+    std::cout << "Options:\n";
+    std::cout << "  -h, --help    Display this help message\n";
+}
+
+Args ParseArgs(int argc, char** argv) {
+    // Default values
+    Args args;
+    args.side = '\0';
+    args.ip = "127.0.0.1";
+    args.port = 10001;
+
+    // Define long options (only help flag)
+    static struct option long_options[] = {{"help", no_argument, 0, 'h'},
+                                           {0, 0, 0, 0}};
+
+    // Parse command-line options
+    int opt;
+    int option_index = 0;
+    while ((opt = getopt_long(argc, argv, "h", long_options, &option_index)) !=
+           -1) {
+        switch (opt) {
+            case 'h':
+                PrintUsage(argv[0]);
+                std::exit(0);
+            case '?':
+                PrintUsage(argv[0]);
+                std::exit(1);
+            default:
+                PrintUsage(argv[0]);
+                std::exit(1);
+        }
+    }
+
+    // Parse positional arguments
+    if (optind >= argc) {
+        std::cerr << "Error: side argument is required\n\n";
+        PrintUsage(argv[0]);
+        std::exit(1);
+    }
+
+    // First positional argument: side
+    args.side = argv[optind][0];
+    if (args.side != 'o' && args.side != 'c') {
+        std::cerr << "Error: side must be 'o' or 'c'\n\n";
+        PrintUsage(argv[0]);
+        std::exit(1);
+    }
+    optind++;
+
+    // Second positional argument: IP (optional)
+    if (optind < argc) {
+        args.ip = argv[optind];
+        optind++;
+    }
+
+    // Third positional argument: port (optional)
+    if (optind < argc) {
+        args.port = std::atoi(argv[optind]);
+        if (args.port <= 0 || args.port > 65535) {
+            std::cerr << "Error: invalid port number\n\n";
+            PrintUsage(argv[0]);
+            std::exit(1);
+        }
+        optind++;
+    }
+
+    return args;
 }
