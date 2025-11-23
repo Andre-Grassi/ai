@@ -33,21 +33,19 @@ int main(int argc, char** argv) {
 
     TabuleiroWrapper tabuleiro;
     tabuleiro.ConnectToServer(argc, argv);
+    // Initialize game
+    AdugoGame game;
     while (true) {
-        Action action = tabuleiro.ReceiveAction();
-        // Print action information
-        std::cout << "Received action from server:\n";
+        State state = tabuleiro.ReceiveState();
+        // Print state information
+        std::cout << "Received state from server:\n";
         std::cout << "  Player Symbol: "
-                  << static_cast<char>(action.player_symbol) << "\n";
-        std::cout << "  Origin Index: " << action.cell_index_origin << "\n";
-        std::cout << "  Destination Index: " << action.cell_index_destination
-                  << "\n";
+                  << static_cast<char>(state.player_to_move.symbol) << "\n";
+        game.PrintState(state);
     }
 
     return 0;
 
-    // Initialize game
-    AdugoGame game;
     game.PrintState(game.GetInitialState());
 
     std::unordered_map<State, Utility> transposition_table;
