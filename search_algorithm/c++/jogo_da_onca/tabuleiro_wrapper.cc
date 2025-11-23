@@ -132,86 +132,102 @@ void TabuleiroWrapper::SendAction(const Player& player, const Action& action) {
     tabuleiro_envia(buf);
 }
 
-State TabuleiroWrapper::ReceiveState() {
+State TabuleiroWrapper::ReceiveState(const Player& my_player) {
     char buf[512];
     tabuleiro_recebe(buf);
     std::cout << "Raw server response: " << buf << std::endl;
-    // State server_state = GetStateFromServer(std::string(buf));
-    // std::cout << server_state << std::endl;
-    constexpr int max_str = 256;
-    constexpr int max_int = 16;
 
-    char my_player_char;
-    char opponent_player_char;
-    char opponent_move_char;
-    int num_opponent_move;
-    int opponent_move_r[max_int];
-    int opponent_move_c[max_int];
+    // Parse using strtok - need to be careful about order
+    // Format: <my_side>\n<opponent_side> <move_type> [positions]\n<board>.\n
 
-    // separa os elementos do string recebido
-    sscanf(strtok(buf, " \n"), "%c", &my_player_char);
-    sscanf(strtok(NULL, " \n"), "%c", &opponent_player_char);
-    sscanf(strtok(NULL, " \n"), "%c", &opponent_move_char);
-
-    // if (opponent_move_char == 'n') return Action();  // No move made by
-    // opponent
-
-    if (opponent_move_char == 'm') {
-        num_opponent_move = 1;
-        for (int i = 0; i <= num_opponent_move; i++) {
-            sscanf(strtok(NULL, " \n"), "%d", &(opponent_move_r[i]));
-            sscanf(strtok(NULL, " \n"), "%d", &(opponent_move_c[i]));
-        }
-    } else if (opponent_move_char == 's') {
-        sscanf(strtok(NULL, " \n"), "%d", &num_opponent_move);
-        for (int i = 0; i <= num_opponent_move; i++) {
-            sscanf(strtok(NULL, " \n"), "%d", &(opponent_move_r[i]));
-            sscanf(strtok(NULL, " \n"), "%d", &(opponent_move_c[i]));
-        }
+    // First line: whose turn it is
+    char* line1 = strtok(buf, "\n");
+    if (!line1) {
+        throw std::runtime_error("Invalid server response: missing first line");
     }
-    char board[max_str];
-    strncpy(board, strtok(NULL, "."), max_str - 1);
-    std::cout << "Board string: " << board << std::endl;
+    char whose_turn = line1[0];
+
+    // Second line: opponent's last move
+    char* line2 = strtok(NULL, "\n");
+    if (!line2) {
+        throw std::runtime_error(
+            "Invalid server response: missing second line");
+    }
+
+    // Get the rest as board string (everything until '.')
+    char board_buffer[512] = "";
+    char* next_line;
+    while ((next_line = strtok(NULL, "\n")) != NULL) {
+        strcat(board_buffer, next_line);
+        strcat(board_buffer, "\n");
+    }
+
+    std::cout << "Board string: " << board_buffer << std::endl;
+
+    // Determine whose turn it is
+    Player player_to_move;
+    if (whose_turn == 'c')
+        player_to_move = Player(Symbol::kC);
+    else if (whose_turn == 'o')
+        player_to_move = Player(Symbol::kO);
+    else
+        throw std::invalid_argument("Invalid turn character: " +
+                                    std::string(1, whose_turn));
+
     State server_state =
-        GetStateFromBoardString(std::string(board), opponent_player_char);
+        GetStateFromBoardString(std::string(board_buffer), player_to_move);
 
     return server_state;
 }
 
 State TabuleiroWrapper::GetStateFromBoardString(const std::string& server_board,
-                                                char opponent_char) {
+                                                const Player& player_to_move) {
     Board board_array;
+
+    // Initialize board with blocks
+    for (size_t i = 0; i < kGridDimension; ++i) {
+        board_array[i] = Symbol::kBlock;
+    }
+
     // Fill the board array
-    for (size_t i = 0, board_pos = 0; i < server_board.size(); ++i) {
+    size_t board_pos = 0;
+    std::cout << "Parsing board, total chars: " << server_board.size()
+              << std::endl;
+
+    for (size_t i = 0; i < server_board.size() && board_pos < kGridDimension;
+         ++i) {
         char c = server_board[i];
         switch (c) {
             case 'c':
-                board_array[board_pos] = Symbol::kC;
-                board_pos++;
+                board_array[board_pos++] = Symbol::kC;
                 break;
             case 'o':
-                board_array[board_pos] = Symbol::kO;
-                board_pos++;
+                board_array[board_pos++] = Symbol::kO;
                 break;
             case '-':
-                board_array[board_pos] = Symbol::kEmpty;
-                board_pos++;
+                board_array[board_pos++] = Symbol::kEmpty;
                 break;
             case ' ':
-                board_array[board_pos] = Symbol::kBlock;
-                board_pos++;
+                board_array[board_pos++] = Symbol::kBlock;
                 break;
             case '\n':
             case '#':
-                break;  // Ignore limits character
+            case '\r':
+            case '.':
+                // Ignore border characters, newlines, and period
+                break;
             default:
-                throw std::invalid_argument("Invalid character" +
-                                            std::string(1, c) +
-                                            " in server board string");
+                // Ignore other characters
+                break;
         }
     }
 
-    Player player_to_move = Player(CharToPlayerSymbol(opponent_char));
+    std::cout << "Parsed " << board_pos << " board positions" << std::endl;
+
+    if (board_pos != kGridDimension) {
+        std::cerr << "Warning: Expected " << kGridDimension
+                  << " positions but got " << board_pos << std::endl;
+    }
 
     return State(board_array, player_to_move);
 }

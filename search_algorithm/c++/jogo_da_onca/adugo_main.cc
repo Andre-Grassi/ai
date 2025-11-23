@@ -9,6 +9,9 @@
 #include "server/tabuleiro.h"
 #include "tabuleiro_wrapper.h"
 
+// Forward declaration from tabuleiro_wrapper.cc
+std::pair<int, int> IndexToPosition(int index);
+
 struct Args {
    public:
     char side;
@@ -33,36 +36,77 @@ int main(int argc, char** argv) {
 
     TabuleiroWrapper tabuleiro;
     tabuleiro.ConnectToServer(argc, argv);
+
     // Initialize game
     AdugoGame game;
-    while (true) {
-        State state = tabuleiro.ReceiveState();
-        // Print state information
-        std::cout << "Received state from server:\n";
-        std::cout << "  Player Symbol: "
-                  << static_cast<char>(state.player_to_move.symbol) << "\n";
-        game.PrintState(state);
-    }
-
-    return 0;
-
-    game.PrintState(game.GetInitialState());
-
     std::unordered_map<State, Utility> transposition_table;
-    State current_state = game.GetInitialState();
 
-    while (!game.IsTerminal(current_state)) {
-        std::cout << std::endl;
+    Player my_player;
+    if (args.side == 'c')
+        my_player = Player(Symbol::kC);
+    else
+        my_player = Player(Symbol::kO);
 
-        std::unique_ptr<Action> best_action =
-            adversarial_search_algorithm::HeuristicMinimaxSearch(
-                game, current_state, transposition_table);
+    std::cout << "Playing as: " << args.side << "\n\n";
 
-        std::unique_ptr<State> next_state =
-            game.GetResult(current_state, *best_action);
-        current_state = *next_state;
+    while (true) {
+        // Receive current state from server
+        std::cout << "=== Waiting for server response ===" << std::endl;
+        State current_state = tabuleiro.ReceiveState(my_player);
 
+        // Print state information
+        std::cout << "\nReceived state from server:\n";
+        std::cout << "Current turn: "
+                  << static_cast<char>(current_state.player_to_move.symbol)
+                  << "\n";
         game.PrintState(current_state);
+
+        // Check if game is over
+        if (game.IsTerminal(current_state)) {
+            std::cout << "\n=== GAME OVER ===" << std::endl;
+            Utility final_utility = game.GetUtility(current_state);
+            if (final_utility > 0) {
+                std::cout << "Result: I WON!" << std::endl;
+            } else if (final_utility < 0) {
+                std::cout << "Result: I LOST!" << std::endl;
+            } else {
+                std::cout << "Result: DRAW!" << std::endl;
+            }
+            break;
+        }
+
+        // Check if it's my turn
+        if (current_state.player_to_move.symbol == my_player.symbol) {
+            std::cout << "\n>>> MY TURN <<<" << std::endl;
+
+            // Calculate best move using minimax
+            std::cout << "Calculating best move..." << std::endl;
+            std::unique_ptr<Action> best_action =
+                adversarial_search_algorithm::HeuristicMinimaxSearch(
+                    game, current_state, transposition_table);
+
+            if (!best_action) {
+                std::cerr << "ERROR: No valid action found!" << std::endl;
+                break;
+            }
+
+            // Display the move
+            auto [from_row, from_col] =
+                IndexToPosition(best_action->cell_index_origin);
+            auto [to_row, to_col] =
+                IndexToPosition(best_action->cell_index_destination);
+            std::cout << "Best move: (" << from_row << "," << from_col
+                      << ") -> (" << to_row << "," << to_col << ")"
+                      << std::endl;
+
+            // Send the action to the server
+            std::cout << "Sending move to server..." << std::endl;
+            tabuleiro.SendAction(my_player, *best_action);
+            std::cout << "Move sent!\n" << std::endl;
+        } else {
+            std::cout << "\n>>> OPPONENT'S TURN - Waiting... <<<\n"
+                      << std::endl;
+        }
     }
 
     return 0;
