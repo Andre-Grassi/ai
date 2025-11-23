@@ -1,10 +1,17 @@
 #ifndef TABULEIRO_WRAPPER_H_
 #define TABULEIRO_WRAPPER_H_
 
+#include <stdexcept>
+
 #include "data_structure/adversarial_search/games/adugo_game.h"
 #include "server/tabuleiro.h"
 
 using namespace adugo_game;
+
+class TimeoutException : public std::runtime_error {
+   public:
+    TimeoutException(const std::string& msg) : std::runtime_error(msg) {}
+};
 
 /**
  * @brief Wrapper class for the tabuleiro c library in server/library.
@@ -34,9 +41,11 @@ class TabuleiroWrapper {
 
     /**
      * @brief Receives the current state from the server.
+     * @param timeout_seconds Maximum seconds to wait for server response (default: 20)
      * @return The current game state.
+     * @throws TimeoutException if no response received within timeout
      */
-    State ReceiveState();
+    State ReceiveState(int timeout_seconds = 20);
 
    private:
     State GetStateFromBoardString(const std::string& server_board,

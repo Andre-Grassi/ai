@@ -24,6 +24,7 @@ void PrintUsage(const char* program_name);
 
 int main(int argc, char** argv) {
     using namespace adugo_game;
+    constexpr int kServerResponseTimeout = 20;
 
     // Parse command-line arguments
     Args args = ParseArgs(argc, argv);
@@ -52,7 +53,18 @@ int main(int argc, char** argv) {
     while (true) {
         // Receive current state from server
         std::cout << "=== Waiting for server response ===" << std::endl;
-        State current_state = tabuleiro.ReceiveState();
+
+        State current_state;
+        try {
+            current_state = tabuleiro.ReceiveState(
+                kServerResponseTimeout);  // Timeout, that usually happens in
+                                          // draws
+        } catch (const TimeoutException& e) {
+            std::cerr << "\n=== TIMEOUT ===" << std::endl;
+            std::cerr << e.what() << std::endl;
+            std::cerr << "Exiting ..." << std::endl;
+            return 1;
+        }
 
         // Print state information
         std::cout << "\nReceived state from server:\n";

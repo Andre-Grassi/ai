@@ -3,6 +3,9 @@
 #include <cstdio>
 #include <cstring>
 #include <stdexcept>
+#include <thread>
+#include <atomic>
+#include <chrono>
 
 #include "data_structure/adversarial_search/games/adugo_game.h"
 #include "server/tabuleiro.h"
@@ -132,9 +135,37 @@ void TabuleiroWrapper::SendAction(const Player& player, const Action& action) {
     tabuleiro_envia(buf);
 }
 
-State TabuleiroWrapper::ReceiveState() {
+State TabuleiroWrapper::ReceiveState(int timeout_seconds) {
     char buf[512];
-    tabuleiro_recebe(buf);
+    
+    // Use atomic flag and thread to implement timeout
+    std::atomic<bool> received(false);
+    std::atomic<bool> should_stop(false);
+    
+    std::thread receiver_thread([&buf, &received, &should_stop]() {
+        if (!should_stop.load()) {
+            tabuleiro_recebe(buf);
+            received.store(true);
+        }
+    });
+    
+    // Wait for timeout or completion
+    auto start = std::chrono::steady_clock::now();
+    while (!received.load()) {
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::steady_clock::now() - start).count();
+        
+        if (elapsed >= timeout_seconds) {
+            should_stop.store(true);
+            receiver_thread.detach();  // Detach thread as we can't cancel it
+            throw TimeoutException("No response from server after " + 
+                                 std::to_string(timeout_seconds) + " seconds");
+        }
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    
+    receiver_thread.join();
 
     // Parse using strtok - need to be careful about order
     // Format: <my_side>\n<opponent_side> <move_type> [positions]\n<board>.\n
