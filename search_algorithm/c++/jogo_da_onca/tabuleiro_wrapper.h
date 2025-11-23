@@ -32,6 +32,10 @@ class TabuleiroWrapper {
      * @return The action received from the server. If no action was made by
      * the opponent, returns default Action().
      */
-    Action ReceiveAction();
+    State ReceiveState();
+
+   private:
+    State GetStateFromBoardString(const std::string& server_board,
+                                  char opponent_char);
 };
 #endif  // TABULEIRO_WRAPPER_H_

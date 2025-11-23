@@ -132,10 +132,13 @@ void TabuleiroWrapper::SendAction(const Player& player, const Action& action) {
     tabuleiro_envia(buf);
 }
 
-Action TabuleiroWrapper::ReceiveAction() {
+State TabuleiroWrapper::ReceiveState() {
     char buf[512];
     tabuleiro_recebe(buf);
-
+    std::cout << "Raw server response: " << buf << std::endl;
+    // State server_state = GetStateFromServer(std::string(buf));
+    // std::cout << server_state << std::endl;
+    constexpr int max_str = 256;
     constexpr int max_int = 16;
 
     char my_player_char;
@@ -150,7 +153,8 @@ Action TabuleiroWrapper::ReceiveAction() {
     sscanf(strtok(NULL, " \n"), "%c", &opponent_player_char);
     sscanf(strtok(NULL, " \n"), "%c", &opponent_move_char);
 
-    if (opponent_move_char == 'n') return Action();  // No move made by opponent
+    // if (opponent_move_char == 'n') return Action();  // No move made by
+    // opponent
 
     if (opponent_move_char == 'm') {
         num_opponent_move = 1;
@@ -165,15 +169,49 @@ Action TabuleiroWrapper::ReceiveAction() {
             sscanf(strtok(NULL, " \n"), "%d", &(opponent_move_c[i]));
         }
     }
+    char board[max_str];
+    strncpy(board, strtok(NULL, "."), max_str - 1);
+    std::cout << "Board string: " << board << std::endl;
+    State server_state =
+        GetStateFromBoardString(std::string(board), opponent_player_char);
 
-    Symbol opponent = CharToPlayerSymbol(opponent_player_char);
+    return server_state;
+}
 
-    // Convert opponent's move from positions to indices
-    // TODO if move is s, need to handle multiple jumps
-    int cell_index_origin =
-        PositionToIndex(opponent_move_r[0], opponent_move_c[0]);
-    int cell_index_destination = PositionToIndex(
-        opponent_move_r[num_opponent_move], opponent_move_c[num_opponent_move]);
+State TabuleiroWrapper::GetStateFromBoardString(const std::string& server_board,
+                                                char opponent_char) {
+    Board board_array;
+    // Fill the board array
+    for (size_t i = 0, board_pos = 0; i < server_board.size(); ++i) {
+        char c = server_board[i];
+        switch (c) {
+            case 'c':
+                board_array[board_pos] = Symbol::kC;
+                board_pos++;
+                break;
+            case 'o':
+                board_array[board_pos] = Symbol::kO;
+                board_pos++;
+                break;
+            case '-':
+                board_array[board_pos] = Symbol::kEmpty;
+                board_pos++;
+                break;
+            case ' ':
+                board_array[board_pos] = Symbol::kBlock;
+                board_pos++;
+                break;
+            case '\n':
+            case '#':
+                break;  // Ignore limits character
+            default:
+                throw std::invalid_argument("Invalid character" +
+                                            std::string(1, c) +
+                                            " in server board string");
+        }
+    }
 
-    return Action(opponent, cell_index_origin, cell_index_destination);
+    Player player_to_move = Player(CharToPlayerSymbol(opponent_char));
+
+    return State(board_array, player_to_move);
 }
