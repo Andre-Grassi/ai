@@ -41,7 +41,8 @@ class TabuleiroWrapper {
 
     /**
      * @brief Receives the current state from the server.
-     * @param timeout_seconds Maximum seconds to wait for server response (default: 20)
+     * @param timeout_seconds Maximum seconds to wait for server response
+     * (default: 20)
      * @return The current game state.
      * @throws TimeoutException if no response received within timeout
      */
