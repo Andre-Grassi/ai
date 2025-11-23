@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     while (true) {
         // Receive current state from server
         std::cout << "=== Waiting for server response ===" << std::endl;
-        State current_state = tabuleiro.ReceiveState(my_player);
+        State current_state = tabuleiro.ReceiveState();
 
         // Print state information
         std::cout << "\nReceived state from server:\n";
@@ -95,8 +95,8 @@ int main(int argc, char** argv) {
                 IndexToPosition(best_action->cell_index_origin);
             auto [to_row, to_col] =
                 IndexToPosition(best_action->cell_index_destination);
-            std::cout << "Best move: (" << from_row << "," << from_col
-                      << ") -> (" << to_row << "," << to_col << ")"
+            std::cout << "\033[1mBest move: (" << from_row << "," << from_col
+                      << ") -> (" << to_row << "," << to_col << ")\033[0m"
                       << std::endl;
 
             // Send the action to the server

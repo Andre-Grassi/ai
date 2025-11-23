@@ -25,16 +25,18 @@ class TabuleiroWrapper {
         tabuleiro_conecta(argc, argv);
     }
 
+    /**
+     * @brief Sends an action to the server.
+     * @param player The player making the action.
+     * @param action The action to send.
+     */
     void SendAction(const Player& player, const Action& action);
 
     /**
-     * @brief Receives an action from the server.
-     * @return The action received from the server. If no action was made by
-     * the opponent, returns default Action().
+     * @brief Receives the current state from the server.
+     * @return The current game state.
      */
-    State ReceiveState(const Player& my_player);
-
-    bool IsPlayerTurn(const std::string& server_response, const Player& player);
+    State ReceiveState();
 
    private:
     State GetStateFromBoardString(const std::string& server_board,

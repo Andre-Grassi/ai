@@ -132,10 +132,9 @@ void TabuleiroWrapper::SendAction(const Player& player, const Action& action) {
     tabuleiro_envia(buf);
 }
 
-State TabuleiroWrapper::ReceiveState(const Player& my_player) {
+State TabuleiroWrapper::ReceiveState() {
     char buf[512];
     tabuleiro_recebe(buf);
-    std::cout << "Raw server response: " << buf << std::endl;
 
     // Parse using strtok - need to be careful about order
     // Format: <my_side>\n<opponent_side> <move_type> [positions]\n<board>.\n
@@ -161,8 +160,6 @@ State TabuleiroWrapper::ReceiveState(const Player& my_player) {
         strcat(board_buffer, next_line);
         strcat(board_buffer, "\n");
     }
-
-    std::cout << "Board string: " << board_buffer << std::endl;
 
     // Determine whose turn it is
     Player player_to_move;
@@ -191,8 +188,6 @@ State TabuleiroWrapper::GetStateFromBoardString(const std::string& server_board,
 
     // Fill the board array
     size_t board_pos = 0;
-    std::cout << "Parsing board, total chars: " << server_board.size()
-              << std::endl;
 
     for (size_t i = 0; i < server_board.size() && board_pos < kGridDimension;
          ++i) {
@@ -221,8 +216,6 @@ State TabuleiroWrapper::GetStateFromBoardString(const std::string& server_board,
                 break;
         }
     }
-
-    std::cout << "Parsed " << board_pos << " board positions" << std::endl;
 
     if (board_pos != kGridDimension) {
         std::cerr << "Warning: Expected " << kGridDimension
