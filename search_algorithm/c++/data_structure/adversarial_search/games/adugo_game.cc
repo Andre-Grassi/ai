@@ -294,53 +294,40 @@ Player AdugoGame::CalculateWinner(const State& state) const {
     return Player(reference_symbol);
 }
 
-// p imprimir bonitinho
+// Print board similar to controlador.c format
 std::string AdugoGame::GetStateString(const State& state) const {
-    std::vector<std::string> lines = {"  1    2    3    4    5",
-                                      "1 %0----%1----%2----%3----%4",
-                                      "  |\\   |   /|\\   |   /|",
-                                      "  | \\  |  / | \\  |  / |",
-                                      "  |  \\ | /  |  \\ | /  |",
-                                      "  |   \\|/   |   \\|/   |",
-                                      "2 %5----%6----%7----%8----%9",
-                                      "  |   /|\\   |   /|\\   |",
-                                      "  |  / | \\  |  / | \\  |",
-                                      "  | /  |  \\ | /  |  \\ |",
-                                      "  |/   |   \\|/   |   \\|",
-                                      "3 %10----%11----%12----%13----%14",
-                                      "  |\\   |   /|\\   |   /|",
-                                      "  | \\  |  / | \\  |  / |",
-                                      "  |  \\ | /  |  \\ | /  |",
-                                      "  |   \\|/   |   \\|/   |",
-                                      "4 %15----%16----%17----%18----%19",
-                                      "  |   /|\\   |   /|\\   |",
-                                      "  |  / | \\  |  / | \\  |",
-                                      "  | /  |  \\ | /  |  \\ |",
-                                      "  |/   |   \\|/   |   \\|",
-                                      "5 %20----%21----%22----%23----%24",
-                                      "           /|\\",
-                                      "          / | \\",
-                                      "         /  |  \\",
-                                      "        /   |   \\",
-                                      "6      %26----%27----%28",
-                                      "      /     |     \\",
-                                      "     /      |      \\",
-                                      "    /       |       \\",
-                                      "   /        |        \\",
-                                      "7 %30---------%32---------%34"};
-
     std::stringstream s;
-    for (auto& line : lines) {
-        for (int i = kGridDimension - 1; i >= 0; --i) {
-            std::string key = "%" + std::to_string(i);
-            size_t pos = line.find(key);
-            if (pos != std::string::npos) {
-                std::string stateString = std::string(1, (char)state[i]);
-                line.replace(pos, key.size(), stateString);
-            }
+
+    // Print board with # borders like controlador
+    s << "#######\n";
+
+    // Rows 1-5 (indices 0-24)
+    for (int row = 0; row < 5; row++) {
+        s << "#";
+        for (int col = 0; col < 5; col++) {
+            int index = row * 5 + col;
+            s << static_cast<char>(state[index]);
         }
-        s << line << '\n';
+        s << "#\n";
     }
+
+    // Row 6 (indices 26, 27, 28)
+    s << "# ";
+    s << static_cast<char>(state[26]);
+    s << static_cast<char>(state[27]);
+    s << static_cast<char>(state[28]);
+    s << " #\n";
+
+    // Row 7 (indices 30, 32, 34)
+    s << "#";
+    s << static_cast<char>(state[30]);
+    s << " ";
+    s << static_cast<char>(state[32]);
+    s << " ";
+    s << static_cast<char>(state[34]);
+    s << "#\n";
+
+    s << "#######\n";
 
     return s.str();
 }

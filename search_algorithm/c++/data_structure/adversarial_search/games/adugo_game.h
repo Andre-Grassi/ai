@@ -144,7 +144,7 @@ const std::map<int, std::pair<std::vector<int>, std::vector<int>>>
         {34, {{28, 32}, {VERTICAL_5, DIAGONAL_22}}}};
 
 enum class Symbol : char {
-    kEmpty = '*',  // Empty cell
+    kEmpty = '-',  // Empty cell
     kBlock = '@',  // Invalid cells
     kC = 'c',      // Cachorro
     kO = 'o',      // Onca
@@ -207,6 +207,15 @@ struct State {
     // Used for hashing and comparisons in unordered_map
     bool operator==(const State& other) const {
         return (this->board == other.board);  // Only the board matters
+    }
+
+    // Override print
+    friend std::ostream& operator<<(std::ostream& os, const State& state) {
+        for (size_t i = 0; i < kGridDimension; ++i) {
+            os << static_cast<char>(state.board[i]) << ' ';
+            if ((i + 1) % kBoardWidth == 0) os << std::endl;
+        }
+        return os;
     }
 };
 
