@@ -193,6 +193,9 @@ struct State {
     Board board;
     Player player_to_move;
 
+    // This board is not playable, used to indicate a default invalid state
+    State() : board{}, player_to_move() { board.fill(Symbol::kEmpty); }
+
     State(Board board_array, Player player_to_move)
         : board(board_array), player_to_move(player_to_move) {}
 
