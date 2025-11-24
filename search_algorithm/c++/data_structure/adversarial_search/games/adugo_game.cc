@@ -215,15 +215,18 @@ std::unique_ptr<State> AdugoGame::GetResult(const State& state,
                 }
             }
 
-            // Find which common neighbor is aligned on the same line
-            std::vector<int> common_lines =
-                FindCommonConnections(ply_index, dest_index);
-
+            // For each candidate dog, check if it forms a valid capture path
+            // The dog should be aligned on the path from origin through dog to
+            // destination
             std::vector<int> aligned_candidates;
             for (int candidate : common_neighbors) {
-                // Check if this candidate is aligned with origin and
-                // destination
-                if (IsAligned(ply_index, candidate, dest_index, common_lines)) {
+                // Check alignment: origin -> candidate -> destination
+                // This matches the logic in AddIndirectNeighbors
+                std::vector<int> origin_to_candidate_lines =
+                    FindCommonConnections(ply_index, candidate);
+
+                if (IsAligned(ply_index, candidate, dest_index,
+                              origin_to_candidate_lines)) {
                     aligned_candidates.push_back(candidate);
                 }
             }
