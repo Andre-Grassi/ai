@@ -201,6 +201,33 @@ std::unique_ptr<State> AdugoGame::GetResult(const State& state,
             IsAligned(ply_index, middle.value(), dest_index,
                       FindCommonConnections(ply_index, dest_index)))
             (*new_state)[middle.value()] = Symbol::kEmpty;
+        }
+        else {
+            // If no unique middle, find which common neighbor has the dog
+            auto origin_neighbors = VerifyInMap(ply_index);
+            auto dest_neighbors = VerifyInMap(dest_index);
+
+            if (origin_neighbors && dest_neighbors) {
+                // Find common neighbors
+                bool found = false;
+                for (int origin_n : origin_neighbors->first) {
+                    if (found) break;
+                    for (int dest_n : dest_neighbors->first) {
+                        if (origin_n == dest_n &&
+                            state[origin_n] == Symbol::kC) {
+                            // Found the dog in the middle, check alignment
+                            if (IsAligned(ply_index, origin_n, dest_index,
+                                          FindCommonConnections(ply_index,
+                                                                dest_index))) {
+                                (*new_state)[origin_n] = Symbol::kEmpty;
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     (*new_state)[ply_index] = Symbol::kEmpty;  // player sai da posicao original
