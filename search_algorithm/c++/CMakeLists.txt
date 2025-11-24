@@ -84,6 +84,14 @@ foreach(example_file ${EXAMPLE_SOURCES})
     target_link_libraries(${example_name} PRIVATE problems games tabuleiro tabuleiro_wrapper ${CURSES_LIBRARIES})
 endforeach()
 
+# Test targets
+file(GLOB TEST_SOURCES "tests/*_test.cc")
+foreach(test_file ${TEST_SOURCES})
+    get_filename_component(test_name ${test_file} NAME_WE)
+    add_executable(${test_name} ${test_file})
+    target_link_libraries(${test_name} PRIVATE problems games)
+endforeach()
+
 # Server makefile target
 add_custom_target(server
     COMMAND $(MAKE) -C ${CMAKE_SOURCE_DIR}/jogo_da_onca/server
