@@ -1,6 +1,8 @@
 #ifndef SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 
+#define IGNORE_TERMINAL_TEST true
+
 #include <array>
 #include <cstddef>
 #include <functional>
@@ -339,6 +341,7 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
                               std::vector<Action>& actions,
                               int original_position,
                               int current_position) const;
+    int GetJaguarPosition(const State& state) const;
 
    private:
     // return the intial board

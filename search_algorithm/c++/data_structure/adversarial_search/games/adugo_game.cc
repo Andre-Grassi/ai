@@ -264,6 +264,10 @@ std::vector<Action> AdugoGame::GetActions(const State& state) const {
 }
 
 bool AdugoGame::IsTerminal(const State& state) const {
+#ifdef IGNORE_TERMINAL_TEST
+    return false;
+#endif
+
     if (CalculateWinner(state) == Symbol::kEmpty)  // se ninguem ganhou, falso
         return false;
     return true;  // alguem ganhou
