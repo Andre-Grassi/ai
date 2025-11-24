@@ -179,6 +179,38 @@ void TestJaguarCaptureBasic() {
     AssertTrue(has_capture, "Jaguar can capture dog after initial moves");
 }
 
+void TestDiagonalCapture() {
+    std::cout << "\n=== Test: Jaguar Diagonal Capture ===" << std::endl;
+    AdugoGame game;
+
+    // Create a custom state where jaguar can capture diagonally
+    // Place jaguar at 2, dog at 6, empty at 10
+    State custom_state = CreateCustomState({2}, {6}, Player(Symbol::kO));
+
+    std::cout << "Custom board before capture:\n"
+              << game.GetStateString(custom_state) << std::endl;
+
+    // Get jaguar actions
+    std::vector<Action> jaguar_actions = game.GetActions(custom_state);
+
+    bool has_capture = false;
+    for (const auto& action : jaguar_actions) {
+        if (action.cell_index_destination == 10) {
+            has_capture = true;
+            std::unique_ptr<State> result =
+                game.GetResult(custom_state, action);
+            std::cout << "After jaguar diagonal capture (2->10):\n"
+                      << game.GetStateString(*result) << std::endl;
+
+            // Check if dog at 6 was removed
+            AssertTrue((*result)[6] == Symbol::kEmpty,
+                       "Dog at position 6 was captured diagonally");
+        }
+    }
+
+    AssertTrue(has_capture, "Jaguar can perform diagonal capture");
+}
+
 // Test 3: Jaguar actually captures the dog (removes it from board)
 void TestJaguarExecutesCapture() {
     std::cout << "\n=== Test 3: Jaguar Executes Capture ===" << std::endl;
