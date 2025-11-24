@@ -194,6 +194,8 @@ std::unique_ptr<State> AdugoGame::GetResult(const State& state,
 
     std::unique_ptr<State> new_state = std::make_unique<State>(state);
 
+    bool dog_captured = false;
+
     if (!IsNeighbor(ply_index,
                     dest_index)) {  // caso da onca matar o cachoro, limpa a
                                     // antiga casa do cachorro
@@ -243,6 +245,7 @@ std::unique_ptr<State> AdugoGame::GetResult(const State& state,
                 }
 
                 (*new_state)[best_candidate] = Symbol::kEmpty;
+                dog_captured = true;
             }
         }
     }
@@ -251,10 +254,12 @@ std::unique_ptr<State> AdugoGame::GetResult(const State& state,
     (*new_state)[dest_index] = action_symbol;  // player chega ao destino
 
     // Switch turn to the other player
+    // If jaguar captured a dog, jaguar gets another turn
     if (player.symbol == Symbol::kC)
         new_state->player_to_move = Player(Symbol::kO);
-    else
+    else if (!dog_captured)
         new_state->player_to_move = Player(Symbol::kC);
+    // else: jaguar keeps the turn (player_to_move stays as Symbol::kO)
 
     return new_state;
 }
