@@ -106,15 +106,17 @@ bool AdugoGame::IsAligned(int position1, int position2, int position3,
 
     if (IsNeighbor(position1, position2) &&
         IsNeighbor(position2, position3)) {  // precisam ser 3 pontos vizinhos
-        const std::pair<std::vector<int>, std::vector<int>>*
-            empty_possibilities = VerifyInMap(position3);
-        if (!empty_possibilities)  // se nao tem 3 ponto, nao tem porque ver se
-                                   // ta alinhado
+        const std::pair<std::vector<int>, std::vector<int>>* middle_position =
+            VerifyInMap(position2);
+        if (!middle_position)  // se nao tem o ponto do meio, nao tem
+                               // alinhamento
             return false;
-        for (int emp : empty_possibilities->second) {
+        // Check if the middle position shares any of the common lines
+        // between position1 and position3
+        for (int middle_line : middle_position->second) {
             for (int com : common_lines) {  // se houver reta comum entre os 3
                                             // pontos, estao alinhados
-                if (emp == com) return true;
+                if (middle_line == com) return true;
             }
         }
     }
@@ -187,6 +189,7 @@ std::unique_ptr<State> AdugoGame::GetResult(const State& state,
 
     if (action_symbol != player.symbol) return nullptr;
 
+    // Destination invalid
     if (state[dest_index] == Symbol::kBlock) return nullptr;
 
     std::unique_ptr<State> new_state = std::make_unique<State>(state);
@@ -194,38 +197,52 @@ std::unique_ptr<State> AdugoGame::GetResult(const State& state,
     if (!IsNeighbor(ply_index,
                     dest_index)) {  // caso da onca matar o cachoro, limpa a
                                     // antiga casa do cachorro
-        auto middle = FindMiddlePosition(
-            ply_index, dest_index);  // se ha somente um vizinho entre ambos e
-                                     // os 3 estao alinhados, houve abate
-        if (middle.has_value() &&
-            IsAligned(ply_index, middle.value(), dest_index,
-                      FindCommonConnections(ply_index, dest_index)))
-            (*new_state)[middle.value()] = Symbol::kEmpty;
-        }
-        else {
-            // If no unique middle, find which common neighbor has the dog
-            auto origin_neighbors = VerifyInMap(ply_index);
-            auto dest_neighbors = VerifyInMap(dest_index);
+        // Find all common neighbors between origin and destination
+        auto origin_neighbors = VerifyInMap(ply_index);
+        auto dest_neighbors = VerifyInMap(dest_index);
 
-            if (origin_neighbors && dest_neighbors) {
-                // Find common neighbors
-                bool found = false;
-                for (int origin_n : origin_neighbors->first) {
-                    if (found) break;
-                    for (int dest_n : dest_neighbors->first) {
-                        if (origin_n == dest_n &&
-                            state[origin_n] == Symbol::kC) {
-                            // Found the dog in the middle, check alignment
-                            if (IsAligned(ply_index, origin_n, dest_index,
-                                          FindCommonConnections(ply_index,
-                                                                dest_index))) {
-                                (*new_state)[origin_n] = Symbol::kEmpty;
-                                found = true;
-                                break;
-                            }
-                        }
+        if (origin_neighbors && dest_neighbors) {
+            std::vector<int> common_neighbors;
+
+            // Collect all common neighbors that have dogs
+            for (int origin_n : origin_neighbors->first) {
+                for (int dest_n : dest_neighbors->first) {
+                    if (origin_n == dest_n && state[origin_n] == Symbol::kC) {
+                        common_neighbors.push_back(origin_n);
                     }
                 }
+            }
+
+            // Find which common neighbor is aligned on the same line
+            std::vector<int> common_lines =
+                FindCommonConnections(ply_index, dest_index);
+
+            std::vector<int> aligned_candidates;
+            for (int candidate : common_neighbors) {
+                // Check if this candidate is aligned with origin and
+                // destination
+                if (IsAligned(ply_index, candidate, dest_index, common_lines)) {
+                    aligned_candidates.push_back(candidate);
+                }
+            }
+
+            // If multiple candidates are aligned, choose the one "closest" to
+            // being numerically between origin and destination
+            if (!aligned_candidates.empty()) {
+                int best_candidate = aligned_candidates[0];
+                int min_distance =
+                    std::abs(best_candidate - (ply_index + dest_index) / 2);
+
+                for (int candidate : aligned_candidates) {
+                    int distance =
+                        std::abs(candidate - (ply_index + dest_index) / 2);
+                    if (distance < min_distance) {
+                        min_distance = distance;
+                        best_candidate = candidate;
+                    }
+                }
+
+                (*new_state)[best_candidate] = Symbol::kEmpty;
             }
         }
     }
@@ -357,4 +374,11 @@ std::string AdugoGame::GetStateString(const State& state) const {
     s << "#######\n";
 
     return s.str();
+}
+
+int AdugoGame::GetJaguarPosition(const State& state) const {
+    for (int i = 0; i < kGridDimension; ++i)
+        if (state[i] == Symbol::kO) return i;
+
+    return -1;  // Jaguar not found on the board
 }
