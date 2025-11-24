@@ -181,6 +181,15 @@ const uint8_t kGridDimension = 35;
  * @brief Represent the board configuration as a 1D array.
  * Indexed from * 0 to kGridDimension-1
  * @note Using array instead of vector to define fixed dimension.
+ *
+ * board layout:
+ * 0   1  2  3  4
+ * 5   6  7  8  9
+ * 10 11 12 13 14
+ * 15 16 17 18 19
+ * 20 21 22 23 24
+ * 25 26 27 28 29
+ * 30 31 32 33 34
  */
 using Board = std::array<Symbol, kGridDimension>;  // 0 to kGridDimension - 1
 
@@ -246,6 +255,14 @@ struct Action {
         : player_symbol(player_symbol),
           cell_index_origin(cell_origin),
           cell_index_destination(cell_destination) {};
+
+    // Override print
+    friend std::ostream& operator<<(std::ostream& os, const Action& action) {
+        os << "Player: " << static_cast<char>(action.player_symbol)
+           << ", From: " << action.cell_index_origin
+           << ", To: " << action.cell_index_destination;
+        return os;
+    }
 };
 
 /**
