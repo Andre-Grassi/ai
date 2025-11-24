@@ -40,6 +40,14 @@ class TabuleiroWrapper {
     void SendAction(const Player& player, const Action& action);
 
     /**
+     * @brief Sends a sequence of actions to the server (for jaguar captures).
+     * @param player The player making the actions.
+     * @param actions The sequence of actions to send.
+     */
+    void SendActionSequence(const Player& player,
+                            const std::vector<Action>& actions);
+
+    /**
      * @brief Receives the current state from the server.
      * @param timeout_seconds Maximum seconds to wait for server response
      * (default: 20)

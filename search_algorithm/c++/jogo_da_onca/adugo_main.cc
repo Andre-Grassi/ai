@@ -91,30 +91,128 @@ int main(int argc, char** argv) {
         if (current_state.player_to_move.symbol == my_player.symbol) {
             std::cout << "\n>>> MY TURN <<<" << std::endl;
 
-            // Calculate best move using minimax
-            std::cout << "Calculating best move..." << std::endl;
+            // For jaguar: collect consecutive captures to send as sequence
+            // For dogs: just make one move
+            std::vector<Action> actions_sequence;
+            State temp_state = current_state;
+
+            // First move (always execute)
+            std::cout << "Calculating move 1..." << std::endl;
             std::unique_ptr<Action> best_action =
                 adversarial_search_algorithm::HeuristicMinimaxSearch(
-                    game, current_state, transposition_table);
+                    game, temp_state, transposition_table);
 
             if (!best_action) {
                 std::cerr << "ERROR: No valid action found!" << std::endl;
                 break;
             }
 
-            // Display the move
             auto [from_row, from_col] =
                 IndexToPosition(best_action->cell_index_origin);
             auto [to_row, to_col] =
                 IndexToPosition(best_action->cell_index_destination);
-            std::cout << "\033[1mBest move: (" << from_row << "," << from_col
-                      << ") -> (" << to_row << "," << to_col << ")\033[0m"
+            std::cout << "  Move 1: (" << from_row << "," << from_col
+                      << ") -> (" << to_row << "," << to_col << ")"
                       << std::endl;
 
-            // Send the action to the server
-            std::cout << "Sending move to server..." << std::endl;
-            tabuleiro.SendAction(my_player, *best_action);
-            std::cout << "Move sent!\n" << std::endl;
+            // Check if this first move is a capture
+            bool is_capture = false;
+            if (my_player.symbol == Symbol::kO) {
+                is_capture =
+                    !game.IsNeighbor(best_action->cell_index_origin,
+                                     best_action->cell_index_destination);
+            }
+
+            actions_sequence.push_back(*best_action);
+
+            // Apply the action
+            std::unique_ptr<State> next_state =
+                game.GetResult(temp_state, *best_action);
+            if (!next_state) {
+                std::cerr << "ERROR: Invalid action result!" << std::endl;
+                break;
+            }
+            temp_state = *next_state;
+
+            // If jaguar made a capture and still has turn, look for more
+            // captures
+            if (my_player.symbol == Symbol::kO && is_capture &&
+                temp_state.player_to_move.symbol == my_player.symbol &&
+                !game.IsTerminal(temp_state)) {
+                // Keep looking for consecutive captures
+                while (true) {
+                    std::cout << "Calculating move "
+                              << (actions_sequence.size() + 1) << "..."
+                              << std::endl;
+
+                    best_action =
+                        adversarial_search_algorithm::HeuristicMinimaxSearch(
+                            game, temp_state, transposition_table);
+
+                    if (!best_action) {
+                        std::cerr << "ERROR: No valid action found!"
+                                  << std::endl;
+                        break;
+                    }
+
+                    // Check if this next move is also a capture
+                    bool next_is_capture =
+                        !game.IsNeighbor(best_action->cell_index_origin,
+                                         best_action->cell_index_destination);
+
+                    std::tie(from_row, from_col) =
+                        IndexToPosition(best_action->cell_index_origin);
+                    std::tie(to_row, to_col) =
+                        IndexToPosition(best_action->cell_index_destination);
+                    std::cout << "  Move " << (actions_sequence.size() + 1)
+                              << ": (" << from_row << "," << from_col
+                              << ") -> (" << to_row << "," << to_col << ")";
+
+                    // Only continue the sequence if it's another capture
+                    if (!next_is_capture) {
+                        std::cout << " (not a capture, ending sequence)"
+                                  << std::endl;
+                        break;
+                    }
+
+                    std::cout << std::endl;
+                    actions_sequence.push_back(*best_action);
+
+                    // Apply this capture
+                    next_state = game.GetResult(temp_state, *best_action);
+                    if (!next_state) {
+                        std::cerr << "ERROR: Invalid action result!"
+                                  << std::endl;
+                        break;
+                    }
+                    temp_state = *next_state;
+
+                    // Stop if it's no longer our turn or game ended
+                    if (temp_state.player_to_move.symbol != my_player.symbol ||
+                        game.IsTerminal(temp_state)) {
+                        break;
+                    }
+                }
+            }
+
+            if (actions_sequence.empty()) {
+                std::cerr << "ERROR: No valid action found!" << std::endl;
+                break;
+            }
+
+            // Send the action(s) to the server
+            std::cout << "\033[1mSending " << actions_sequence.size()
+                      << " move(s) to server...\033[0m" << std::endl;
+
+            if (actions_sequence.size() == 1) {
+                // Single move
+                tabuleiro.SendAction(my_player, actions_sequence[0]);
+            } else {
+                // Multiple moves (capture sequence) - send all at once
+                tabuleiro.SendActionSequence(my_player, actions_sequence);
+            }
+
+            std::cout << "Move(s) sent!\n" << std::endl;
         } else {
             std::cout << "\n>>> OPPONENT'S TURN - Waiting... <<<\n"
                       << std::endl;

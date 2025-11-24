@@ -135,6 +135,55 @@ void TabuleiroWrapper::SendAction(const Player& player, const Action& action) {
     tabuleiro_envia(buf);
 }
 
+void TabuleiroWrapper::SendActionSequence(const Player& player,
+                                          const std::vector<Action>& actions) {
+    if (actions.empty()) {
+        throw std::invalid_argument("Action sequence cannot be empty");
+    }
+
+    char player_char;
+    if (player.symbol == Symbol::kC)
+        player_char = 'c';
+    else if (player.symbol == Symbol::kO)
+        player_char = 'o';
+    else
+        throw std::invalid_argument("Invalid player symbol");
+
+    // Only jaguar can make sequential captures
+    if (player.symbol != Symbol::kO) {
+        throw std::invalid_argument("Only jaguar can make sequential moves");
+    }
+
+    // Format: o s <num_captures> <row0> <col0> <row1> <col1> ... <rowN> <colN>
+    // where num_captures is the number of jumps (actions.size())
+    // and we send num_captures+1 positions (origin + all destinations)
+    char buf[512];
+    int pos = 0;
+
+    // Start with player, movement type, and number of captures
+    pos += snprintf(buf + pos, sizeof(buf) - pos, "%c s %zu", player_char,
+                    actions.size());
+
+    // Add origin position of first action
+    auto [row_origin, col_origin] =
+        IndexToPosition(actions[0].cell_index_origin);
+    pos += snprintf(buf + pos, sizeof(buf) - pos, " %d %d", row_origin,
+                    col_origin);
+
+    // Add destination of each action in the sequence
+    for (const auto& action : actions) {
+        auto [row_dest, col_dest] =
+            IndexToPosition(action.cell_index_destination);
+        pos += snprintf(buf + pos, sizeof(buf) - pos, " %d %d", row_dest,
+                        col_dest);
+    }
+
+    pos += snprintf(buf + pos, sizeof(buf) - pos, "\n");
+
+    // Send to server
+    tabuleiro_envia(buf);
+}
+
 State TabuleiroWrapper::ReceiveState(int timeout_seconds) {
     char buf[512];
 
