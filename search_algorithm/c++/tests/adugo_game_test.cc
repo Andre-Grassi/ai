@@ -211,6 +211,73 @@ void TestDiagonalCapture() {
     AssertTrue(has_capture, "Jaguar can perform diagonal capture");
 }
 
+void TestSequentialCapture() {
+    std::cout << "\n=== Test: Jaguar Sequential Capture ===" << std::endl;
+    AdugoGame game;
+
+    // Create a custom state where jaguar can capture two dogs in sequence
+    // Place jaguar at 2, dogs at 7 and 17, the rest empty
+    /* Initial Board configuration:
+        #######
+        #--o--#
+        #--c--#
+        #-----#
+        #--c--#
+        #-----#
+        # --- #
+        #- - -#
+        #######
+
+        The final Board configuration must be
+        #######
+        #-----#
+        #-----#
+        #-----#
+        #-----#
+        #--o--#
+        # --- #
+        #- - -#
+        #######
+    */
+    State custom_state = CreateCustomState({2}, {7, 17}, Player(Symbol::kO));
+
+    std::cout << "Custom board before sequential captures:\n"
+              << game.GetStateString(custom_state) << std::endl;
+
+    // Get jaguar actions, and check if it can capture first dog (2->12)
+    std::vector<Action> jaguar_actions = game.GetActions(custom_state);
+    std::unique_ptr<State> state_after_first_capture = nullptr;
+    for (const auto& action : jaguar_actions) {
+        if (action.cell_index_destination == 12) {
+            state_after_first_capture = game.GetResult(custom_state, action);
+            std::cout << "After first jaguar capture (2->12):\n"
+                      << game.GetStateString(*state_after_first_capture)
+                      << std::endl;
+        }
+    }
+    AssertTrue(state_after_first_capture != nullptr,
+               "Jaguar performed first capture");
+
+    // Now check if from the new state jaguar can capture second dog (12->22)
+    std::vector<Action> jaguar_actions_second =
+        game.GetActions(*state_after_first_capture);
+    std::unique_ptr<State> state_after_second = nullptr;
+    for (const auto& action : jaguar_actions_second) {
+        if (action.cell_index_destination == 22) {
+            state_after_second =
+                game.GetResult(*state_after_first_capture, action);
+            std::cout << "After second jaguar capture (12->22):\n"
+                      << game.GetStateString(*state_after_second) << std::endl;
+        }
+    }
+    AssertTrue(state_after_second != nullptr,
+               "Jaguar performed second capture");
+
+    // Print final board configuration
+    std::cout << "Final board after sequential captures:\n"
+              << game.GetStateString(*state_after_second) << std::endl;
+}
+
 // Test 3: Jaguar actually captures the dog (removes it from board)
 void TestJaguarExecutesCapture() {
     std::cout << "\n=== Test 3: Jaguar Executes Capture ===" << std::endl;
@@ -473,18 +540,20 @@ void TestCorrectDogRemoved() {
 int main() {
     std::cout << "Running Adugo Game Tests...\n" << std::endl;
 
-    // TestInitialState();
-    // TestJaguarCaptureBasic();
+    TestDiagonalCapture();
+    TestSequentialCapture();
+    TestJaguarCaptureBasic();
+    TestMultipleCapturesPossible();
+    /*
+    TestInitialState();
     TestJaguarCaptureCorrectDog();
-    /*TestJaguarExecutesCapture();
+    TestJaguarExecutesCapture();
     TestJaguarCaptureRemovesDog();
     TestCaptureIsNonNeighborMove();
-    TestMultipleCapturesPossible();
     TestJaguarHasMixedActions();
     TestJaguarWinsByCaptures();
     TestDogsCannotCapture();
     */
-
     std::cout << "\n✓ All tests passed!" << std::endl;
     std::cout
         << "\nSummary: Jaguar can correctly capture dogs by jumping over them."
