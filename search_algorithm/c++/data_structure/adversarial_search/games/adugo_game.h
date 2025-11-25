@@ -346,19 +346,15 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
    private:
     // return the intial board
     static State CreateInitialBoard() {
+        using s = adugo_game::Symbol;
         Board board;
-        board.fill(Symbol::kEmpty);
-
-        // add blocked cells
-        board[kBoardWidth * 5 + 0] = Symbol::kBlock;
-        board[kBoardWidth * 5 + 4] = Symbol::kBlock;
-        board[kBoardWidth * 6 + 1] = Symbol::kBlock;
-        board[kBoardWidth * 6 + 3] = Symbol::kBlock;
-
-        // add animals
-        for (int i{0}; i < 3; ++i)
-            for (int j{0}; j < 5; ++j) board[kBoardWidth * i + j] = Symbol::kC;
-        board[kBoardWidth * 2 + 2] = Symbol::kO;
+        board = {s::kC,     s::kC,     s::kC,     s::kC,     s::kC,
+                 s::kC,     s::kC,     s::kC,     s::kC,     s::kC,
+                 s::kC,     s::kC,     s::kO,     s::kC,     s::kC,
+                 s::kEmpty, s::kEmpty, s::kEmpty, s::kEmpty, s::kEmpty,
+                 s::kEmpty, s::kEmpty, s::kEmpty, s::kEmpty, s::kEmpty,
+                 s::kBlock, s::kEmpty, s::kEmpty, s::kEmpty, s::kBlock,
+                 s::kEmpty, s::kBlock, s::kEmpty, s::kBlock, s::kEmpty};
 
         // Starting player is always the jaguar (Onca)
         Player player_to_move(Symbol::kO);
