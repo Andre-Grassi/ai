@@ -89,7 +89,13 @@ file(GLOB TEST_SOURCES "tests/*_test.cc")
 foreach(test_file ${TEST_SOURCES})
     get_filename_component(test_name ${test_file} NAME_WE)
     add_executable(${test_name} ${test_file})
-    target_link_libraries(${test_name} PRIVATE problems games)
+    
+    # Link tabuleiro_wrapper for tabuleiro_wrapper_test
+    if(test_name STREQUAL "tabuleiro_wrapper_test")
+        target_link_libraries(${test_name} PRIVATE problems games tabuleiro tabuleiro_wrapper)
+    else()
+        target_link_libraries(${test_name} PRIVATE problems games)
+    endif()
 endforeach()
 
 # Server makefile target
