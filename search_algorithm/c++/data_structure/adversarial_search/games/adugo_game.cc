@@ -168,8 +168,10 @@ std::vector<Action> AdugoGame::GetPlayerActions(const State& state,
                                          neighbor_pos);
 
                 // For jaguar, also add indirect neighbors: cells that it can
-                // go by jumping over a dog (and capturing it)
-                if (player.symbol == Symbol::kO)
+                // go by jumping over a dog (and capturing it), ONLY if there's
+                // a dog between the empty cell and the jaguar
+                if (player.symbol == Symbol::kO &&
+                    state[neighbor_pos] == Symbol::kC)
                     AddIndirectNeighbors(state, player, actions,
                                          player_position->first, neighbor_pos);
             }
