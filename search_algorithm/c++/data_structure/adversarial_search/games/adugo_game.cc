@@ -68,7 +68,9 @@ std::optional<int> AdugoGame::FindMiddlePosition(int position1, int position3)
     for (const auto neighbor : *neighbors1) {
         if (std::find(neighbors3->begin(), neighbors3->end(), neighbor) !=
             neighbors3->end())
-            possibilities.push_back(neighbor);
+            // Check if they are aligned
+            if (IsAligned(position1, neighbor, position3))
+                possibilities.push_back(neighbor);
     }
 
     // Couldn't find a middle position, or found more than one (error)
@@ -116,15 +118,17 @@ bool AdugoGame::IsAligned(int starting_jaguar_pos, int middle_dog_pos,
         !IsNeighbor(middle_dog_pos, landing_pos))
         return false;
 
-    // Get jaguar to dog alignment
+    // Get jaguar to landing pos alignment
+    Alignment jaguar_landing_alignment =
+        GetAlignment(starting_jaguar_pos, landing_pos);
+
+    // Get jaguar to middle dog alignment
     Alignment jaguar_dog_alignment =
         GetAlignment(starting_jaguar_pos, middle_dog_pos);
 
-    // If the landing_pos to middle_dog_pos alignment is the same, they are all
-    // aligned and the jaguar can capture
-    Alignment dog_landing_alignment = GetAlignment(middle_dog_pos, landing_pos);
-
-    return jaguar_dog_alignment == dog_landing_alignment;
+    // If the jaguar to middle dog and jaguar to landing pos alignment is the
+    // same, they are all aligned and the jaguar can capture
+    return jaguar_dog_alignment == jaguar_landing_alignment;
 }
 
 void AdugoGame::AddIndirectNeighbors(const State& state, Player player,
