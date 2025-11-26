@@ -20,7 +20,7 @@ int CountSymbolsInState(const State& state, Symbol symbol) {
     return count;
 }
 
-const std::pair<std::vector<int>, std::vector<int>>* VerifyInMap(
+const std::vector<int>* GetNeighbors(
     int position) {  // verifica se o ponto pertence ao tabuleiro
     auto homeowner = kGridDimensionNeighborhood.find(
         position);  // retorna um ponteiro para o pair do map se existir no
@@ -37,15 +37,14 @@ Player AdugoGame::GetPlayerToMove(const State& state) const {
 }
 
 bool AdugoGame::IsNeighbor(int position1, int position2) const {
-    const std::pair<std::vector<int>, std::vector<int>>* neighbor =
-        VerifyInMap(position1);
-    if (!neighbor)
+    const std::vector<int>* neighbors = GetNeighbors(position1);
+    if (!neighbors)
         return false;  // se ta fora do mapa, nao e vizinho de
                        // ninguem
 
-    if (std::find(neighbor->first.begin(), neighbor->first.end(), position2) !=
-        neighbor->first.end())
-        return true;  // se achou no mapa de vizinhanca, e vizinho
+    if (std::find(neighbors->begin(), neighbors->end(), position2) !=
+        neighbors->end())
+        return true;  // se achou no mapa de vizinhanca, é vizinho
 
     return false;
 }
@@ -55,90 +54,91 @@ std::optional<int> AdugoGame::FindMiddlePosition(int position1, int position3)
              // alinhadas
     std::vector<int> possibilities;
 
-    auto collection1 = VerifyInMap(position1);
-    auto collection3 = VerifyInMap(position3);
+    auto neighbors1 = GetNeighbors(position1);
+    auto neighbors3 = GetNeighbors(position3);
 
-    if (!collection1 || !collection3) return std::nullopt;
+    if (!neighbors1 || !neighbors3) return std::nullopt;
 
     if (IsNeighbor(position1,
                    position3))  // se sao vizinhos diretos, nao ha ponto no meio
         return std::nullopt;
 
-    for (const auto neighbor : collection1->first) {
-        if (std::find(collection3->first.begin(), collection3->first.end(),
-                      neighbor) != collection3->first.end())
+    // Search for common neighbors between the neighbors of position1 and
+    // position3
+    for (const auto neighbor : *neighbors1) {
+        if (std::find(neighbors3->begin(), neighbors3->end(), neighbor) !=
+            neighbors3->end())
             possibilities.push_back(neighbor);
     }
 
-    if (possibilities.size() == 1) {
-        return possibilities[0];
-    }
+    // Couldn't find a middle position, or found more than one (error)
+    if (possibilities.size() != 1) return std::nullopt;
 
-    return std::nullopt;
+    // Return the single middle position found
+    return possibilities[0];
 }
 
-std::vector<int> AdugoGame::FindCommonConnections(int position1,
-                                                  int position2) const {
-    std::vector<int> common_lines;
+enum class Alignment { kNotAligned, kHorizontal, kVertical, kDiagonal };
 
-    const std::pair<std::vector<int>, std::vector<int>>* tiger =
-        VerifyInMap(position1);
-    const std::pair<std::vector<int>, std::vector<int>>* dog =
-        VerifyInMap(position2);
+Alignment GetAlignment(int pos1, int pos2) {
+    // Check if they are in valid range
+    if (pos1 < 0 || pos1 >= kGridDimension || pos2 < 0 ||
+        pos2 >= kGridDimension)
+        return Alignment::kNotAligned;
 
-    if (!tiger || !dog) return common_lines;
+    int row1 = pos1 / kBoardWidth;
+    int col1 = pos1 % kBoardWidth;
+    int row2 = pos2 / kBoardWidth;
+    int col2 = pos2 % kBoardWidth;
 
-    for (int tiger_pos :
-         tiger->second) {  // separa as retas comuns entre os pontos
-        for (int dog_pos : dog->second) {
-            if (tiger_pos == dog_pos) common_lines.emplace_back(tiger_pos);
-        }
-    }
+    if (row1 == row2) return Alignment::kHorizontal;
+    if (col1 == col2) return Alignment::kVertical;
+    if (std::abs(row1 - row2) == std::abs(col1 - col2))
+        return Alignment::kDiagonal;
 
-    return common_lines;
+    return Alignment::kNotAligned;
 }
 
-bool AdugoGame::IsAligned(int position1, int position2, int position3,
-                          std::vector<int> common_lines) const {
-    if (position1 == position2 || position1 == position3 ||
-        position2 == position3)
+bool AdugoGame::IsAligned(int starting_jaguar_pos, int middle_dog_pos,
+                          int landing_pos) const {
+    if (starting_jaguar_pos == middle_dog_pos ||
+        starting_jaguar_pos == landing_pos || middle_dog_pos == landing_pos)
         return false;  // necessario 3 pontos distintos para o abate
 
-    if (IsNeighbor(position1, position2) &&
-        IsNeighbor(position2, position3)) {  // precisam ser 3 pontos vizinhos
-        const std::pair<std::vector<int>, std::vector<int>>* middle_position =
-            VerifyInMap(position2);
-        if (!middle_position)  // se nao tem o ponto do meio, nao tem
-                               // alinhamento
-            return false;
-        // Check if the middle position shares any of the common lines
-        // between position1 and position3
-        for (int middle_line : middle_position->second) {
-            for (int com : common_lines) {  // se houver reta comum entre os 3
-                                            // pontos, estao alinhados
-                if (middle_line == com) return true;
-            }
-        }
-    }
-    return false;
+    // Check if they are in valid rage
+    if (starting_jaguar_pos < 0 || starting_jaguar_pos >= kGridDimension ||
+        middle_dog_pos < 0 || middle_dog_pos >= kGridDimension ||
+        landing_pos < 0 || landing_pos >= kGridDimension)
+        return false;
+
+    // Check if they are not direct neighbors
+    if (!IsNeighbor(starting_jaguar_pos, middle_dog_pos) ||
+        !IsNeighbor(middle_dog_pos, landing_pos))
+        return false;
+
+    // Get jaguar to dog alignment
+    Alignment jaguar_dog_alignment =
+        GetAlignment(starting_jaguar_pos, middle_dog_pos);
+
+    // If the landing_pos to middle_dog_pos alignment is the same, they are all
+    // aligned and the jaguar can capture
+    Alignment dog_landing_alignment = GetAlignment(middle_dog_pos, landing_pos);
+
+    return jaguar_dog_alignment == dog_landing_alignment;
 }
 
 void AdugoGame::AddIndirectNeighbors(const State& state, Player player,
                                      std::vector<Action>& actions,
-                                     int original_position,
-                                     int current_position) const {
-    const std::pair<std::vector<int>, std::vector<int>>* neighbors =
-        VerifyInMap(current_position);
-    if (!neighbors) return;  // se current_position nao ta no tabuleiro, retorna
+                                     int jaguar_position,
+                                     int dog_position) const {
+    const std::vector<int>* dog_neighbors = GetNeighbors(dog_position);
+    if (!dog_neighbors) return;  // se dog_position nao ta no tabuleiro, retorna
 
-    for (int neighbor :
-         neighbors->first) {  // pra cada vizinho do cachorro, verifica se ha
-                              // casa vazia e alinhada com cachorro/onca
-        if (state[neighbor] == Symbol::kEmpty &&
-            IsAligned(original_position, current_position, neighbor,
-                      this->FindCommonConnections(original_position,
-                                                  current_position)))
-            actions.emplace_back(player.symbol, original_position, neighbor);
+    for (int dog_neighbor : *dog_neighbors) {
+        // Check if the neighbor cell is empty and aligned for capture
+        if (state[dog_neighbor] == Symbol::kEmpty &&
+            IsAligned(jaguar_position, dog_position, dog_neighbor))
+            actions.emplace_back(player.symbol, jaguar_position, dog_neighbor);
     }
 
     return;
@@ -150,27 +150,24 @@ std::vector<Action> AdugoGame::GetPlayerActions(const State& state,
 
     for (int i = 0; i < kGridDimension; i++) {
         if (state[i] == player.symbol) {
-            auto homeowner = kGridDimensionNeighborhood.find(i);
-            if (homeowner == kGridDimensionNeighborhood.end())
+            auto player_position = kGridDimensionNeighborhood.find(i);
+            if (player_position == kGridDimensionNeighborhood.end())
                 continue;  // posicao do player fora do mapa
                            // continua para caso for cachorro
 
-            const std::pair<std::vector<int>, std::vector<int>>& neighbors =
-                homeowner->second;
+            const std::vector<int>& neighbors = player_position->second;
 
-            for (int neighbor_pos : neighbors.first) {
-                if (player.symbol == Symbol::kO) {
-                    if (state[neighbor_pos] == Symbol::kEmpty)
-                        actions.emplace_back(player.symbol, homeowner->first,
-                                             neighbor_pos);
-                    else if (state[neighbor_pos] == Symbol::kC)
-                        AddIndirectNeighbors(state, player, actions,
-                                             homeowner->first, neighbor_pos);
-                } else if (player.symbol == Symbol::kC &&
-                           state[neighbor_pos] == Symbol::kEmpty) {
-                    actions.emplace_back(player.symbol, homeowner->first,
+            for (int neighbor_pos : neighbors) {
+                // Going to an empty neighbor is always a valid move
+                if (state[neighbor_pos] == Symbol::kEmpty)
+                    actions.emplace_back(player.symbol, player_position->first,
                                          neighbor_pos);
-                }
+
+                // For jaguar, also add indirect neighbors: cells that it can
+                // go by jumping over a dog (and capturing it)
+                if (player.symbol == Symbol::kO)
+                    AddIndirectNeighbors(state, player, actions,
+                                         player_position->first, neighbor_pos);
             }
         }
     }
@@ -189,80 +186,35 @@ std::unique_ptr<State> AdugoGame::GetResult(const State& state,
 
     if (action_symbol != player.symbol) return nullptr;
 
-    // Destination invalid
+    // Invalid destination
     if (state[dest_index] == Symbol::kBlock) return nullptr;
 
     std::unique_ptr<State> new_state = std::make_unique<State>(state);
 
-    bool dog_captured = false;
+    // If the move is not to a neighbor, it's a capture move
+    if (!IsNeighbor(ply_index, dest_index)) {
+        auto captured_dog_pos = FindMiddlePosition(
+            ply_index, dest_index);  // se ha somente um vizinho entre ambos e
+                                     // os 3 estao alinhados, houve abate
 
-    if (!IsNeighbor(ply_index,
-                    dest_index)) {  // caso da onca matar o cachoro, limpa a
-                                    // antiga casa do cachorro
-        // Find all common neighbors between origin and destination
-        auto origin_neighbors = VerifyInMap(ply_index);
-        auto dest_neighbors = VerifyInMap(dest_index);
+        if (captured_dog_pos == std::nullopt)
+            throw std::logic_error(
+                "Invalid capture move: no middle position found.");
 
-        if (origin_neighbors && dest_neighbors) {
-            std::vector<int> common_neighbors;
-
-            // Collect all common neighbors that have dogs
-            for (int origin_n : origin_neighbors->first) {
-                for (int dest_n : dest_neighbors->first) {
-                    if (origin_n == dest_n && state[origin_n] == Symbol::kC) {
-                        common_neighbors.push_back(origin_n);
-                    }
-                }
-            }
-
-            // For each candidate dog, check if it forms a valid capture path
-            // The dog should be aligned on the path from origin through dog to
-            // destination
-            std::vector<int> aligned_candidates;
-            for (int candidate : common_neighbors) {
-                // Check alignment: origin -> candidate -> destination
-                // This matches the logic in AddIndirectNeighbors
-                std::vector<int> origin_to_candidate_lines =
-                    FindCommonConnections(ply_index, candidate);
-
-                if (IsAligned(ply_index, candidate, dest_index,
-                              origin_to_candidate_lines)) {
-                    aligned_candidates.push_back(candidate);
-                }
-            }
-
-            // If multiple candidates are aligned, choose the one "closest" to
-            // being numerically between origin and destination
-            if (!aligned_candidates.empty()) {
-                int best_candidate = aligned_candidates[0];
-                int min_distance =
-                    std::abs(best_candidate - (ply_index + dest_index) / 2);
-
-                for (int candidate : aligned_candidates) {
-                    int distance =
-                        std::abs(candidate - (ply_index + dest_index) / 2);
-                    if (distance < min_distance) {
-                        min_distance = distance;
-                        best_candidate = candidate;
-                    }
-                }
-
-                (*new_state)[best_candidate] = Symbol::kEmpty;
-                dog_captured = true;
-            }
-        }
+        if (captured_dog_pos.has_value() &&
+            IsAligned(ply_index, captured_dog_pos.value(), dest_index))
+            // Clear the captured dog from the board
+            (*new_state)[captured_dog_pos.value()] = Symbol::kEmpty;
     }
 
     (*new_state)[ply_index] = Symbol::kEmpty;  // player sai da posicao original
     (*new_state)[dest_index] = action_symbol;  // player chega ao destino
 
     // Switch turn to the other player
-    // If jaguar captured a dog, jaguar gets another turn
     if (player.symbol == Symbol::kC)
         new_state->player_to_move = Player(Symbol::kO);
-    else if (!dog_captured)
+    else
         new_state->player_to_move = Player(Symbol::kC);
-    // else: jaguar keeps the turn (player_to_move stays as Symbol::kO)
 
     return new_state;
 }
@@ -272,10 +224,6 @@ std::vector<Action> AdugoGame::GetActions(const State& state) const {
 }
 
 bool AdugoGame::IsTerminal(const State& state) const {
-#ifdef IGNORE_TERMINAL_TEST
-    return false;
-#endif
-
     if (CalculateWinner(state) == Symbol::kEmpty)  // se ninguem ganhou, falso
         return false;
     return true;  // alguem ganhou

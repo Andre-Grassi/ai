@@ -14,122 +14,55 @@
 #include "data_structure/adversarial_search/game.h"
 
 namespace adugo_game {
-// ---------- nomes para line IDs ----------
-constexpr int HORIZONTAL_1 = 1;
-constexpr int HORIZONTAL_2 = 2;
-constexpr int HORIZONTAL_3 = 3;
-constexpr int HORIZONTAL_4 = 4;
-constexpr int HORIZONTAL_5 = 5;
-
-constexpr int VERTICAL_1 = 6;
-constexpr int VERTICAL_2 = 7;
-constexpr int VERTICAL_3 = 8;
-constexpr int VERTICAL_4 = 9;
-constexpr int VERTICAL_5 = 10;
-
-// diagonais / linhas extras (IDs 11..25)
-constexpr int DIAGONAL_11 = 11;
-constexpr int DIAGONAL_12 = 12;
-constexpr int DIAGONAL_13 = 13;
-constexpr int DIAGONAL_14 = 14;
-constexpr int DIAGONAL_15 = 15;
-constexpr int DIAGONAL_16 = 16;
-constexpr int DIAGONAL_17 = 17;
-constexpr int DIAGONAL_18 = 18;
-constexpr int DIAGONAL_19 = 19;
-constexpr int DIAGONAL_20 = 20;
-constexpr int DIAGONAL_21 = 21;
-constexpr int DIAGONAL_22 = 22;
-constexpr int DIAGONAL_23 = 23;
-constexpr int DIAGONAL_24 = 24;
-constexpr int DIAGONAL_25 = 25;
-constexpr int DIAGONAL_26 = 26;
-constexpr int DIAGONAL_27 = 27;
-constexpr int DIAGONAL_28 = 28;
-constexpr int DIAGONAL_29 = 29;
 
 // ---------- tabela ----------
-// formato: node_index -> { {neighbors...}, {line_ids...} }
-const std::map<int, std::pair<std::vector<int>, std::vector<int>>>
-    kGridDimensionNeighborhood = {
+// formato: node_index -> {neighbors }
+const std::map<int, std::vector<int>> kGridDimensionNeighborhood = {
 
-        // Linha 1
-        {0, {{1, 5, 6}, {HORIZONTAL_1, VERTICAL_1, DIAGONAL_11}}},
-        {1, {{0, 2, 6}, {HORIZONTAL_1, VERTICAL_2}}},
-        {2,
-         {{1, 3, 6, 7, 8},
-          {HORIZONTAL_1, VERTICAL_3, DIAGONAL_12, DIAGONAL_13}}},
-        {3, {{2, 4, 8}, {HORIZONTAL_1, VERTICAL_4}}},
-        {4, {{3, 8, 9}, {HORIZONTAL_1, VERTICAL_5, DIAGONAL_14}}},
+    // Linha 1
+    {0, {1, 5, 6}},
+    {1, {0, 2, 6}},
+    {2, {1, 3, 6, 7, 8}},
+    {3, {2, 4, 8}},
+    {4, {3, 8, 9}},
 
-        // Linha 2
-        {5, {{0, 6, 10}, {HORIZONTAL_2, VERTICAL_1}}},
-        {6,
-         {{0, 1, 2, 5, 7, 10, 11, 12},
-          {HORIZONTAL_2, VERTICAL_2, DIAGONAL_11, DIAGONAL_12, DIAGONAL_15,
-           DIAGONAL_16}}},
-        {7, {{2, 6, 8, 12}, {HORIZONTAL_2, VERTICAL_3}}},
-        {8,
-         {{2, 3, 4, 7, 9, 12, 13, 14},
-          {HORIZONTAL_2, VERTICAL_4, DIAGONAL_13, DIAGONAL_14, DIAGONAL_17,
-           DIAGONAL_18}}},
-        {9, {{4, 8, 14}, {HORIZONTAL_2, VERTICAL_5}}},
+    // Linha 2
+    {5, {0, 6, 10}},
+    {6, {0, 1, 2, 5, 7, 10, 11, 12}},
+    {7, {2, 6, 8, 12}},
+    {8, {2, 3, 4, 7, 9, 12, 13, 14}},
+    {9, {4, 8, 14}},
 
-        // Linha 3
-        {10,
-         {{5, 6, 11, 15, 16},
-          {HORIZONTAL_3, VERTICAL_1, DIAGONAL_15, DIAGONAL_19}}},
-        {11, {{6, 10, 12, 16}, {HORIZONTAL_3, VERTICAL_2}}},
-        {12,
-         {{6, 7, 8, 11, 13, 16, 17, 18},
-          {HORIZONTAL_3, VERTICAL_3, DIAGONAL_16, DIAGONAL_17, DIAGONAL_20,
-           DIAGONAL_21}}},
-        {13, {{8, 12, 14, 18}, {HORIZONTAL_3, VERTICAL_4}}},
-        {14,
-         {{8, 9, 13, 18, 19},
-          {HORIZONTAL_3, VERTICAL_5, DIAGONAL_18, DIAGONAL_22}}},
+    // Linha 3
+    {10, {5, 6, 11, 15, 16}},
+    {11, {6, 10, 12, 16}},
+    {12, {6, 7, 8, 11, 13, 16, 17, 18}},
+    {13, {8, 12, 14, 18}},
+    {14, {8, 9, 13, 18, 19}},
 
-        // Linha 4
-        {15,
-         {{10, 16, 20},
-          {
-              HORIZONTAL_4,
-              VERTICAL_1,
-          }}},
-        {16,
-         {{10, 11, 12, 15, 17, 20, 21, 22},
-          {HORIZONTAL_4, VERTICAL_2, DIAGONAL_19, DIAGONAL_20, DIAGONAL_23,
-           DIAGONAL_24}}},
-        {17,
-         {{12, 16, 18, 22},
-          {
-              HORIZONTAL_4,
-              VERTICAL_3,
-          }}},
-        {18,
-         {{12, 13, 14, 17, 19, 22, 23, 24},
-          {HORIZONTAL_4, VERTICAL_4, DIAGONAL_21, DIAGONAL_22, DIAGONAL_25,
-           DIAGONAL_26}}},
-        {19, {{14, 18, 24}, {HORIZONTAL_4, VERTICAL_5}}},
+    // Linha 4
+    {15, {10, 16, 20}},
+    {16, {10, 11, 12, 15, 17, 20, 21, 22}},
+    {17, {12, 16, 18, 22}},
+    {18, {12, 13, 14, 17, 19, 22, 23, 24}},
+    {19, {14, 18, 24}},
 
-        // Linha 5
-        {20, {{15, 16, 21}, {HORIZONTAL_5, VERTICAL_1, DIAGONAL_23}}},
-        {21, {{16, 20, 22}, {HORIZONTAL_5, VERTICAL_2}}},
-        {22,
-         {{16, 17, 18, 21, 23, 26, 27, 28},
-          {HORIZONTAL_5, VERTICAL_3, DIAGONAL_24, DIAGONAL_25}}},
-        {23, {{18, 22, 24}, {HORIZONTAL_5, VERTICAL_4}}},
-        {24, {{18, 19, 23}, {HORIZONTAL_5, VERTICAL_5, DIAGONAL_26}}},
+    // Linha 5
+    {20, {15, 16, 21}},
+    {21, {16, 20, 22}},
+    {22, {16, 17, 18, 21, 23, 26, 27, 28}},
+    {23, {18, 22, 24}},
+    {24, {18, 19, 23}},
 
-        // Linha 6 (Triângulo central)
-        {26, {{22, 27, 30}, {HORIZONTAL_6, DIAGONAL_27, DIAGONAL_29}}},
-        {27, {{22, 26, 28, 32}, {HORIZONTAL_6, VERTICAL_3}}},
-        {28, {{22, 27, 34}, {HORIZONTAL_6, DIAGONAL_28, DIAGONAL_30}}},
+    // Linha 6 (Triângulo central)
+    {26, {22, 27, 30}},
+    {27, {22, 26, 28, 32}},
+    {28, {22, 27, 34}},
 
-        // Linha 7 (base do triângulo)
-        {30, {{26, 32}, {HORIZONTAL_7, DIAGONAL_29}}},
-        {32, {{27, 30, 34}, {VERTICAL_3, HORIZONTAL_7}}},
-        {34, {{28, 32}, {HORIZONTAL_7, DIAGONAL_30}}}};
+    // Linha 7 (base do triângulo)
+    {30, {26, 32}},
+    {32, {27, 30, 34}},
+    {34, {28, 32}}};
 
 enum class Symbol : char {
     kEmpty = '-',  // Empty cell
@@ -321,8 +254,8 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
     std::optional<int> FindMiddlePosition(int position1, int position3) const;
     bool IsNeighbor(int position1, int position2) const;
     std::vector<int> FindCommonConnections(int position1, int position2) const;
-    bool IsAligned(int position1, int position2, int position3,
-                   std::vector<int> common_lines) const;
+    bool IsAligned(int starting_jaguar_pos, int middle_dog_pos,
+                   int landing_pos) const;
     void AddIndirectNeighbors(const State& state, Player player,
                               std::vector<Action>& actions,
                               int original_position,
