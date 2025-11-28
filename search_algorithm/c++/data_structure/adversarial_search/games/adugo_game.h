@@ -186,10 +186,10 @@ struct Action {
     }
 };
 
-/**
- * @note For debugging, use int, because the debugger shows int8_t as char.
- */
-using Utility = int8_t;  // -1 (loss), 0 (draw), +1 (win)
+/// WARNING: UTILITY MUST BE FLOAT OR DOUBLE, otherwise the GetEval will be
+/// inneficient using integer values
+using Utility = float;  // Value from -1 (loss) to +1 (win) from MAX player's
+                        // perspective
 
 /**
  * @brief Class representing the Adugo game. The jaguar is MIN, and the dogs are
@@ -247,6 +247,7 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
      *         - -1.0 = worst outcome for dogs (jaguar has maximum
      * captures/mobility)
      *         - 0.0 = neutral/balanced position
+     * @warning To work properly, Utility MUST be float or double.
      */
     Utility GetEval(const State& state) const override;
 

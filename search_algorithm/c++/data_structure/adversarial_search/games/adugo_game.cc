@@ -238,6 +238,7 @@ bool AdugoGame::IsTerminal(const State& state) const {
 }
 
 // eai??
+// FIX Issue 8
 Utility AdugoGame::GetUtility(const State& state) const {
     if (!IsTerminal(state))
         throw std::logic_error("GetUtility called on non-terminal state");
@@ -249,6 +250,7 @@ Utility AdugoGame::GetUtility(const State& state) const {
     return -1;                                       // O win
 }
 
+// Heuristic
 Utility AdugoGame::GetEval(const State& state) const {
     // If terminal, can calculate utility directly
     if (IsTerminal(state)) {
@@ -261,22 +263,22 @@ Utility AdugoGame::GetEval(const State& state) const {
 
     const int max_jaguar_mobility = 8;  // If the jaguar has all moves available
 
-    const double max_jaguar_score = (kNumDogsToCapture * capture_weight) +
-                                    (max_jaguar_mobility * mobility_weight);
+    const Utility max_jaguar_score = (kNumDogsToCapture * capture_weight) +
+                                     (max_jaguar_mobility * mobility_weight);
 
     int captured_dogs =
         kNumStartingDogs - CountSymbolsInState(state, Symbol::kC);
     int jaguar_mobility = GetPlayerActions(state, Player(Symbol::kO)).size();
 
-    double raw_jaguar_score =
+    Utility raw_jaguar_score =
         (captured_dogs * capture_weight) + (jaguar_mobility * mobility_weight);
     // Normalize to [0, 1]
-    double normalized_jaguar_score = (raw_jaguar_score / max_jaguar_score);
+    Utility normalized_jaguar_score = (raw_jaguar_score / max_jaguar_score);
 
     // Calculate dogs value based on jaguar score
     // If jaguar score is 0 -> dogs value = 1 (best for dogs)
     // If jaguar score is max -> dogs value = -1 (worst for dogs)
-    double dogs_value = 1.0 - (2.0 * normalized_jaguar_score);
+    Utility dogs_value = 1.0 - (2.0 * normalized_jaguar_score);
 
     return dogs_value;
 }
