@@ -258,7 +258,7 @@ Utility AdugoGame::GetEval(const State& state) const {
     }
 
     // Weights
-    const int capture_weight = 100;
+    const int capture_weight = 10;
     const int mobility_weight = 1;
 
     const int max_jaguar_mobility = 8;  // If the jaguar has all moves available
