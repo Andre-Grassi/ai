@@ -76,6 +76,13 @@ add_executable(${MAIN_EXECUTABLE} ${MAIN_SOURCE})
 target_link_libraries(${MAIN_EXECUTABLE} PRIVATE problems games tabuleiro tabuleiro_wrapper ${CURSES_LIBRARIES} ${HIREDIS_LIB})
 add_dependencies(${MAIN_EXECUTABLE} tabuleiro)
 
+# Parameter adjustment target
+set(PARAM_ADJUST_EXECUTABLE "adugo_param_adjust")
+set(PARAM_ADJUST_SOURCE "tests/adugo_param_adjust.cc")
+add_executable(${PARAM_ADJUST_EXECUTABLE} ${PARAM_ADJUST_SOURCE})
+target_link_libraries(${PARAM_ADJUST_EXECUTABLE} PRIVATE problems games tabuleiro tabuleiro_wrapper ${CURSES_LIBRARIES} ${HIREDIS_LIB})
+add_dependencies(${PARAM_ADJUST_EXECUTABLE} tabuleiro)
+
 # Examples target
 file(GLOB EXAMPLE_SOURCES "examples/*.cc")
 foreach(example_file ${EXAMPLE_SOURCES})
