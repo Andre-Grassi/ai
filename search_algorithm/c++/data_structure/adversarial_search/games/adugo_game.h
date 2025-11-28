@@ -204,9 +204,10 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
     static const int kNumStartingDogs = 14;  ///< Number of dogs at game start
     static const int kNumDogsToCapture =
         5;  ///< Number of dogs the jaguar must capture to win
-    static const int kMaxDepth = 10;  ///< Maximum search depth
+    static const int kMaxDepth = 10;  ///< Default maximum search depth
 
-    AdugoGame() : Game(CreateInitialBoard(), kMaxDepth) {}
+    AdugoGame(int max_depth = kMaxDepth)
+        : Game(CreateInitialBoard(), max_depth) {}
 
     Player GetPlayerToMove(const State& state) const override;
 
