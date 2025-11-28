@@ -80,9 +80,7 @@ std::optional<int> AdugoGame::FindMiddlePosition(int position1, int position3)
     return possibilities[0];
 }
 
-enum class Alignment { kNotAligned, kHorizontal, kVertical, kDiagonal };
-
-Alignment GetAlignment(int pos1, int pos2) {
+AdugoGame::Alignment AdugoGame::GetAlignment(int pos1, int pos2) const {
     // Check if they are in valid range
     if (pos1 < 0 || pos1 >= kGridDimension || pos2 < 0 ||
         pos2 >= kGridDimension)

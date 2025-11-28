@@ -264,6 +264,11 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
     int GetJaguarPosition(const State& state) const;
 
    private:
+    /**
+     * @brief Alignment types between pieces.
+     */
+    enum class Alignment { kNotAligned, kHorizontal, kVertical, kDiagonal };
+
     // return the intial board
     static State CreateInitialBoard() {
         using s = adugo_game::Symbol;
@@ -287,6 +292,15 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
      * player's symbol will be kEmpty.
      */
     Player CalculateWinner(const State& state) const;
+
+    /**
+     * @brief Determines the alignment type between two positions on the board.
+     * @param pos1 The first position index.
+     * @param pos2 The second position index.
+     * @return The alignment type (horizontal, vertical, diagonal, or not
+     * aligned).
+     */
+    Alignment GetAlignment(int pos1, int pos2) const;
 };
 };  // namespace adugo_game
 
