@@ -221,19 +221,21 @@ State TabuleiroWrapper::ReceiveState(int timeout_seconds) {
     // Parse using strtok - need to be careful about order
     // Format: <my_side>\n<opponent_side> <move_type> [positions]\n<board>.\n
 
-    // First line: whose turn it is
+    // First line: my side ('c' or 'o')
     char* line1 = strtok(buf, "\n");
     if (!line1) {
         throw std::runtime_error("Invalid server response: missing first line");
     }
-    char whose_turn = line1[0];
+    char my_side = line1[0];
 
-    // Second line: opponent's last move
+    // Second line: player's last move
     char* line2 = strtok(NULL, "\n");
     if (!line2) {
         throw std::runtime_error(
             "Invalid server response: missing second line");
     }
+    char last_player_side = line2[0];
+    char move_type = line2[2];  // 'm', 's' or 'n' (no move)
 
     // Get the rest as board string (everything until '.')
     char board_buffer[512] = "";
@@ -245,13 +247,14 @@ State TabuleiroWrapper::ReceiveState(int timeout_seconds) {
 
     // Determine whose turn it is
     Player player_to_move;
-    if (whose_turn == 'c')
-        player_to_move = Player(Symbol::kC);
-    else if (whose_turn == 'o')
+    // If last move was by 'c', now 'o' to move, and vice versa
+    if (last_player_side == 'c')
         player_to_move = Player(Symbol::kO);
+    else if (last_player_side == 'o')
+        player_to_move = Player(Symbol::kC);
     else
         throw std::invalid_argument("Invalid turn character: " +
-                                    std::string(1, whose_turn));
+                                    std::string(1, last_player_side));
 
     State server_state =
         GetStateFromBoardString(std::string(board_buffer), player_to_move);
