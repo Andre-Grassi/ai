@@ -213,6 +213,10 @@ int main(int argc, char** argv) {
             }
 
             std::cout << "Move(s) sent!\n" << std::endl;
+
+            // Print resulting board
+            std::cout << "Resulting state after my move(s):\n";
+            game.PrintState(temp_state);
         } else {
             std::cout << "\n>>> OPPONENT'S TURN - Waiting... <<<\n"
                       << std::endl;
