@@ -25,6 +25,7 @@ void PrintUsage(const char* program_name);
 int main(int argc, char** argv) {
     using namespace adugo_game;
     constexpr int kServerResponseTimeout = 20;
+    constexpr int kMaxDepth = 20;  // A safe bet for the depth regarding time
 
     // Parse command-line arguments
     Args args = ParseArgs(argc, argv);
@@ -39,7 +40,7 @@ int main(int argc, char** argv) {
     tabuleiro.ConnectToServer(argc, argv);
 
     // Initialize game
-    AdugoGame game;
+    AdugoGame game(kMaxDepth);
     std::unordered_map<State, Utility> transposition_table;
 
     Player my_player;
