@@ -1,18 +1,49 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Launch",
-            "program": "${workspaceFolder}/search_algorithm/c++/bin/search_algorithm",
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        }
-        
-
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Launch",
+      "program": "${workspaceFolder}/search_algorithm/c++/bin/search_algorithm",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Adugo Main Dog",
+      "program": "${workspaceFolder}/search_algorithm/c++/bin/adugo_main",
+      "args": ["c"],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Adugo Main Jaguar",
+      "program": "${workspaceFolder}/search_algorithm/c++/bin/adugo_main",
+      "args": ["o"],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Main Jaguar Custom Depth",
+      "program": "${workspaceFolder}/search_algorithm/c++/bin/adugo_param_adjust",
+      "args": ["o", "2"],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Debug Jaguar (with server)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/search_algorithm/c++/bin/adugo_main",
+      "args": ["o"],
+      "cwd": "${workspaceFolder}/search_algorithm/c++",
+      "preLaunchTask": "Start Server and Dogs"
+    }
+  ]
 }
