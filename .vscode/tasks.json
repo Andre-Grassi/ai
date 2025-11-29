@@ -2,34 +2,53 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start Server and Dogs",
+      "label": "Start Server",
       "type": "shell",
       "command": "bash",
       "args": [
         "-c",
-        // CHANGE 1: Added '&' after start_server.sh so it doesn't block.
-        // CHANGE 2: Used ';' or just continued to ensure the next steps run while server is alive.
-        "./start_server.sh & sleep 1"
+        // TRICK: Run server, wait a bit, then manually print 'READY' to satisfy the matcher
+        "./start_server.sh & sleep 1; echo 'READY'"
       ],
       "options": {
         "cwd": "${workspaceFolder}/search_algorithm/c++/jogo_da_onca"
       },
       "isBackground": true,
       "problemMatcher": {
-        "pattern": {
-          // CHANGE 3: Changed regex to catch-all. ^$ only matches empty lines.
-          "regexp": "."
-        },
+        "pattern": { "regexp": "." },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "Starting server",
+          "beginsPattern": "Starting server", // Ensure this matches something or use "."
           "endsPattern": "READY"
         }
       },
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Start Dogs",
+      "type": "shell",
+      "command": "bash", // Use bash to allow chaining commands
+      "args": [
+        "-c",
+        // FIX 1: Run dogs in background (&), wait 1s, then print a specific signal
+        "${workspaceFolder}/search_algorithm/c++/bin/adugo_main c & sleep 1; echo 'DOGS_READY'"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "." },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          // FIX 2: Match the specific signal we just echoed
+          "endsPattern": "DOGS_READY"
+        }
+      },
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Start Server and Dogs",
+      "dependsOn": ["Start Server", "Start Dogs"],
+      "dependsOrder": "sequence"
     }
   ]
 }
