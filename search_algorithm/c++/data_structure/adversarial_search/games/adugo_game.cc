@@ -251,33 +251,41 @@ Utility AdugoGame::GetUtility(const State& state) const {
 }
 
 // Heuristic
+
+
+// Heuristic = 1 - 2 * ((captured_dogs * cw + jaguar_mobility * mw) / max_jaguar_score)
 Utility AdugoGame::GetEval(const State& state) const {
     // If terminal, can calculate utility directly
     if (IsTerminal(state)) {
         return GetUtility(state);
     }
 
-    Utility dogs_value = 0.0;
-    int capture_weight, mobility_weight;
+    Utility dogs_value = 0.0f;
+    float capture_weight, mobility_weight;
 
     if (state.player_to_move == Player(Symbol::kC)) {
         // Weights
-        capture_weight = 1;
-        mobility_weight = 10;
+        capture_weight = 10.0f;
+        mobility_weight = 1.0f;
     } else {
     // Weights
-        mobility_weight = 1;
-        capture_weight = 100;
+        mobility_weight = 10.0f;
+        capture_weight = 1.0f;
     }
 
-    const int max_jaguar_mobility = 8;  // If the jaguar has all moves available
 
-    const Utility max_jaguar_score = (kNumDogsToCapture * capture_weight) +
+
+    const float max_jaguar_mobility =
+        8.0f;  // If the jaguar has all moves available
+
+    const Utility max_jaguar_score =
+        (static_cast<float>(kNumDogsToCapture) * capture_weight) +
                                      (max_jaguar_mobility * mobility_weight);
 
-    int captured_dogs =
-        kNumStartingDogs - CountSymbolsInState(state, Symbol::kC);
-    int jaguar_mobility = GetPlayerActions(state, Player(Symbol::kO)).size();
+    float captured_dogs = static_cast<float>(
+        kNumStartingDogs - CountSymbolsInState(state, Symbol::kC));
+    float jaguar_mobility =
+        static_cast<float>(GetPlayerActions(state, Player(Symbol::kO)).size());
 
     Utility raw_jaguar_score =
         (captured_dogs * capture_weight) + (jaguar_mobility * mobility_weight);
@@ -287,7 +295,9 @@ Utility AdugoGame::GetEval(const State& state) const {
     // Calculate dogs value based on jaguar score
     // If jaguar score is 0 -> dogs value = 1 (best for dogs)
     // If jaguar score is max -> dogs value = -1 (worst for dogs)
-    dogs_value = 1.0 - (2.0 * normalized_jaguar_score);
+    // You can't simply make it the opposit, because the jaguar score is
+    // between 0 and 1.
+    dogs_value = 1.0f - (2.0f * normalized_jaguar_score);
 
     return dogs_value;
 }
