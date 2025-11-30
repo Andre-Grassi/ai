@@ -10,9 +10,6 @@
 #include "server/tabuleiro.h"
 #include "tabuleiro_wrapper.h"
 
-// Forward declaration from tabuleiro_wrapper.cc
-std::pair<int, int> IndexToPosition(int index);
-
 struct Args {
    public:
     char side;
@@ -22,6 +19,8 @@ struct Args {
 
 Args ParseArgs(int argc, char** argv);
 void PrintUsage(const char* program_name);
+// Forward declaration from tabuleiro_wrapper.cc
+std::pair<int, int> IndexToPosition(int index);
 std::unique_ptr<Action> SearchMove(adugo_game::AdugoGame& game,
                                    const adugo_game::State& state);
 void SendActionsToServer(const Player& player,
