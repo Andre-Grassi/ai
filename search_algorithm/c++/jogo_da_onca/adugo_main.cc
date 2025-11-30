@@ -105,14 +105,7 @@ int main(int argc, char** argv) {
                     std::cout << "\033[1;31mWARNING: State repeated "
                                  ""
                               << state_count_table[current_state]
-                              << " times! Forcing a bad eval to avoid "
-                                 "cycling.\033[0m"
-                              << std::endl;
-
-                    // Penalize this state
-                    game.transposition_table[current_state] = 0.0f;
-                    std::cout << "Transposition state value forced to: "
-                              << game.transposition_table[current_state]
+                              << " times! Clearing transposition table.\033[0m"
                               << std::endl;
                     /*
                     game.PrintTranspositionTableToFile(
