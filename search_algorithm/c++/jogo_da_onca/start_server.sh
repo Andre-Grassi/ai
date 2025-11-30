@@ -1,3 +1,7 @@
+# You will pobably want to run this without sudo. To do that,
+# type `sudo visudo` and add the following line:
+# `your_username ALL=(ALL) NOPASSWD: /full/path/to/your/start_server.sh`
+
 redis-server server/redis.conf &
 sleep 0.5
 

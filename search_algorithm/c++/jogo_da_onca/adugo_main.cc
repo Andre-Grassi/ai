@@ -3,14 +3,12 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <unordered_set>
 
 #include "algorithms/adversarial_search/adversarial_search_algorithm.h"
 #include "data_structure/adversarial_search/games/adugo_game.h"
 #include "server/tabuleiro.h"
 #include "tabuleiro_wrapper.h"
-
-// Forward declaration from tabuleiro_wrapper.cc
-std::pair<int, int> IndexToPosition(int index);
 
 struct Args {
    public:
@@ -21,11 +19,18 @@ struct Args {
 
 Args ParseArgs(int argc, char** argv);
 void PrintUsage(const char* program_name);
+// Forward declaration from tabuleiro_wrapper.cc
+std::pair<int, int> IndexToPosition(int index);
+std::unique_ptr<Action> SearchMove(adugo_game::AdugoGame& game,
+                                   const adugo_game::State& state);
+void SendActionsToServer(const Player& player,
+                         std::vector<Action> actions_sequence,
+                         TabuleiroWrapper& tabuleiro);
 
 int main(int argc, char** argv) {
     using namespace adugo_game;
     constexpr int kServerResponseTimeout = 300;  // 5 min timeout
-    constexpr int kMaxDepth = 20;  // A safe bet for the depth regarding time
+    constexpr int kMaxDepth = 12;  // A safe bet for the depth regarding time
 
     // Parse command-line arguments
     Args args = ParseArgs(argc, argv);
@@ -42,6 +47,7 @@ int main(int argc, char** argv) {
     // Initialize game
     AdugoGame game(kMaxDepth);
     std::unordered_map<State, int> state_count_table;
+    std::unordered_set<State> penalized_states;
 
     Player my_player;
     if (args.side == 'c')
@@ -95,120 +101,25 @@ int main(int argc, char** argv) {
             std::cout << "State received" << std::endl;
             game.PrintState(current_state);
 
-            auto it = state_count_table.find(current_state);
-            if (it != state_count_table.end()) {
-                // Key exists
-                state_count_table[current_state] += 1;
-
-                if (state_count_table[current_state] >= 3) {
-                    // Print in red
-                    std::cout << "\033[1;31mWARNING: State repeated "
-                                 ""
-                              << state_count_table[current_state]
-                              << " times! Clearing transposition table.\033[0m"
-                              << std::endl;
-                    /*
-                    game.PrintTranspositionTableToFile(
-                        "transposition_table.log");
-                    */
-
-                    // Clear transposition table
-                    game.transposition_table.clear();
-                }
-
-            } else
-                // Key does not exist, initialize count to 1
-                state_count_table[current_state] = 1;
-
             // For jaguar: collect consecutive captures to send as sequence
             // For dogs: just make one move
-            std::vector<Action> actions_sequence;
+            std ::vector<Action> actions_sequence;
+            bool is_capture = false;
             State temp_state = current_state;
+            bool is_first_move = true;
 
+            do {
             // First move (always execute)
             std::cout << "Calculating move 1..." << std::endl;
-            std::unique_ptr<Action> best_action =
-                adversarial_search_algorithm::HeuristicMinimaxSearch(
-                    game, temp_state, game.transposition_table);
+                std::unique_ptr<Action> best_action =
+                    SearchMove(game, temp_state);
 
-            if (!best_action) {
-                std::cerr << "ERROR: No valid action found!" << std::endl;
-                break;
-            }
+                is_capture = game.IsCaptureMove(*best_action);
 
-            auto [from_row, from_col] =
-                IndexToPosition(best_action->cell_index_origin);
-            auto [to_row, to_col] =
-                IndexToPosition(best_action->cell_index_destination);
-            std::cout << "  Move 1: (" << from_row << "," << from_col
-                      << ") -> (" << to_row << "," << to_col << ")"
-                      << std::endl;
-
-            // Check if this first move is a capture
-            bool is_capture = false;
-            if (my_player.symbol == Symbol::kO) {
-                is_capture =
-                    !game.IsNeighbor(best_action->cell_index_origin,
-                                     best_action->cell_index_destination);
-            }
-
-            actions_sequence.push_back(*best_action);
-
+                if (is_first_move || is_capture) {
             // Apply the action
             std::unique_ptr<State> next_state =
                 game.GetResult(temp_state, *best_action);
-            if (!next_state) {
-                std::cerr << "ERROR: Invalid action result!" << std::endl;
-                break;
-            }
-            temp_state = *next_state;
-
-            // If jaguar made a capture and still has turn, look for more
-            // captures
-            if (my_player.symbol == Symbol::kO && is_capture &&
-                temp_state.player_to_move.symbol == my_player.symbol &&
-                !game.IsTerminal(temp_state)) {
-                // Keep looking for consecutive captures
-                while (true) {
-                    std::cout << "Calculating move "
-                              << (actions_sequence.size() + 1) << "..."
-                              << std::endl;
-
-                    best_action =
-                        adversarial_search_algorithm::HeuristicMinimaxSearch(
-                            game, temp_state, game.transposition_table);
-
-                    if (!best_action) {
-                        std::cerr << "ERROR: No valid action found!"
-                                  << std::endl;
-                        break;
-                    }
-
-                    // Check if this next move is also a capture
-                    bool next_is_capture =
-                        !game.IsNeighbor(best_action->cell_index_origin,
-                                         best_action->cell_index_destination);
-
-                    std::tie(from_row, from_col) =
-                        IndexToPosition(best_action->cell_index_origin);
-                    std::tie(to_row, to_col) =
-                        IndexToPosition(best_action->cell_index_destination);
-                    std::cout << "  Move " << (actions_sequence.size() + 1)
-                              << ": (" << from_row << "," << from_col
-                              << ") -> (" << to_row << "," << to_col << ")";
-
-                    // Only continue the sequence if it's another capture
-                    if (!next_is_capture) {
-                        std::cout << " (not a capture, ending sequence)"
-                                  << std::endl;
-                        break;
-                    }
-
-                    std::cout << std::endl;
-                    actions_sequence.push_back(*best_action);
-
-                    // Apply this capture
-                    next_state = game.GetResult(temp_state, *best_action);
                     if (!next_state) {
                         std::cerr << "ERROR: Invalid action result!"
                                   << std::endl;
@@ -216,32 +127,56 @@ int main(int argc, char** argv) {
                     }
                     temp_state = *next_state;
 
-                    // Stop if it's no longer our turn or game ended
-                    if (temp_state.player_to_move.symbol != my_player.symbol ||
-                        game.IsTerminal(temp_state)) {
-                        break;
+                    // If it's a penalized state, search another time to
+                    // avoid repetition and expand the horizon
+                    if (penalized_states.find(temp_state) !=
+                        penalized_states.end()) {
+                        std::cout << "\033[1;31mPenalized state detected! "
+                                     "Expanding search...\033[0m"
+                                  << std::endl;
+                        best_action = SearchMove(game, temp_state);
                     }
+
+                    std::cout << "Transposition state value stored: "
+                              << game.transposition_table[temp_state]
+                              << std::endl;
+
+                    actions_sequence.push_back(*best_action);
                 }
-            }
+
+                // If jaguar made a capture and still has turn, look for more
+                // captures
+            } while (is_capture && !game.IsTerminal(temp_state));
 
             if (actions_sequence.empty()) {
                 std::cerr << "ERROR: No valid action found!" << std::endl;
                 break;
             }
 
-            // Send the action(s) to the server
-            std::cout << "\033[1mSending " << actions_sequence.size()
-                      << " move(s) to server...\033[0m" << std::endl;
+            // Update state count table and penalized states for repetition
+            // detection
+            auto it = state_count_table.find(temp_state);
+            if (it != state_count_table.end()) {
+                // Key exists
+                state_count_table[temp_state] += 1;
 
-            if (actions_sequence.size() == 1) {
-                // Single move
-                tabuleiro.SendAction(my_player, actions_sequence[0]);
-            } else {
-                // Multiple moves (capture sequence) - send all at once
-                tabuleiro.SendActionSequence(my_player, actions_sequence);
-            }
+                if (state_count_table[temp_state] >= 2) {
+                    // Print in red
+                    std::cout << "\033[1;31mWARNING: State repeated "
+                                 ""
+                              << state_count_table[temp_state]
+                              << " times! Inserting state into "
+                                 "penalized_states set.\033[0m"
+                              << std::endl;
 
-            std::cout << "Move(s) sent!\n" << std::endl;
+                    penalized_states.insert(temp_state);
+                }
+
+            } else
+                // Key does not exist, initialize count to 1
+                state_count_table[temp_state] = 1;
+
+            SendActionsToServer(my_player, actions_sequence, tabuleiro);
 
             // Print resulting board
             std::cout << "Resulting state after my move(s):\n";
@@ -255,13 +190,52 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+void SendActionsToServer(const Player& player,
+                         std::vector<Action> actions_sequence,
+                         TabuleiroWrapper& tabuleiro) {
+    // Send the action(s) to the server
+    std::cout << "\033[1mSending " << actions_sequence.size()
+              << " move(s) to server...\033[0m" << std::endl;
+
+    if (actions_sequence.size() == 1) {
+        // Single move
+        tabuleiro.SendAction(player, actions_sequence[0]);
+    } else {
+        // Multiple moves (capture sequence) - send all at once
+        tabuleiro.SendActionSequence(player, actions_sequence);
+    }
+
+    std::cout << "Move(s) sent!\n" << std::endl;
+}
+
+std::unique_ptr<Action> SearchMove(adugo_game::AdugoGame& game,
+                                   const adugo_game::State& state) {
+    std::unique_ptr<Action> best_action =
+        adversarial_search_algorithm::HeuristicMinimaxSearch(
+            game, state, game.transposition_table);
+    game.transposition_table.clear();
+
+    if (!best_action) {
+        std::cerr << "ERROR: No valid action found!" << std::endl;
+        return nullptr;
+    }
+
+    auto [from_row, from_col] = IndexToPosition(best_action->cell_index_origin);
+    auto [to_row, to_col] =
+        IndexToPosition(best_action->cell_index_destination);
+    std::cout << "  Move: (" << from_row << "," << from_col << ") -> ("
+              << to_row << "," << to_col << ")" << std::endl;
+
+    return best_action;
+}
+
 void PrintUsage(const char* program_name) {
     std::cout << "Usage:\n";
     std::cout << "  " << program_name << " <side> [ip] [port]\n\n";
     std::cout << "Arguments:\n";
     std::cout << "  side    Side to play with (o or c) [required]\n";
-    std::cout
-        << "  ip      IP or hostname of Redis server (default: 127.0.0.1)\n";
+    std::cout << "  ip      IP or hostname of Redis server (default: "
+                 "127.0.0.1)\n";
     std::cout << "  port    Port of Redis server (default: 10001)\n\n";
     std::cout << "Options:\n";
     std::cout << "  -h, --help    Display this help message\n";

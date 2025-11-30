@@ -105,6 +105,13 @@ foreach(test_file ${TEST_SOURCES})
     endif()
 endforeach()
 
+# Manual play executable
+set(MANUAL_PLAY_EXECUTABLE "adugo_manual_play")
+set(MANUAL_PLAY_SOURCE "tests/adugo_manual_play.cc")
+add_executable(${MANUAL_PLAY_EXECUTABLE} ${MANUAL_PLAY_SOURCE})
+target_link_libraries(${MANUAL_PLAY_EXECUTABLE} PRIVATE problems games tabuleiro tabuleiro_wrapper ${CURSES_LIBRARIES} ${HIREDIS_LIB})
+add_dependencies(${MANUAL_PLAY_EXECUTABLE} tabuleiro)
+
 # Server makefile target
 add_custom_target(server
     COMMAND $(MAKE) -C ${CMAKE_SOURCE_DIR}/jogo_da_onca/server

@@ -286,6 +286,8 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
                               int original_position,
                               int current_position) const;
     int GetJaguarPosition(const State& state) const;
+    bool IsCaptureMove(const Action& action) const;
+
 
    private:
     /**

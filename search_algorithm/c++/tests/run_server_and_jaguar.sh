@@ -11,9 +11,8 @@ sudo ./start_server.sh &
 echo "Starting server..."
 sleep 2
 
-# Start the clients silently
+# Start the dogs silently
 ../bin/adugo_main o > /dev/null 2>&1 &
-../bin/adugo_main c > /dev/null 2>&1 &
 
 # Keep this script running as long as the games are running
 wait
