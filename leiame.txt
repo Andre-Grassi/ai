@@ -30,6 +30,9 @@ Autores:
     O wrapper está em tabuleiro_wrapper.h e tabuleiro_wrapper.cc. Ele atua como
     uma ponte entre o nosso código C++ e a biblioteca tabuleiro escrita em C.
 
+- bin:
+    Diretório onde o executável é gerado após a compilação.
+
 == Implementação do Jogo ==
 
 Como dito anteriormente, a main está implementada em jogo_da_onca/adugo_main.cc.
@@ -89,12 +92,12 @@ Então execute
 
 Para executar o programa, inicie o servidor e o controlador (presente em server/).
 Em seguida, execute os clientes com o comando:
-    ./adugo_main <simbolo> <ip> <porta>
+    ./bin/adugo_main <simbolo> <ip> <porta>
 Onde <simbolo> é 'o' para a onça e 'c' para os cachorros.
 O ip e a porta são opcionais. Devem corresponder ao servidor iniciado
 anteriormente.
 Por padrão, o ip é 127.0.0.1 (localhost) e a porta é 10001.
-Caso seja necessário, execute ./adugo_main --help para ver a ajuda.
+Caso seja necessário, execute ./bin/adugo_main --help para ver a ajuda.
 
 == Scripts Extras ==
 
