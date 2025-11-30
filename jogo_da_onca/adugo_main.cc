@@ -1,3 +1,11 @@
+/**
+ * @file adugo_main.cc
+ * @brief Main program for playing Adugo game with AI agent using Minimax
+ * algorithm
+ * @author Andre Grassi, Caue Samonek, Ricardo Faria
+ * @date 2025
+ */
+
 #include <getopt.h>
 
 #include <cstdlib>
@@ -10,6 +18,7 @@
 #include "server/tabuleiro.h"
 #include "tabuleiro_wrapper.h"
 
+// Used to parse command-line arguments
 struct Args {
    public:
     char side;
@@ -17,20 +26,36 @@ struct Args {
     int port;
 };
 
+/*
+ * Program usage functions
+ */
 Args ParseArgs(int argc, char** argv);
 void PrintUsage(const char* program_name);
+
+/*
+ * Game playing utilities
+ */
+
 // Forward declaration from tabuleiro_wrapper.cc
 std::pair<int, int> IndexToPosition(int index);
+
+// Get the best move with heuristic minimax search from the given state
 std::unique_ptr<Action> SearchMove(adugo_game::AdugoGame& game,
                                    const adugo_game::State& state);
+
+// Send a sequence of actions to the server.
+// Usually the sequence is just one action, except for jaguar captures.
+// which can be multiple jumps in one turn.
 void SendActionsToServer(const Player& player,
                          std::vector<Action> actions_sequence,
                          TabuleiroWrapper& tabuleiro);
 
 int main(int argc, char** argv) {
     using namespace adugo_game;
-    constexpr int kServerResponseTimeout = 300;  // 5 min timeout
-    constexpr int kMaxDepth = 12;  // A safe bet for the depth regarding time
+    constexpr int kServerResponseTimeout =
+        300;  // 5 min timeout of server response
+    constexpr int kMaxDepth =
+        12;  // A safe bet for the minimax search tree depth regarding time
 
     // Parse command-line arguments
     Args args = ParseArgs(argc, argv);
@@ -41,12 +66,20 @@ int main(int argc, char** argv) {
     std::cout << "  IP: " << args.ip << "\n";
     std::cout << "  Port: " << args.port << "\n\n";
 
+    // Adapter from tabuleiro lib to our data structures
     TabuleiroWrapper tabuleiro;
     tabuleiro.ConnectToServer(argc, argv);
 
     // Initialize game
     AdugoGame game(kMaxDepth);
+
+    // Table to count state occurrences for repetition detection
     std::unordered_map<State, int> state_count_table;
+
+    // Set of penalized states to avoid repetition.
+    // When a state is repeated more than once, it is added here.
+    // Then, when reaching a penalized state, the agent will perform a new
+    // search, to try to look beyond and find more promising moves.
     std::unordered_set<State> penalized_states;
 
     Player my_player;
@@ -104,22 +137,25 @@ int main(int argc, char** argv) {
             // For jaguar: collect consecutive captures to send as sequence
             // For dogs: just make one move
             std ::vector<Action> actions_sequence;
-            bool is_capture = false;
+            bool is_capture = false;  // To track if the last move was a capture
             State temp_state = current_state;
             bool is_first_move = true;
 
             do {
-            // First move (always execute)
-            std::cout << "Calculating move 1..." << std::endl;
+                std::cout << "Calculating move..." << std::endl;
+
                 std::unique_ptr<Action> best_action =
                     SearchMove(game, temp_state);
 
                 is_capture = game.IsCaptureMove(*best_action);
 
+                // Check if it's the first move (to always apply it) or a
+                // capture in case the jaguar is performing consecutive
+                // captures.
                 if (is_first_move || is_capture) {
-            // Apply the action
-            std::unique_ptr<State> next_state =
-                game.GetResult(temp_state, *best_action);
+                    // Apply the action
+                    std::unique_ptr<State> next_state =
+                        game.GetResult(temp_state, *best_action);
                     if (!next_state) {
                         std::cerr << "ERROR: Invalid action result!"
                                   << std::endl;
@@ -141,11 +177,15 @@ int main(int argc, char** argv) {
                               << game.transposition_table[temp_state]
                               << std::endl;
 
+                    // Store action in sequence
                     actions_sequence.push_back(*best_action);
                 }
 
+                is_first_move = false;
+
                 // If jaguar made a capture and still has turn, look for more
-                // captures
+                // captures.
+                // Otherwise, stop processing our moves.
             } while (is_capture && !game.IsTerminal(temp_state));
 
             if (actions_sequence.empty()) {
@@ -161,7 +201,6 @@ int main(int argc, char** argv) {
                 state_count_table[temp_state] += 1;
 
                 if (state_count_table[temp_state] >= 2) {
-                    // Print in red
                     std::cout << "\033[1;31mWARNING: State repeated "
                                  ""
                               << state_count_table[temp_state]

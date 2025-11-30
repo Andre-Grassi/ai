@@ -1,7 +1,15 @@
+/**
+ * @file adugo_game.h
+ * @brief Adugo (Jogo da Onça) game implementation header with state
+ * representation and game logic
+ * @author Andre Grassi, Caue Samonek, Ricardo Faria
+ * @date 2025
+ */
+
 #ifndef SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 
-#define IGNORE_TERMINAL_TEST true
+#define IGNORE_TERMINAL_TEST true  // Ignore terminal test for debugging
 
 #include <array>
 #include <cstddef>
@@ -15,60 +23,63 @@
 
 namespace adugo_game {
 
-// ---------- tabela ----------
-// formato: node_index -> {neighbors }
+// ---------- Graph topology of the game board ----------
+// format: cell index -> {list of connected cell indices}
 const std::map<int, std::vector<int>> kGridDimensionNeighborhood = {
 
-    // Linha 1
-    {0, {1, 5, 6}},
+    // Line 1
+    {0, {1, 5, 6}},  // Cell is 0, from there we can navigate to 1, 5 and 6
     {1, {0, 2, 6}},
     {2, {1, 3, 6, 7, 8}},
     {3, {2, 4, 8}},
     {4, {3, 8, 9}},
 
-    // Linha 2
+    // Line 2
     {5, {0, 6, 10}},
     {6, {0, 1, 2, 5, 7, 10, 11, 12}},
     {7, {2, 6, 8, 12}},
     {8, {2, 3, 4, 7, 9, 12, 13, 14}},
     {9, {4, 8, 14}},
 
-    // Linha 3
+    // Line 3
     {10, {5, 6, 11, 15, 16}},
     {11, {6, 10, 12, 16}},
     {12, {6, 7, 8, 11, 13, 16, 17, 18}},
     {13, {8, 12, 14, 18}},
     {14, {8, 9, 13, 18, 19}},
 
-    // Linha 4
+    // Line 4
     {15, {10, 16, 20}},
     {16, {10, 11, 12, 15, 17, 20, 21, 22}},
     {17, {12, 16, 18, 22}},
     {18, {12, 13, 14, 17, 19, 22, 23, 24}},
     {19, {14, 18, 24}},
 
-    // Linha 5
+    // Line 5
     {20, {15, 16, 21}},
     {21, {16, 20, 22}},
     {22, {16, 17, 18, 21, 23, 26, 27, 28}},
     {23, {18, 22, 24}},
     {24, {18, 19, 23}},
 
-    // Linha 6 (Triângulo central)
+    // Line 6 (Triangle's center)
     {26, {22, 27, 30}},
     {27, {22, 26, 28, 32}},
     {28, {22, 27, 34}},
 
-    // Linha 7 (base do triângulo)
+    // Line 7 (Triangle's base)
     {30, {26, 32}},
     {32, {27, 30, 34}},
     {34, {28, 32}}};
 
+/**
+ * @brief Symbols used in the Adugo game for each cell on the board.
+ */
 enum class Symbol : char {
     kEmpty = '-',  // Empty cell
     kBlock = '@',  // Invalid cells
-    kC = 'c',      // Cachorro
-    kO = 'o',      // Onca
+    kC = 'c',      // Dog (Cachorro)
+    kO = 'o',      // Jaguar (Onça)
 };
 
 class Player {
@@ -152,8 +163,6 @@ struct State {
     }
 };
 
-// Action/Move is a struct that tells where the player is "drawing" its
-// symbol
 /**
  * @brief Action representing a player's move on the board.
  * It specifies which player (by its symbol) is making the move and the cell
@@ -161,8 +170,6 @@ struct State {
  */
 struct Action {
    public:
-    // Optimize passa PLayer and not Symbol -> maybe this would be worse
-    // actually??
     Symbol player_symbol;
     int cell_index_origin;
     int cell_index_destination;
@@ -188,8 +195,8 @@ struct Action {
 
 /// WARNING: UTILITY MUST BE FLOAT OR DOUBLE, otherwise the GetEval will be
 /// inneficient using integer values
-using Utility = float;  // Value from -1 (loss) to +1 (win) from MAX player's
-                        // perspective
+using Utility =
+    float;  ///< Value from -1 (loss) to +1 (win) from MAX player's perspective
 
 class AdugoGame;  // forward declaration
 };  // namespace adugo_game
@@ -227,6 +234,10 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
         5;  ///< Number of dogs the jaguar must capture to win
     static const int kMaxDepth = 10;  ///< Default maximum search depth
 
+    /**
+     * @brief Transposition table to store previously evaluated states.
+     * Maps State to its Utility value. Used to optimize search algorithms.
+     */
     std::unordered_map<State, Utility> transposition_table;
 
     AdugoGame(int max_depth = kMaxDepth)
@@ -261,8 +272,10 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
      * Heuristic = 1.0 - 2.0 * (jaguar_score / max_jaguar_score)
      *
      * Where:
-     * - jaguar_score = (captured_dogs * 100) + (jaguar_mobility * 1)
-     * - max_jaguar_score = (total_capturable_dogs * 100) + (max_mobility * 1)
+     * - jaguar_score = (captured_dogs * capture_weight) + (jaguar_mobility *
+     * mobility_weight)
+     * - max_jaguar_score = (total_capturable_dogs * capture_weight) +
+     * (max_mobility * mobility_weight)
      *
      * @param state The current game state to evaluate
      * @return Utility value in range [-1, 1] where:
@@ -276,22 +289,93 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
 
     virtual std::string GetStateString(const State& state) const override;
 
+    /**
+     * @brief Finds the middle position between two positions if they are
+     * aligned.
+     *
+     * This function determines if there is exactly one position between two
+     * given positions on the board, and if all three positions are aligned
+     * (horizontally, vertically, or diagonally). This is used primarily for
+     * validating jaguar capture moves.
+     *
+     * @param position1 The starting position index (typically jaguar's
+     * position)
+     * @param position3 The ending position index (typically landing position)
+     * @return std::optional<int> The middle position index if found and
+     * aligned, std::nullopt if:
+     *         - Either position is invalid
+     *         - Positions are direct neighbors (no middle position exists)
+     *         - No common neighbor exists between the two positions
+     *         - Multiple middle positions found (ambiguous)
+     *         - The three positions are not properly aligned
+     */
     std::optional<int> FindMiddlePosition(int position1, int position3) const;
+
+    /**
+     * @brief Checks if two positions on the board are adjacent to each other.
+     * @param position1 The first position index.
+     * @param position2 The second position index.
+     * @return True if the positions are neighbors, false otherwise.
+     */
     bool IsNeighbor(int position1, int position2) const;
-    std::vector<int> FindCommonConnections(int position1, int position2) const;
+
+    /**
+     * @brief Checks if three positions are aligned in a straight line for a
+     * valid jaguar capture.
+     *
+     * This function validates that three positions form a straight line
+     * (horizontal, vertical, or diagonal) and are properly connected for a
+     * jaguar capture move. The jaguar must jump from the starting position,
+     * over the middle position (containing a dog), to the landing position
+     * (empty cell).
+     *
+     * @param starting_jaguar_pos The jaguar's current position index
+     * @param middle_dog_pos The position index of the dog to be captured
+     * (middle position)
+     * @param landing_pos The destination position index where jaguar will land
+     *
+     * @return true if:
+     *         - All three positions are distinct
+     *         - All positions are valid (within board bounds)
+     *         - starting_jaguar_pos and middle_dog_pos are neighbors
+     *         - middle_dog_pos and landing_pos are neighbors
+     *         - All three positions share the same alignment (horizontal,
+     * vertical, or diagonal)
+     * @return false otherwise
+     */
     bool IsAligned(int starting_jaguar_pos, int middle_dog_pos,
                    int landing_pos) const;
+
+    /**
+     * @brief Adds jaguar capture moves by finding valid landing positions
+     * beyond a dog.
+     *
+     * This function generates possible capture actions for the jaguar by
+     * checking all positions adjacent to a dog that the jaguar can jump to. For
+     * each valid landing position (empty and aligned), a capture action is
+     * added to the actions vector.
+     *
+     * @param state The current game state to check for empty landing positions
+     * @param player The player making the move (should be jaguar/Symbol::kO)
+     * @param actions Reference to vector where valid capture actions will be
+     * added
+     * @param jaguar_position The current position index of the jaguar
+     * @param dog_position The position index of the dog to potentially jump
+     * over
+     */
     void AddIndirectNeighbors(const State& state, Player player,
                               std::vector<Action>& actions,
                               int original_position,
                               int current_position) const;
-    int GetJaguarPosition(const State& state) const;
     bool IsCaptureMove(const Action& action) const;
-
 
    private:
     /**
      * @brief Alignment types between pieces.
+     *
+     * For example, to determine if the jaguar and a dog are aligned.
+     * They are considered aligned if they are in the same row, column, or
+     * diagonal AND the cells are directly connected.
      */
     enum class Alignment { kNotAligned, kHorizontal, kVertical, kDiagonal };
 
