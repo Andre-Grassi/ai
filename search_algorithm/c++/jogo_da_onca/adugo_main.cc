@@ -106,12 +106,10 @@ int main(int argc, char** argv) {
             // For dogs: just make one move
             std ::vector<Action> actions_sequence;
             bool is_capture = false;
-            State temp_state;
+            State temp_state = current_state;
             bool is_first_move = true;
 
             do {
-                temp_state = current_state;
-
             // First move (always execute)
             std::cout << "Calculating move 1..." << std::endl;
                 std::unique_ptr<Action> best_action =
@@ -135,7 +133,7 @@ int main(int argc, char** argv) {
                     if (penalized_states.find(temp_state) !=
                         penalized_states.end()) {
                         std::cout << "\033[1;31mPenalized state detected! "
-                                     "Searching for alternative move...\033[0m"
+                                     "Expanding search...\033[0m"
                                   << std::endl;
                         best_action = SearchMove(game, temp_state);
                     }
