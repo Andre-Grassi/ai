@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <unordered_set>
 
 #include "algorithms/adversarial_search/adversarial_search_algorithm.h"
 #include "data_structure/adversarial_search/games/adugo_game.h"
@@ -44,6 +45,7 @@ int main(int argc, char** argv) {
     // Initialize game
     AdugoGame game(kMaxDepth);
     std::unordered_map<State, int> state_count_table;
+    std::unordered_set<State> penalized_states;
 
     Player my_player;
     if (args.side == 'c')
@@ -97,28 +99,6 @@ int main(int argc, char** argv) {
             std::cout << "State received" << std::endl;
             game.PrintState(current_state);
 
-            auto it = state_count_table.find(current_state);
-            if (it != state_count_table.end()) {
-                // Key exists
-                state_count_table[current_state] += 1;
-
-                if (state_count_table[current_state] >= 3) {
-                    // Print in red
-                    std::cout
-                        << "\033[1;31mWARNING: State repeated "
-                                 ""
-                              << state_count_table[current_state]
-                        << " times! Clearing the transposition table.\033[0m"
-                              << std::endl;
-
-                    // Clear transposition table
-                    game.transposition_table.clear();
-                }
-
-            } else
-                // Key does not exist, initialize count to 1
-                state_count_table[current_state] = 1;
-
             // For jaguar: collect consecutive captures to send as sequence
             // For dogs: just make one move
             std ::vector<Action> actions_sequence;
@@ -137,8 +117,6 @@ int main(int argc, char** argv) {
                 is_capture = game.IsCaptureMove(*best_action);
 
                 if (is_first_move || is_capture) {
-            actions_sequence.push_back(*best_action);
-
             // Apply the action
             std::unique_ptr<State> next_state =
                 game.GetResult(temp_state, *best_action);
@@ -149,9 +127,21 @@ int main(int argc, char** argv) {
                     }
                     temp_state = *next_state;
 
+                    // If it's a penalized state, search another time to
+                    // avoid repetition and expand the horizon
+                    if (penalized_states.find(temp_state) !=
+                        penalized_states.end()) {
+                        std::cout << "\033[1;31mPenalized state detected! "
+                                     "Searching for alternative move...\033[0m"
+                                  << std::endl;
+                        best_action = SearchMove(game, temp_state);
+                    }
+
                     std::cout << "Transposition state value stored: "
                               << game.transposition_table[temp_state]
                               << std::endl;
+
+                    actions_sequence.push_back(*best_action);
                 }
 
                 // If jaguar made a capture and still has turn, look for more
@@ -162,6 +152,29 @@ int main(int argc, char** argv) {
                 std::cerr << "ERROR: No valid action found!" << std::endl;
                 break;
             }
+
+            // Update state count table and penalized states for repetition
+            // detection
+            auto it = state_count_table.find(temp_state);
+            if (it != state_count_table.end()) {
+                // Key exists
+                state_count_table[temp_state] += 1;
+
+                if (state_count_table[temp_state] >= 3) {
+                    // Print in red
+                    std::cout << "\033[1;31mWARNING: State repeated "
+                                 ""
+                              << state_count_table[temp_state]
+                              << " times! Inserting state into "
+                                 "penalized_states set.\033[0m"
+                              << std::endl;
+
+                    penalized_states.insert(temp_state);
+                }
+
+            } else
+                // Key does not exist, initialize count to 1
+                state_count_table[temp_state] = 1;
 
             // Send the action(s) to the server
             std::cout << "\033[1mSending " << actions_sequence.size()
