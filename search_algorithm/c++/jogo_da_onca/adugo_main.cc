@@ -124,30 +124,9 @@ int main(int argc, char** argv) {
 
             // First move (always execute)
             std::cout << "Calculating move 1..." << std::endl;
-            std::unique_ptr<Action> best_action =
-                adversarial_search_algorithm::HeuristicMinimaxSearch(
-                    game, temp_state, game.transposition_table);
+            std::unique_ptr<Action> best_action = SearchMove(game, temp_state);
 
-            if (!best_action) {
-                std::cerr << "ERROR: No valid action found!" << std::endl;
-                break;
-            }
-
-            auto [from_row, from_col] =
-                IndexToPosition(best_action->cell_index_origin);
-            auto [to_row, to_col] =
-                IndexToPosition(best_action->cell_index_destination);
-            std::cout << "  Move 1: (" << from_row << "," << from_col
-                      << ") -> (" << to_row << "," << to_col << ")"
-                      << std::endl;
-
-            // Check if this first move is a capture
-            bool is_capture = false;
-            if (my_player.symbol == Symbol::kO) {
-                is_capture =
-                    !game.IsNeighbor(best_action->cell_index_origin,
-                                     best_action->cell_index_destination);
-            }
+            bool is_capture = game.IsCaptureMove(*best_action);
 
             actions_sequence.push_back(*best_action);
 
@@ -171,28 +150,10 @@ int main(int argc, char** argv) {
                               << (actions_sequence.size() + 1) << "..."
                               << std::endl;
 
-                    best_action =
-                        adversarial_search_algorithm::HeuristicMinimaxSearch(
-                            game, temp_state, game.transposition_table);
-
-                    if (!best_action) {
-                        std::cerr << "ERROR: No valid action found!"
-                                  << std::endl;
-                        break;
-                    }
+                    best_action = SearchMove(game, temp_state);
 
                     // Check if this next move is also a capture
-                    bool next_is_capture =
-                        !game.IsNeighbor(best_action->cell_index_origin,
-                                         best_action->cell_index_destination);
-
-                    std::tie(from_row, from_col) =
-                        IndexToPosition(best_action->cell_index_origin);
-                    std::tie(to_row, to_col) =
-                        IndexToPosition(best_action->cell_index_destination);
-                    std::cout << "  Move " << (actions_sequence.size() + 1)
-                              << ": (" << from_row << "," << from_col
-                              << ") -> (" << to_row << "," << to_col << ")";
+                    bool next_is_capture = game.IsCaptureMove(*best_action);
 
                     // Only continue the sequence if it's another capture
                     if (!next_is_capture) {
@@ -250,6 +211,27 @@ int main(int argc, char** argv) {
     }
 
     return 0;
+}
+
+std::unique_ptr<Action> SearchMove(adugo_game::AdugoGame& game,
+                                   const adugo_game::State& state) {
+    std::unique_ptr<Action> best_action =
+        adversarial_search_algorithm::HeuristicMinimaxSearch(
+            game, state, game.transposition_table);
+    game.transposition_table.clear();
+
+    if (!best_action) {
+        std::cerr << "ERROR: No valid action found!" << std::endl;
+        return nullptr;
+    }
+
+    auto [from_row, from_col] = IndexToPosition(best_action->cell_index_origin);
+    auto [to_row, to_col] =
+        IndexToPosition(best_action->cell_index_destination);
+    std::cout << "  Move: (" << from_row << "," << from_col << ") -> ("
+              << to_row << "," << to_col << ")" << std::endl;
+
+    return best_action;
 }
 
 void PrintUsage(const char* program_name) {
