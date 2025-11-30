@@ -121,54 +121,27 @@ int main(int argc, char** argv) {
 
             // For jaguar: collect consecutive captures to send as sequence
             // For dogs: just make one move
-            std::vector<Action> actions_sequence;
-            State temp_state = current_state;
+            std ::vector<Action> actions_sequence;
+            bool is_capture = false;
+            State temp_state;
+            bool is_first_move = true;
+
+            do {
+                temp_state = current_state;
 
             // First move (always execute)
             std::cout << "Calculating move 1..." << std::endl;
-            std::unique_ptr<Action> best_action = SearchMove(game, temp_state);
+                std::unique_ptr<Action> best_action =
+                    SearchMove(game, temp_state);
 
-            bool is_capture = game.IsCaptureMove(*best_action);
+                is_capture = game.IsCaptureMove(*best_action);
 
+                if (is_first_move || is_capture) {
             actions_sequence.push_back(*best_action);
 
             // Apply the action
             std::unique_ptr<State> next_state =
                 game.GetResult(temp_state, *best_action);
-            if (!next_state) {
-                std::cerr << "ERROR: Invalid action result!" << std::endl;
-                break;
-            }
-            temp_state = *next_state;
-
-            // If jaguar made a capture and still has turn, look for more
-            // captures
-            if (my_player.symbol == Symbol::kO && is_capture &&
-                temp_state.player_to_move.symbol == my_player.symbol &&
-                !game.IsTerminal(temp_state)) {
-                // Keep looking for consecutive captures
-                while (true) {
-                    std::cout << "Calculating move "
-                              << (actions_sequence.size() + 1) << "..."
-                              << std::endl;
-
-                    best_action = SearchMove(game, temp_state);
-
-                    // Check if this next move is also a capture
-                    bool next_is_capture = game.IsCaptureMove(*best_action);
-
-                    // Only continue the sequence if it's another capture
-                    if (!next_is_capture) {
-                        std::cout << " (not a capture, ending sequence)"
-                                  << std::endl;
-                        break;
-                    }
-
-                    std::cout << std::endl;
-                    actions_sequence.push_back(*best_action);
-
-                    // Apply this capture
-                    next_state = game.GetResult(temp_state, *best_action);
                     if (!next_state) {
                         std::cerr << "ERROR: Invalid action result!"
                                   << std::endl;
@@ -176,13 +149,14 @@ int main(int argc, char** argv) {
                     }
                     temp_state = *next_state;
 
-                    // Stop if it's no longer our turn or game ended
-                    if (temp_state.player_to_move.symbol != my_player.symbol ||
-                        game.IsTerminal(temp_state)) {
-                        break;
-                    }
+                    std::cout << "Transposition state value stored: "
+                              << game.transposition_table[temp_state]
+                              << std::endl;
                 }
-            }
+
+                // If jaguar made a capture and still has turn, look for more
+                // captures
+            } while (is_capture && !game.IsTerminal(temp_state));
 
             if (actions_sequence.empty()) {
                 std::cerr << "ERROR: No valid action found!" << std::endl;
