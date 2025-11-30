@@ -1,6 +1,8 @@
 search_algorithm/c++/bin
 search_algorithm/c++/build
 search_algorithm/c++/docs/doxygen
+build
+bin
 *.rdb
 controlador
 exemplo1

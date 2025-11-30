@@ -6,7 +6,6 @@
 
 #include "adversarial_search_algorithm.h"
 #include "data_structure/adversarial_search/game.h"
-#include "data_structure/adversarial_search/games/tic_tac_toe_game.h"
 
 using namespace adversarial_search_algorithm;
 
