@@ -26,7 +26,8 @@
       "name": "Debug Adugo Main Jaguar",
       "program": "${workspaceFolder}/search_algorithm/c++/bin/adugo_main",
       "args": ["o"],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "terminal": "external"
     },
     {
       "type": "lldb",
@@ -44,6 +45,14 @@
       "args": ["o"],
       "cwd": "${workspaceFolder}/search_algorithm/c++",
       "preLaunchTask": "Start Server and Dogs"
+    },
+    {
+      "name": "Debug Adugo Manual Play (Dog)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/search_algorithm/c++/bin/adugo_manual_play",
+      "args": ["c"],
+      "cwd": "${workspaceFolder}/search_algorithm/c++"
     }
   ]
 }
