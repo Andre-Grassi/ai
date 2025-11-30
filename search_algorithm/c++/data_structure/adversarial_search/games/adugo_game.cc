@@ -269,8 +269,8 @@ Utility AdugoGame::GetEval(const State& state) const {
         mobility_weight = 1.0f;
     } else {
     // Weights
-        mobility_weight = 10.0f;
-        capture_weight = 1.0f;
+        capture_weight = 10.0f;
+        mobility_weight = 1.0f;
     }
 
 
