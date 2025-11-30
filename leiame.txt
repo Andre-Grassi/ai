@@ -78,7 +78,7 @@ Então realizamos uma transformação linear para mapear o valor para o interval
 [-1, 1], onde -1 representa a melhor situação para a onça e +1 a pior.
 Assim, -1 é o pior para os cachorros e +1 o melhor.
 
-É possível plotar o gráfico dessa função de avaliação com o script plot_eval.py.
+É possível plotar o gráfico dessa função de avaliação com o script scripts/plot_eval.py.
 Uma imagem do gráfico plotado está presente em eval_plot.jpg.
 
 == Como Compilar e Executar ==
@@ -96,3 +96,17 @@ anteriormente.
 Por padrão, o ip é 127.0.0.1 (localhost) e a porta é 10001.
 Caso seja necessário, execute ./adugo_main --help para ver a ajuda.
 
+== Scripts Extras ==
+
+Em scripts/ estão presentes alguns scripts auxiliares:
+ - run_game.sh: Script para executar uma partida completa entre o servidor e dois
+   clientes (onça e cachorros). Faz output apenas do servidor.
+ - start_server.sh: Script para iniciar o servidor redis com o controlador
+   do jogo da onça.
+ - run_server_and_dogs.sh: Script para iniciar o servidor e um cliente de
+   cachorros.
+ - run_server_and_jaguar.sh: Script para iniciar o servidor e um cliente de 
+   onça.
+
+Certifique-se de executá-los a partir do diretório scripts, para evitar erros
+de path.
