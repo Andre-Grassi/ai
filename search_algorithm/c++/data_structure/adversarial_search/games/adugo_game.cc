@@ -257,9 +257,18 @@ Utility AdugoGame::GetEval(const State& state) const {
         return GetUtility(state);
     }
 
+    Utility dogs_value = 0.0;
+    int capture_weight, mobility_weight;
+
+    if (state.player_to_move == Player(Symbol::kC)) {
+        // Weights
+        capture_weight = 1;
+        mobility_weight = 10;
+    } else {
     // Weights
-    const int capture_weight = 10;
-    const int mobility_weight = 1;
+        mobility_weight = 1;
+        capture_weight = 100;
+    }
 
     const int max_jaguar_mobility = 8;  // If the jaguar has all moves available
 
@@ -278,7 +287,7 @@ Utility AdugoGame::GetEval(const State& state) const {
     // Calculate dogs value based on jaguar score
     // If jaguar score is 0 -> dogs value = 1 (best for dogs)
     // If jaguar score is max -> dogs value = -1 (worst for dogs)
-    Utility dogs_value = 1.0 - (2.0 * normalized_jaguar_score);
+    dogs_value = 1.0 - (2.0 * normalized_jaguar_score);
 
     return dogs_value;
 }

@@ -191,6 +191,27 @@ struct Action {
 using Utility = float;  // Value from -1 (loss) to +1 (win) from MAX player's
                         // perspective
 
+class AdugoGame;  // forward declaration
+};  // namespace adugo_game
+
+// Hash specialization for State to be used in unordered_map
+namespace std {
+template <>
+struct hash<adugo_game::State> {
+    std::size_t operator()(const adugo_game::State& state) const {
+        size_t hash_value = 0;
+        // Hash the board
+        for (size_t i = 0; i < state.board.size(); ++i) {
+            hash_value ^= std::hash<int>{}(static_cast<int>(state.board[i])) +
+                          0x9e3779b9 + (hash_value << 6) + (hash_value >> 2);
+        }
+        return hash_value;
+    }
+};
+}  // namespace std
+
+namespace adugo_game {
+
 /**
  * @brief Class representing the Adugo game. The jaguar is MIN, and the dogs are
  * MAX.
@@ -205,6 +226,8 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
     static const int kNumDogsToCapture =
         5;  ///< Number of dogs the jaguar must capture to win
     static const int kMaxDepth = 10;  ///< Default maximum search depth
+
+    std::unordered_map<State, Utility> transposition_table;
 
     AdugoGame(int max_depth = kMaxDepth)
         : Game(CreateInitialBoard(), max_depth) {}
