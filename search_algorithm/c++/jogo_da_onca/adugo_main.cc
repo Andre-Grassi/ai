@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 
     // Initialize game
     AdugoGame game(kMaxDepth);
-    std::unordered_map<State, Utility> transposition_table;
+    std::unordered_map<State, int> state_count_table;
 
     Player my_player;
     if (args.side == 'c')
@@ -92,6 +92,41 @@ int main(int argc, char** argv) {
         if (current_state.player_to_move.symbol == my_player.symbol) {
             std::cout << "\n>>> MY TURN <<<" << std::endl;
 
+            std::cout << "State received" << std::endl;
+            game.PrintState(current_state);
+
+            auto it = state_count_table.find(current_state);
+            if (it != state_count_table.end()) {
+                // Key exists
+                state_count_table[current_state] += 1;
+
+                if (state_count_table[current_state] >= 3) {
+                    // Print in red
+                    std::cout << "\033[1;31mWARNING: State repeated "
+                                 ""
+                              << state_count_table[current_state]
+                              << " times! Forcing a bad eval to avoid "
+                                 "cycling.\033[0m"
+                              << std::endl;
+
+                    // Penalize this state
+                    game.transposition_table[current_state] = 0.0f;
+                    std::cout << "Transposition state value forced to: "
+                              << game.transposition_table[current_state]
+                              << std::endl;
+                    /*
+                    game.PrintTranspositionTableToFile(
+                        "transposition_table.log");
+                    */
+
+                    // Clear transposition table
+                    game.transposition_table.clear();
+                }
+
+            } else
+                // Key does not exist, initialize count to 1
+                state_count_table[current_state] = 1;
+
             // For jaguar: collect consecutive captures to send as sequence
             // For dogs: just make one move
             std::vector<Action> actions_sequence;
@@ -101,7 +136,7 @@ int main(int argc, char** argv) {
             std::cout << "Calculating move 1..." << std::endl;
             std::unique_ptr<Action> best_action =
                 adversarial_search_algorithm::HeuristicMinimaxSearch(
-                    game, temp_state, transposition_table);
+                    game, temp_state, game.transposition_table);
 
             if (!best_action) {
                 std::cerr << "ERROR: No valid action found!" << std::endl;
@@ -148,7 +183,7 @@ int main(int argc, char** argv) {
 
                     best_action =
                         adversarial_search_algorithm::HeuristicMinimaxSearch(
-                            game, temp_state, transposition_table);
+                            game, temp_state, game.transposition_table);
 
                     if (!best_action) {
                         std::cerr << "ERROR: No valid action found!"
