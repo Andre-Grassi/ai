@@ -234,8 +234,8 @@ void PrintUsage(const char* program_name) {
     std::cout << "  " << program_name << " <side> [ip] [port]\n\n";
     std::cout << "Arguments:\n";
     std::cout << "  side    Side to play with (o or c) [required]\n";
-    std::cout
-        << "  ip      IP or hostname of Redis server (default: 127.0.0.1)\n";
+    std::cout << "  ip      IP or hostname of Redis server (default: "
+                 "127.0.0.1)\n";
     std::cout << "  port    Port of Redis server (default: 10001)\n\n";
     std::cout << "Options:\n";
     std::cout << "  -h, --help    Display this help message\n";
