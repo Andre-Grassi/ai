@@ -371,3 +371,7 @@ int AdugoGame::GetJaguarPosition(const State& state) const {
 
     return -1;  // Jaguar not found on the board
 }
+
+bool AdugoGame::IsCaptureMove(const Action& action) const {
+    return !IsNeighbor(action.cell_index_origin, action.cell_index_destination);
+}
