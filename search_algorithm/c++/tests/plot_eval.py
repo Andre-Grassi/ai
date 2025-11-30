@@ -1,3 +1,9 @@
+"""Plotting script to visualize evaluation function for the Adugo game.
+
+Author: Andre Grassi de Jesus
+Date: November 2025
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
@@ -10,7 +16,6 @@ def calculate_max_score(cw, mw):
     return (MAX_CAPTURED_DOGS * cw) + (MAX_JAGUAR_MOBILITY * mw)
 
 
-# MODIFIED: Now accepts current_max as an argument
 def calculate_score(cw, mw, current_max):
     # Avoid division by zero if sliders are both 0
     if current_max == 0:
@@ -18,7 +23,7 @@ def calculate_score(cw, mw, current_max):
     return 1 - 2 * ((X * cw + Y * mw) / current_max)
 
 
-# 1. Setup Data
+# Setup Data
 dogs = np.linspace(0, MAX_CAPTURED_DOGS, 100)
 mobility = np.linspace(0, MAX_JAGUAR_MOBILITY, 100)
 X, Y = np.meshgrid(dogs, mobility)
@@ -28,7 +33,7 @@ init_cw = 5.0
 init_mw = 1.0
 init_max = calculate_max_score(init_cw, init_mw)
 
-# 2. Create the Figure
+# Create the Figure
 fig, ax = plt.subplots(figsize=(10, 8))
 plt.subplots_adjust(bottom=0.25)
 
