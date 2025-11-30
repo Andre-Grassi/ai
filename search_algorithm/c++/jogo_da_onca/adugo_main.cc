@@ -163,7 +163,7 @@ int main(int argc, char** argv) {
                 // Key exists
                 state_count_table[temp_state] += 1;
 
-                if (state_count_table[temp_state] >= 3) {
+                if (state_count_table[temp_state] >= 2) {
                     // Print in red
                     std::cout << "\033[1;31mWARNING: State repeated "
                                  ""
