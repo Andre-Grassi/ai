@@ -1,0 +1,96 @@
+Trabalho 2 - Inteligência Artificial - Jogo da Onça
+Autores:
+ - Andre Grassi de Jesus, GRR 20235169
+ - Cauê Samonek, GRR 20232339
+ - Ricardo Faria, GRR 20235161
+
+== Organização do Código Fonte ==
+
+- data_structure/adversarial_search:
+    Estão implementadas as classes e estruturas de dados necessárias para 
+    representar o jogo.
+    Em game.h há uma classe abstrata Game que define a interface para jogos adversariais.
+    No diretório games, há a implementação específica do jogo da Onça 
+    (AdugoGame).
+
+- algorithms/adversarial_search:
+    Contém a implementação dos algoritmo de busca adversarial. Estão definidos
+    em adversarial_search_algorithm.h e os outros arquivos implementam variações
+    do minimax.
+
+    A variante utilizada é o minimax heurístico com poda alpha-beta.
+    Ele é heurístico pois interrompe a busca após certa profundidade e
+    utiliza uma função de avaliação para estimar o valor dos ramos em que parou,
+    os armazenando em uma tabela de transposição para evitar cálculos repetidos.
+
+- jogo_da_onca:
+    Contém a main para jogar o jogo da onça (adugo_main.cc) e os arquivos do
+    servidor redis em server/. 
+    Também possui a implementação de um wrapper da biblioteca tabuleiro em C++.
+    O wrapper está em tabuleiro_wrapper.h e tabuleiro_wrapper.cc. Ele atua como
+    uma ponte entre o nosso código C++ e a biblioteca tabuleiro escrita em C.
+
+== Implementação do Jogo ==
+
+Como dito anteriormente, a main está implementada em jogo_da_onca/adugo_main.cc.
+Ele faz parsing dos argumentos da linha de comando para inicializar o cliente e
+comunicar com o servidor. Em seguida executa os turnos.
+
+A cada turno, o cliente verifica se é sua vez de jogar. Caso seja, ele atualiza
+seu estado interno com o estado do jogo enviado pelo servidor, utiliza
+o algoritmo de busca adversarial para decidir a melhor jogada possível, e então
+envia essa jogada ao servidor.
+
+Em algumas situações, o jogo pode tender a entrar em ciclos, em que os jogadores
+repetem as mesmas jogadas indefinidamente. Para evitar isso, implementamos uma
+lógica simples que detecta quando um mesmo estado do jogo se repete mais de 1
+vez. Quando isso ocorre, o cliente utiliza o estado resultante e realiza mais
+uma busca, para expandir o horizonte de busca e sair do ciclo. Então ele envia
+essa jogada ao servidor.
+
+O jogador que controla a onça, pode realizar mais de uma ação por turno, desde 
+de que sejam encadeadas ações de captura. Em nossa implementação, cada pulo
+configura uma ação individual. Essas ações são armazenadas em um vetor e o 
+TabuleiroWrapper é responsável por convertê-las para o formato aceito pelo
+servidor.
+
+Os jogadores realizam as ações até que o jogo termine, seja por vitória de um
+dos jogadaores ou empate (determinado pelo servidor).
+
+== Função de Avaliação Heurística e Utilidade ==
+
+Modelamos a onça como o jogador Min e os cachorros como o jogador Max. Dessa
+forma, a utilidade da vitória da onça é -1, a utilidade da vitória dos
+cachorros é +1, e a utilidade do empate é 0.
+
+A função de avaliação heurística utilizada no jogo da onça está presente no
+método GetEval da classe AdugoGame, implementada em adugo_game.cc.
+Seu cálculo é o seguinte:
+    eval =  1 - 2 * ((capturas * cw + mobilidade * mw) / pontuação_máxima_onça)
+Onde:
+- capturas: número de cachorros capturados pela onça
+- mobilidade: número de movimentos possíveis para a onça no estado atual
+- cw: peso atribuído à captura de cachorros
+- mw: peso atribuído à mobilidade da onça
+- pontuação_máxima_onça: pontuação máxima possível para a onça, para normalizar
+  o valor entre 0 e 1.
+Então realizamos uma transformação linear para mapear o valor para o intervalo
+[-1, 1], onde -1 representa a melhor situação para a onça e +1 a pior.
+Assim, -1 é o pior para os cachorros e +1 o melhor.
+
+É possível plotar o gráfico dessa função de avaliação com o script plot_eval.py.
+Uma imagem do gráfico plotado está presente em eval_plot.jpg.
+
+== Como Compilar e Executar ==
+
+Para compilar o código, certifique-se de ter o compilador g++ instalado.
+Então execute 
+    make
+
+Para executar o programa, inicie o servidor e o controlador (presente em server/).
+Em seguida, execute os clientes com o comando:
+    ./adugo_main <simbolo> <host> <porta>
+Onde <simbolo> é 'o' para a onça e 'c' para os cachorros.
+Caso seja necessário, execute ./adugo_main --help para ver a ajuda.
+
+
