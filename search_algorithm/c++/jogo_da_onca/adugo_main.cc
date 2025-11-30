@@ -30,7 +30,7 @@ void SendActionsToServer(const Player& player,
 int main(int argc, char** argv) {
     using namespace adugo_game;
     constexpr int kServerResponseTimeout = 300;  // 5 min timeout
-    constexpr int kMaxDepth = 20;  // A safe bet for the depth regarding time
+    constexpr int kMaxDepth = 12;  // A safe bet for the depth regarding time
 
     // Parse command-line arguments
     Args args = ParseArgs(argc, argv);
