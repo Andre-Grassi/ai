@@ -21,6 +21,8 @@ struct Args {
 
 Args ParseArgs(int argc, char** argv);
 void PrintUsage(const char* program_name);
+std::unique_ptr<Action> SearchMove(adugo_game::AdugoGame& game,
+                                   const adugo_game::State& state);
 
 int main(int argc, char** argv) {
     using namespace adugo_game;
