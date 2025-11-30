@@ -89,8 +89,10 @@ Então execute
 
 Para executar o programa, inicie o servidor e o controlador (presente em server/).
 Em seguida, execute os clientes com o comando:
-    ./adugo_main <simbolo> <host> <porta>
+    ./adugo_main <simbolo> <ip> <porta>
 Onde <simbolo> é 'o' para a onça e 'c' para os cachorros.
+O ip e a porta são opcionais. Devem corresponder ao servidor iniciado
+anteriormente.
+Por padrão, o ip é 127.0.0.1 (localhost) e a porta é 10001.
 Caso seja necessário, execute ./adugo_main --help para ver a ajuda.
-
 
