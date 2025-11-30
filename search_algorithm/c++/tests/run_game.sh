@@ -4,7 +4,8 @@
 sudo -v
 
 # Start the server in the background
-sudo ../jogo_da_onca/start_server.sh &
+cd ../jogo_da_onca
+sudo ./start_server.sh &
 
 # Give the server a moment to start up (Important!)
 echo "Starting server..."
