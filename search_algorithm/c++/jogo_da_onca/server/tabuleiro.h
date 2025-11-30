@@ -1,6 +1,7 @@
 #ifndef __TABULEIRO_H__
 #define __TABULEIRO_H__
 
+// Add bridge to allow C++ code to call C functions
 #ifdef __cplusplus
 extern "C" {
 #endif
