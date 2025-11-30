@@ -289,21 +289,93 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
 
     virtual std::string GetStateString(const State& state) const override;
 
+    /**
+     * @brief Finds the middle position between two positions if they are
+     * aligned.
+     *
+     * This function determines if there is exactly one position between two
+     * given positions on the board, and if all three positions are aligned
+     * (horizontally, vertically, or diagonally). This is used primarily for
+     * validating jaguar capture moves.
+     *
+     * @param position1 The starting position index (typically jaguar's
+     * position)
+     * @param position3 The ending position index (typically landing position)
+     * @return std::optional<int> The middle position index if found and
+     * aligned, std::nullopt if:
+     *         - Either position is invalid
+     *         - Positions are direct neighbors (no middle position exists)
+     *         - No common neighbor exists between the two positions
+     *         - Multiple middle positions found (ambiguous)
+     *         - The three positions are not properly aligned
+     */
     std::optional<int> FindMiddlePosition(int position1, int position3) const;
+
+    /**
+     * @brief Checks if two positions on the board are adjacent to each other.
+     * @param position1 The first position index.
+     * @param position2 The second position index.
+     * @return True if the positions are neighbors, false otherwise.
+     */
     bool IsNeighbor(int position1, int position2) const;
-    std::vector<int> FindCommonConnections(int position1, int position2) const;
+
+    /**
+     * @brief Checks if three positions are aligned in a straight line for a
+     * valid jaguar capture.
+     *
+     * This function validates that three positions form a straight line
+     * (horizontal, vertical, or diagonal) and are properly connected for a
+     * jaguar capture move. The jaguar must jump from the starting position,
+     * over the middle position (containing a dog), to the landing position
+     * (empty cell).
+     *
+     * @param starting_jaguar_pos The jaguar's current position index
+     * @param middle_dog_pos The position index of the dog to be captured
+     * (middle position)
+     * @param landing_pos The destination position index where jaguar will land
+     *
+     * @return true if:
+     *         - All three positions are distinct
+     *         - All positions are valid (within board bounds)
+     *         - starting_jaguar_pos and middle_dog_pos are neighbors
+     *         - middle_dog_pos and landing_pos are neighbors
+     *         - All three positions share the same alignment (horizontal,
+     * vertical, or diagonal)
+     * @return false otherwise
+     */
     bool IsAligned(int starting_jaguar_pos, int middle_dog_pos,
                    int landing_pos) const;
+
+    /**
+     * @brief Adds jaguar capture moves by finding valid landing positions
+     * beyond a dog.
+     *
+     * This function generates possible capture actions for the jaguar by
+     * checking all positions adjacent to a dog that the jaguar can jump to. For
+     * each valid landing position (empty and aligned), a capture action is
+     * added to the actions vector.
+     *
+     * @param state The current game state to check for empty landing positions
+     * @param player The player making the move (should be jaguar/Symbol::kO)
+     * @param actions Reference to vector where valid capture actions will be
+     * added
+     * @param jaguar_position The current position index of the jaguar
+     * @param dog_position The position index of the dog to potentially jump
+     * over
+     */
     void AddIndirectNeighbors(const State& state, Player player,
                               std::vector<Action>& actions,
                               int original_position,
                               int current_position) const;
-    int GetJaguarPosition(const State& state) const;
     bool IsCaptureMove(const Action& action) const;
 
    private:
     /**
      * @brief Alignment types between pieces.
+     *
+     * For example, to determine if the jaguar and a dog are aligned.
+     * They are considered aligned if they are in the same row, column, or
+     * diagonal AND the cells are directly connected.
      */
     enum class Alignment { kNotAligned, kHorizontal, kVertical, kDiagonal };
 
