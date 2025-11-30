@@ -24,6 +24,9 @@ Args ParseArgs(int argc, char** argv);
 void PrintUsage(const char* program_name);
 std::unique_ptr<Action> SearchMove(adugo_game::AdugoGame& game,
                                    const adugo_game::State& state);
+void SendActionsToServer(const Player& player,
+                         std::vector<Action> actions_sequence,
+                         TabuleiroWrapper& tabuleiro);
 
 int main(int argc, char** argv) {
     using namespace adugo_game;
@@ -176,19 +179,7 @@ int main(int argc, char** argv) {
                 // Key does not exist, initialize count to 1
                 state_count_table[temp_state] = 1;
 
-            // Send the action(s) to the server
-            std::cout << "\033[1mSending " << actions_sequence.size()
-                      << " move(s) to server...\033[0m" << std::endl;
-
-            if (actions_sequence.size() == 1) {
-                // Single move
-                tabuleiro.SendAction(my_player, actions_sequence[0]);
-            } else {
-                // Multiple moves (capture sequence) - send all at once
-                tabuleiro.SendActionSequence(my_player, actions_sequence);
-            }
-
-            std::cout << "Move(s) sent!\n" << std::endl;
+            SendActionsToServer(my_player, actions_sequence, tabuleiro);
 
             // Print resulting board
             std::cout << "Resulting state after my move(s):\n";
@@ -200,6 +191,24 @@ int main(int argc, char** argv) {
     }
 
     return 0;
+}
+
+void SendActionsToServer(const Player& player,
+                         std::vector<Action> actions_sequence,
+                         TabuleiroWrapper& tabuleiro) {
+    // Send the action(s) to the server
+    std::cout << "\033[1mSending " << actions_sequence.size()
+              << " move(s) to server...\033[0m" << std::endl;
+
+    if (actions_sequence.size() == 1) {
+        // Single move
+        tabuleiro.SendAction(player, actions_sequence[0]);
+    } else {
+        // Multiple moves (capture sequence) - send all at once
+        tabuleiro.SendActionSequence(player, actions_sequence);
+    }
+
+    std::cout << "Move(s) sent!\n" << std::endl;
 }
 
 std::unique_ptr<Action> SearchMove(adugo_game::AdugoGame& game,
