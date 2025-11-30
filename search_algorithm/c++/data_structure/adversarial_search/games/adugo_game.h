@@ -9,7 +9,7 @@
 #ifndef SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 
-#define IGNORE_TERMINAL_TEST true
+#define IGNORE_TERMINAL_TEST true  // Ignore terminal test for debugging
 
 #include <array>
 #include <cstddef>
@@ -23,60 +23,63 @@
 
 namespace adugo_game {
 
-// ---------- tabela ----------
-// formato: node_index -> {neighbors }
+// ---------- Graph topology of the game board ----------
+// format: cell index -> {list of connected cell indices}
 const std::map<int, std::vector<int>> kGridDimensionNeighborhood = {
 
-    // Linha 1
-    {0, {1, 5, 6}},
+    // Line 1
+    {0, {1, 5, 6}},  // Cell is 0, from there we can navigate to 1, 5 and 6
     {1, {0, 2, 6}},
     {2, {1, 3, 6, 7, 8}},
     {3, {2, 4, 8}},
     {4, {3, 8, 9}},
 
-    // Linha 2
+    // Line 2
     {5, {0, 6, 10}},
     {6, {0, 1, 2, 5, 7, 10, 11, 12}},
     {7, {2, 6, 8, 12}},
     {8, {2, 3, 4, 7, 9, 12, 13, 14}},
     {9, {4, 8, 14}},
 
-    // Linha 3
+    // Line 3
     {10, {5, 6, 11, 15, 16}},
     {11, {6, 10, 12, 16}},
     {12, {6, 7, 8, 11, 13, 16, 17, 18}},
     {13, {8, 12, 14, 18}},
     {14, {8, 9, 13, 18, 19}},
 
-    // Linha 4
+    // Line 4
     {15, {10, 16, 20}},
     {16, {10, 11, 12, 15, 17, 20, 21, 22}},
     {17, {12, 16, 18, 22}},
     {18, {12, 13, 14, 17, 19, 22, 23, 24}},
     {19, {14, 18, 24}},
 
-    // Linha 5
+    // Line 5
     {20, {15, 16, 21}},
     {21, {16, 20, 22}},
     {22, {16, 17, 18, 21, 23, 26, 27, 28}},
     {23, {18, 22, 24}},
     {24, {18, 19, 23}},
 
-    // Linha 6 (Triângulo central)
+    // Line 6 (Triangle's center)
     {26, {22, 27, 30}},
     {27, {22, 26, 28, 32}},
     {28, {22, 27, 34}},
 
-    // Linha 7 (base do triângulo)
+    // Line 7 (Triangle's base)
     {30, {26, 32}},
     {32, {27, 30, 34}},
     {34, {28, 32}}};
 
+/**
+ * @brief Symbols used in the Adugo game for each cell on the board.
+ */
 enum class Symbol : char {
     kEmpty = '-',  // Empty cell
     kBlock = '@',  // Invalid cells
-    kC = 'c',      // Cachorro
-    kO = 'o',      // Onca
+    kC = 'c',      // Dog (Cachorro)
+    kO = 'o',      // Jaguar (Onça)
 };
 
 class Player {
@@ -160,8 +163,6 @@ struct State {
     }
 };
 
-// Action/Move is a struct that tells where the player is "drawing" its
-// symbol
 /**
  * @brief Action representing a player's move on the board.
  * It specifies which player (by its symbol) is making the move and the cell
@@ -169,8 +170,6 @@ struct State {
  */
 struct Action {
    public:
-    // Optimize passa PLayer and not Symbol -> maybe this would be worse
-    // actually??
     Symbol player_symbol;
     int cell_index_origin;
     int cell_index_destination;
@@ -196,8 +195,8 @@ struct Action {
 
 /// WARNING: UTILITY MUST BE FLOAT OR DOUBLE, otherwise the GetEval will be
 /// inneficient using integer values
-using Utility = float;  // Value from -1 (loss) to +1 (win) from MAX player's
-                        // perspective
+using Utility =
+    float;  ///< Value from -1 (loss) to +1 (win) from MAX player's perspective
 
 class AdugoGame;  // forward declaration
 };  // namespace adugo_game
@@ -235,6 +234,10 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
         5;  ///< Number of dogs the jaguar must capture to win
     static const int kMaxDepth = 10;  ///< Default maximum search depth
 
+    /**
+     * @brief Transposition table to store previously evaluated states.
+     * Maps State to its Utility value. Used to optimize search algorithms.
+     */
     std::unordered_map<State, Utility> transposition_table;
 
     AdugoGame(int max_depth = kMaxDepth)
@@ -269,8 +272,10 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
      * Heuristic = 1.0 - 2.0 * (jaguar_score / max_jaguar_score)
      *
      * Where:
-     * - jaguar_score = (captured_dogs * 100) + (jaguar_mobility * 1)
-     * - max_jaguar_score = (total_capturable_dogs * 100) + (max_mobility * 1)
+     * - jaguar_score = (captured_dogs * capture_weight) + (jaguar_mobility *
+     * mobility_weight)
+     * - max_jaguar_score = (total_capturable_dogs * capture_weight) +
+     * (max_mobility * mobility_weight)
      *
      * @param state The current game state to evaluate
      * @return Utility value in range [-1, 1] where:
