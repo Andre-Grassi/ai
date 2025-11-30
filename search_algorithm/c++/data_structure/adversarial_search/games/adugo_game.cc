@@ -1,3 +1,10 @@
+/**
+ * @file adugo_game.cc
+ * @brief Implementation of Adugo game logic, rules, and heuristic evaluation
+ * @author Andre Grassi, Caue Samonek, Ricardo Faria
+ * @date 2025
+ */
+
 #include "adugo_game.h"
 
 #include <algorithm>

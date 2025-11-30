@@ -1,3 +1,11 @@
+/**
+ * @file adugo_main.cc
+ * @brief Main program for playing Adugo game with AI agent using Minimax
+ * algorithm
+ * @author Andre Grassi, Caue Samonek, Ricardo Faria
+ * @date 2025
+ */
+
 #include <getopt.h>
 
 #include <cstdlib>

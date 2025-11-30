@@ -1,3 +1,11 @@
+/**
+ * @file tabuleiro_wrapper.h
+ * @brief Wrapper interface for Redis-based game server communication for adugo
+ * game
+ * @author Andre Grassi
+ * @date 2025
+ */
+
 #ifndef TABULEIRO_WRAPPER_H_
 #define TABULEIRO_WRAPPER_H_
 

@@ -1,3 +1,11 @@
+/**
+ * @file adugo_game.h
+ * @brief Adugo (Jogo da Onça) game implementation header with state
+ * representation and game logic
+ * @author Andre Grassi, Caue Samonek, Ricardo Faria
+ * @date 2025
+ */
+
 #ifndef SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 
@@ -287,7 +295,6 @@ class AdugoGame : public Game<State, Action, Utility, Player> {
                               int current_position) const;
     int GetJaguarPosition(const State& state) const;
     bool IsCaptureMove(const Action& action) const;
-
 
    private:
     /**
