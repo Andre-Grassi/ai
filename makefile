@@ -121,5 +121,11 @@ tar:
 	--exclude='ai/.vscode' \
 	--exclude='ai/*.tgz' \
 	--exclude='ai/*.tar.gz' \
+	--exclude='ai/.github' \
+	--exclude='ai/scripts/dump.rdb' \
+	--exclude='ai/.gitignore' \
+	--exclude='ai/jogo_da_onca/server/controlador' \
+	--exclude='ai/jogo_da_onca/server/exemplo1' \
+	--exclude='ai/jogo_da_onca/server/exemplo2' \
 	ai
 	@echo "Tarball created: ../trabalho_2.tgz"
