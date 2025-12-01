@@ -181,10 +181,6 @@ int main(int argc, char** argv) {
                         best_action = SearchMove(game, temp_state);
                     }
 
-                    std::cout << "Transposition state value stored: "
-                              << game.transposition_table[temp_state]
-                              << std::endl;
-
                     // Store action in sequence
                     actions_sequence.push_back(*best_action);
                 }
@@ -281,6 +277,8 @@ void PrintUsage(const char* program_name) {
     std::cout << "  " << program_name << " <side> [ip] [port]\n\n";
     std::cout << "Arguments:\n";
     std::cout << "  side    Side to play with (o or c) [required]\n";
+    std::cout << "  max_moves  Maximum number of moves to play (positive "
+                 "integer) [required]\n";
     std::cout << "  ip      IP or hostname of Redis server (default: "
                  "127.0.0.1)\n";
     std::cout << "  port    Port of Redis server (default: 10001)\n\n";

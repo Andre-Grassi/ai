@@ -234,7 +234,6 @@ State TabuleiroWrapper::ReceiveState(int timeout_seconds) {
     if (!line1) {
         throw std::runtime_error("Invalid server response: missing first line");
     }
-    char my_side = line1[0];
 
     // Second line: player's last move
     char* line2 = strtok(NULL, "\n");
@@ -243,7 +242,6 @@ State TabuleiroWrapper::ReceiveState(int timeout_seconds) {
             "Invalid server response: missing second line");
     }
     char last_player_side = line2[0];
-    char move_type = line2[2];  // 'm', 's' or 'n' (no move)
 
     // Get the rest as board string (everything until '.')
     char board_buffer[512] = "";
