@@ -44,9 +44,9 @@ ADUGO_MANUAL_DEBUG = $(BIN_DIR)/adugo_manual_play_debug
 
 .PHONY: all clean directories debug server clean_server
 
-all: directories server $(ADUGO_MAIN) $(ADUGO_MANUAL)
+all: directories $(ADUGO_MAIN)
 
-debug: directories server $(ADUGO_MAIN_DEBUG) $(ADUGO_MANUAL_DEBUG)
+debug: directories server $(ADUGO_MAIN_DEBUG)
 
 # Build server components
 server:
@@ -60,17 +60,11 @@ directories:
 $(ADUGO_MAIN): $(MAIN_OBJ) $(ADUGO_GAME_OBJ) $(TABULEIRO_OBJ) $(SERVER_OBJ)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
-# Build adugo_manual_play (release)
-$(ADUGO_MANUAL): $(MANUAL_PLAY_OBJ) $(ADUGO_GAME_OBJ) $(TABULEIRO_OBJ) $(SERVER_OBJ)
-	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 # Build adugo_main (debug)
 $(ADUGO_MAIN_DEBUG): $(MAIN_OBJ_DEBUG) $(ADUGO_GAME_OBJ_DEBUG) $(TABULEIRO_OBJ_DEBUG) $(SERVER_OBJ_DEBUG)
 	$(CXX) $(CXXFLAGS_DEBUG) $^ -o $@ $(LDFLAGS)
 
-# Build adugo_manual_play (debug)
-$(ADUGO_MANUAL_DEBUG): $(MANUAL_PLAY_OBJ_DEBUG) $(ADUGO_GAME_OBJ_DEBUG) $(TABULEIRO_OBJ_DEBUG) $(SERVER_OBJ_DEBUG)
-	$(CXX) $(CXXFLAGS_DEBUG) $^ -o $@ $(LDFLAGS)
 
 # Compile C++ sources (release)
 $(OBJ_DIR)/adugo_game.o: data_structure/adversarial_search/games/adugo_game.cc
@@ -82,8 +76,6 @@ $(OBJ_DIR)/tabuleiro_wrapper.o: jogo_da_onca/tabuleiro_wrapper.cc
 $(OBJ_DIR)/adugo_main.o: jogo_da_onca/adugo_main.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-$(OBJ_DIR)/adugo_manual_play.o: tests/adugo_manual_play.cc
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 # Compile C source (release)
 $(OBJ_DIR)/tabuleiro.o: jogo_da_onca/server/tabuleiro.c
@@ -99,8 +91,6 @@ $(OBJ_DIR_DEBUG)/tabuleiro_wrapper.o: jogo_da_onca/tabuleiro_wrapper.cc
 $(OBJ_DIR_DEBUG)/adugo_main.o: jogo_da_onca/adugo_main.cc
 	$(CXX) $(CXXFLAGS_DEBUG) $(INCLUDES) -c $< -o $@
 
-$(OBJ_DIR_DEBUG)/adugo_manual_play.o: tests/adugo_manual_play.cc
-	$(CXX) $(CXXFLAGS_DEBUG) $(INCLUDES) -c $< -o $@
 
 # Compile C source (debug)
 $(OBJ_DIR_DEBUG)/tabuleiro.o: jogo_da_onca/server/tabuleiro.c
@@ -116,11 +106,5 @@ clean_server:
 run_main: $(ADUGO_MAIN)
 	$(ADUGO_MAIN) o 127.0.0.1 10001
 
-run_manual: $(ADUGO_MANUAL)
-	$(ADUGO_MANUAL) o 127.0.0.1 10001
-
 run_main_debug: $(ADUGO_MAIN_DEBUG)
 	$(ADUGO_MAIN_DEBUG) o 127.0.0.1 10001
-
-run_manual_debug: $(ADUGO_MANUAL_DEBUG)
-	$(ADUGO_MANUAL_DEBUG) o 127.0.0.1 10001
