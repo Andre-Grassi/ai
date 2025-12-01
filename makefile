@@ -13,6 +13,7 @@ BUILD_DIR = build
 BIN_DIR = bin
 OBJ_DIR = $(BUILD_DIR)/obj
 OBJ_DIR_DEBUG = $(BUILD_DIR)/obj_debug
+SERVER_DIR = jogo_da_onca/server
 
 # Source files
 ADUGO_GAME_SRC = data_structure/adversarial_search/games/adugo_game.cc
@@ -41,11 +42,16 @@ ADUGO_MANUAL = $(BIN_DIR)/adugo_manual_play
 ADUGO_MAIN_DEBUG = $(BIN_DIR)/adugo_main_debug
 ADUGO_MANUAL_DEBUG = $(BIN_DIR)/adugo_manual_play_debug
 
-.PHONY: all clean directories debug
+.PHONY: all clean directories debug server clean_server
 
-all: directories $(ADUGO_MAIN) $(ADUGO_MANUAL)
+all: directories server $(ADUGO_MAIN) $(ADUGO_MANUAL)
 
-debug: directories $(ADUGO_MAIN_DEBUG) $(ADUGO_MANUAL_DEBUG)
+debug: directories server $(ADUGO_MAIN_DEBUG) $(ADUGO_MANUAL_DEBUG)
+
+# Build server components
+server:
+	@echo "Building server..."
+	$(MAKE) -C $(SERVER_DIR)
 
 directories:
 	@mkdir -p $(BIN_DIR) $(OBJ_DIR) $(OBJ_DIR_DEBUG)
@@ -100,8 +106,12 @@ $(OBJ_DIR_DEBUG)/adugo_manual_play.o: tests/adugo_manual_play.cc
 $(OBJ_DIR_DEBUG)/tabuleiro.o: jogo_da_onca/server/tabuleiro.c
 	$(CC) $(CFLAGS_DEBUG) $(INCLUDES) -c $< -o $@
 
-clean:
+clean: clean_server
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
+
+clean_server:
+	@echo "Cleaning server..."
+	$(MAKE) -C $(SERVER_DIR) clean
 
 run_main: $(ADUGO_MAIN)
 	$(ADUGO_MAIN) o 127.0.0.1 10001
