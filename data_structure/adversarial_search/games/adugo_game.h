@@ -9,7 +9,7 @@
 #ifndef SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 #define SEARCH_ALG_DATA_STRUCTURE_ADVERSARIAL_SEARCH_GAMES_ADUGO_GAME_H_
 
-#define IGNORE_TERMINAL_TEST true  // Ignore terminal test for debugging
+#define IGNORE_TERMINAL_TEST false  // Ignore terminal test for debugging
 
 #include <array>
 #include <cstddef>

@@ -27,17 +27,6 @@ constexpr T negative_infinity() {
         return std::numeric_limits<T>::lowest();
 }
 
-// Minimax
-template <typename TState, typename TAction, typename TUtility,
-          typename TPlayer>
-std::unique_ptr<TAction> MinimaxSearch(
-    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state);
-
-template <typename TState, typename TAction, typename TUtility,
-          typename TPlayer>
-std::unique_ptr<TAction> MinimaxSearchWithPruning(
-    const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state);
-
 // Heuristic Alpha-Beta pruning Minimax with transposition table (can avoid
 // cycles)
 template <typename TState, typename TAction, typename TUtility,
@@ -45,19 +34,8 @@ template <typename TState, typename TAction, typename TUtility,
 std::unique_ptr<TAction> HeuristicMinimaxSearch(
     const Game<TState, TAction, TUtility, TPlayer>& game, const TState& state,
     std::unordered_map<TState, TUtility>& transposition_table);
-
-template <typename TState, typename TAction, typename TUtility,
-          typename TPlayer>
-std::tuple<std::unique_ptr<TAction>, std::map<int, std::vector<TState>>,
-           TUtility>
-MinimaxSearchStoreTree(const Game<TState, TAction, TUtility, TPlayer>& game,
-                       const TState& state);
-
 }  // namespace adversarial_search_algorithm
 
 #include "heuristic_minimax.tpp"
-#include "minimax_search.tpp"
-#include "minimax_search_store_tree.tpp"
-#include "minimax_search_with_pruning.tpp"
 
 #endif  // ALGORITHMS_ADVERSARIAL_SEARCH_ADVERSARIAL_SEARCH_ALGORITHM_H_

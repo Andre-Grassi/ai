@@ -14,9 +14,8 @@ Autores:
     (AdugoGame).
 
 - algorithms/adversarial_search:
-    Contém a implementação dos algoritmo de busca adversarial. Estão definidos
-    em adversarial_search_algorithm.h e os outros arquivos implementam variações
-    do minimax.
+    Contém a implementação do algoritmo de busca adversarial. Está definido
+    em adversarial_search_algorithm.h.
 
     A variante utilizada é o minimax heurístico com poda alpha-beta.
     Ele é heurístico pois interrompe a busca após certa profundidade e

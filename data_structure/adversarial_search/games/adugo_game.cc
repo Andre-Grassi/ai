@@ -255,8 +255,6 @@ bool AdugoGame::IsTerminal(const State& state) const {
     return true;  // alguem ganhou
 }
 
-// eai??
-// FIX Issue 8
 Utility AdugoGame::GetUtility(const State& state) const {
     if (!IsTerminal(state))
         throw std::logic_error("GetUtility called on non-terminal state");
@@ -319,7 +317,7 @@ Utility AdugoGame::GetEval(const State& state) const {
 }
 
 Player AdugoGame::CalculateWinner(const State& state) const {
-    Symbol reference_symbol;
+    Symbol reference_symbol = Symbol::kEmpty;
 
     // onca ganha se matar 5 cachorros
     int dog_count = CountSymbolsInState(state, Symbol::kC);
