@@ -94,7 +94,9 @@ int main(int argc, char** argv) {
 
     std::cout << "Playing as: " << args.side << "\n\n";
 
-    while (true) {
+    int moves = 0;
+    while (moves <= args.max_moves / 2) {
+        std::cout << "MOVES=" << std::to_string(moves) << std::endl;
         // Receive current state from server
         std::cout << "=== Waiting for server response ===" << std::endl;
 
@@ -102,13 +104,15 @@ int main(int argc, char** argv) {
         try {
             current_state = tabuleiro.ReceiveState(
                 kServerResponseTimeout);  // Timeout, that usually happens in
-                                          // draws
+            // draws
         } catch (const TimeoutException& e) {
             std::cerr << "\n=== TIMEOUT ===" << std::endl;
             std::cerr << e.what() << std::endl;
             std::cerr << "Exiting ..." << std::endl;
             return 1;
         }
+
+        moves++;
 
         // Print state information
         std::cout << "\nReceived state from server:\n";
