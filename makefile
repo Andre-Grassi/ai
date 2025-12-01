@@ -44,7 +44,7 @@ ADUGO_MANUAL_DEBUG = $(BIN_DIR)/adugo_manual_play_debug
 
 .PHONY: all clean directories debug server clean_server
 
-all: directories $(ADUGO_MAIN)
+all: directories server $(ADUGO_MAIN)
 
 debug: directories server $(ADUGO_MAIN_DEBUG)
 
