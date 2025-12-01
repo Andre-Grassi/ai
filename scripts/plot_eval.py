@@ -2,6 +2,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
+# Increase font sizes globally
+plt.rcParams.update(
+    {
+        "font.size": 20,
+        "axes.titlesize": 22,
+        "axes.labelsize": 20,
+        "xtick.labelsize": 18,
+        "ytick.labelsize": 18,
+        "legend.fontsize": 18,
+        "figure.titlesize": 24,
+    }
+)
+
 MAX_CAPTURED_DOGS = 5
 MAX_JAGUAR_MOBILITY = 8
 
