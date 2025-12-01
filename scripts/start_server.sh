@@ -6,5 +6,5 @@ redis-server ../jogo_da_onca/server/redis.conf &
 sleep 0.5
 
 # Start controller
-../jogo_da_onca/server/controlador o 50 0
+../jogo_da_onca/server/controlador o 100 0
 sudo pkill -9 redis-server

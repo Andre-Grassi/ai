@@ -11,7 +11,7 @@ echo "Starting server..."
 sleep 2
 
 # Start the dogs silently
-../bin/adugo_main c 50 > /dev/null 2>&1 &
+../bin/adugo_main c 100 > /dev/null 2>&1 &
 
 # Keep this script running as long as the games are running
 wait
