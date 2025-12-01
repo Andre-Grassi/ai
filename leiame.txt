@@ -82,7 +82,7 @@ Então realizamos uma transformação linear para mapear o valor para o interval
 Assim, -1 é o pior para os cachorros e +1 o melhor.
 
 É possível plotar o gráfico dessa função de avaliação com o script scripts/plot_eval.py.
-Uma imagem do gráfico plotado está presente em eval_plot.jpg.
+Uma imagem do gráfico plotado está presente em eval_plot.png.
 
 == Como Compilar e Executar ==
 
