@@ -108,3 +108,18 @@ run_main: $(ADUGO_MAIN)
 
 run_main_debug: $(ADUGO_MAIN_DEBUG)
 	$(ADUGO_MAIN_DEBUG) o 127.0.0.1 10001
+
+tar:
+	@echo "Creating tarball..."
+	tar -czf ../trabalho_2.tgz -C .. \
+	--exclude='ai/build' \
+	--exclude='ai/bin' \
+	--exclude='ai/*.o' \
+	--exclude='ai/.git' \
+	--exclude='ai/__pycache__' \
+	--exclude='ai/*.pyc' \
+	--exclude='ai/.vscode' \
+	--exclude='ai/*.tgz' \
+	--exclude='ai/*.tar.gz' \
+	ai
+	@echo "Tarball created: ../trabalho_2.tgz"
