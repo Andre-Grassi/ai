@@ -22,6 +22,7 @@
 struct Args {
    public:
     char side;
+    int max_moves;
     std::string ip;
     int port;
 };
@@ -63,12 +64,15 @@ int main(int argc, char** argv) {
     // Display configuration
     std::cout << "Configuration:\n";
     std::cout << "  Side: " << args.side << "\n";
+    std::cout << "  Max Moves: " << args.max_moves << "\n";
     std::cout << "  IP: " << args.ip << "\n";
     std::cout << "  Port: " << args.port << "\n\n";
 
     // Adapter from tabuleiro lib to our data structures
     TabuleiroWrapper tabuleiro;
-    tabuleiro.ConnectToServer(argc, argv);
+    tabuleiro.ConnectToServer(
+        args.side, const_cast<char*>(args.ip.c_str()),
+        const_cast<char*>(std::to_string(args.port).c_str()));
 
     // Initialize game
     AdugoGame game(kMaxDepth);
@@ -284,6 +288,7 @@ Args ParseArgs(int argc, char** argv) {
     // Default values
     Args args;
     args.side = '\0';
+    args.max_moves = -1;
     args.ip = "127.0.0.1";
     args.port = 10001;
 
@@ -325,13 +330,29 @@ Args ParseArgs(int argc, char** argv) {
     }
     optind++;
 
-    // Second positional argument: IP (optional)
+    // Second positional argument: max moves
+    std::cout << "optind: " << optind << " argc: " << argc << std::endl;
+    if (optind < argc) {
+        args.max_moves = std::atoi(argv[optind]);
+        if (args.max_moves <= -1) {
+            std::cerr << "Error: invalid max moves number\n\n";
+            PrintUsage(argv[0]);
+            std::exit(1);
+        }
+        optind++;
+    } else {
+        std::cerr << "Error: max moves argument is required\n\n";
+        PrintUsage(argv[0]);
+        std::exit(1);
+    }
+
+    // Third positional argument: IP (optional)
     if (optind < argc) {
         args.ip = argv[optind];
         optind++;
     }
 
-    // Third positional argument: port (optional)
+    // Fourth positional argument: port (optional)
     if (optind < argc) {
         args.port = std::atoi(argv[optind]);
         if (args.port <= 0 || args.port > 65535) {

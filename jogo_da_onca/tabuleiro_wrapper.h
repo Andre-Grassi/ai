@@ -36,7 +36,27 @@ class TabuleiroWrapper {
      * @param argc Argument count from main.
      * @param argv Argument vector from main.
      */
-    void ConnectToServer(int argc, char** argv) {
+    void ConnectToServer(char side, char* ip = nullptr, char* port = nullptr) {
+        // Build argv array
+        const char* program_name = "tabuleiro_client";
+        char side_str[2] = {side, '\0'};
+
+        // Default values
+        const char* default_ip = "127.0.0.1";
+        const char* default_port = "10001";
+
+        // Use provided values or defaults
+        const char* actual_ip = ip ? ip : default_ip;
+        const char* actual_port = port ? port : default_port;
+
+        // Construct argv
+        int argc = 4;
+        char* argv[4];
+        argv[0] = const_cast<char*>(program_name);
+        argv[1] = side_str;
+        argv[2] = const_cast<char*>(actual_ip);
+        argv[3] = const_cast<char*>(actual_port);
+
         tabuleiro_conecta(argc, argv);
     }
 
